@@ -1,3 +1,4 @@
+    <a href="#" class="scroll-top"> <i class="lni lni-chevron-up"></i> </a>
  <script src="{{ asset('assets/assets-admin/js/bootstrap-5.0.0-beta1.min.js') }}"></script>
     <script src="{{ asset('assets/assets-admin/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets/assets-admin/js/wow.min.js') }}"></script>

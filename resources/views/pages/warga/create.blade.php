@@ -5,6 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                 <div class="section-title text-center mb-50">
+                    <br><br>
                     <h3 class="mb-15">Tambahkan data anda</h3>
                     <p>Silahkan isi form dibawa untuk kelengkapan anda</p>
                 </div>
@@ -15,7 +16,7 @@
             <div class="col-lg-8">
                 <div class="contact-form-wrapper">
 
-                    
+
 
                     <form action="{{ route('warga.store') }}" method="POST">
                         @csrf

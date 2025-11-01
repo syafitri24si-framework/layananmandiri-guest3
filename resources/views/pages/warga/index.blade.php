@@ -5,6 +5,7 @@
     <div class="container">
         <div class="row mb-4 align-items-center">
             <div class="col-md-6 text-center text-md-start">
+                <br><br>
                 <h3 class="mb-3">Daftar Warga</h3>
                 <p>Berikut adalah data warga yang telah diinputkan.</p>
             </div>

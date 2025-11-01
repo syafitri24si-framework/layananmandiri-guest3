@@ -13,7 +13,7 @@ class JenisSuratController extends Controller
     public function index()
     {
         $jenisSurat = JenisSurat::all();
-        return view('guest.jenis_surat.index', compact('jenisSurat'));
+        return view('pages.jenis_surat.index', compact('jenisSurat'));
     }
 
     /**
@@ -21,7 +21,7 @@ class JenisSuratController extends Controller
      */
     public function create()
     {
-        return view('guest.jenis_surat.create');
+        return view('pages.jenis_surat.create');
     }
 
     /**
@@ -50,7 +50,7 @@ class JenisSuratController extends Controller
     public function edit($id)
     {
         $jenisSurat = JenisSurat::findOrFail($id);
-        return view('guest.jenis_surat.edit', compact('jenisSurat'));
+        return view('pages.jenis_surat.edit', compact('jenisSurat'));
     }
 
     /**
@@ -63,13 +63,13 @@ class JenisSuratController extends Controller
         $validated = $request->validate([
             'kode' => 'required|max:20|unique:jenis_surat,kode,' . $jenisSurat->jenis_id . ',jenis_id',
             'nama_jenis' => 'required|string|max:100',
-            'syarat_json' => 'nullable|array',
+            'syarat_json' => 'nullable|string',
         ]);
 
         $jenisSurat->update([
             'kode' => $validated['kode'],
             'nama_jenis' => $validated['nama_jenis'],
-            'syarat_json' => $validated['syarat_json'] ?? [],
+            'syarat_json' => $validated['syarat_json'] ? array_map('trim', explode(',', $validated['syarat_json'])) : [],
         ]);
 
         return redirect()->route('jenis_surat.index')->with('success', 'Jenis surat berhasil diperbarui!');

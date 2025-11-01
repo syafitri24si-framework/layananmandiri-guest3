@@ -31,6 +31,24 @@
     <!-- ========================= Hero Section end ========================= -->
 
     <!-- ========================= About Section ========================= -->
+        <section id="pricing" class="pricing-section pricing-style-4 bg-light">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-xl-5 col-lg-6">
+
+          </div>
+          <div class="col-xl-7 col-lg-6">
+            <div class="pricing-active-wrapper wow fadeInUp" data-wow-delay=".4s">
+              <div class="pricing-active">
+                <div class="single-pricing-wrapper">
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     <section id="about" class="about-section about-style-4">
         <div class="container">
             <div class="row align-items-center">

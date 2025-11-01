@@ -5,6 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                 <div class="section-title text-center mb-50">
+                    <br><br>
                     <h3 class="mb-15">Edit Data Warga</h3>
                     <p>Perbarui informasi warga sesuai kebutuhan</p>
                 </div>
