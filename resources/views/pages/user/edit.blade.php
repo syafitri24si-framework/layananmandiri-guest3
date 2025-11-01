@@ -7,8 +7,8 @@
                 <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                     <div class="section-title text-center mb-50">
                         <br><br>
-                        <h3 class="mb-15">Edit Jenis Surat</h3>
-                        <p>Silahkan ubah data jenis surat sesuai kebutuhan</p>
+                        <h3 class="mb-15">Edit User</h3>
+                        <p>Perbarui data user di bawah. Kosongkan password jika tidak ingin mengganti.</p>
                     </div>
                 </div>
             </div>
@@ -17,58 +17,74 @@
                 <div class="col-lg-8">
                     <div class="contact-form-wrapper">
 
-                        <form action="{{ route('jenis_surat.update', $jenisSurat->jenis_id) }}" method="POST">
+                        @if (session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+
+                        <form action="{{ route('user.update', $user->id) }}" method="POST">
                             @csrf
-                            @method('PUT') <!-- Method PUT untuk update -->
+                            @method('PUT')
+
                             <div class="row g-3">
 
-                                {{-- Kode Surat --}}
+                                {{-- Nama User --}}
                                 <div class="col-md-6">
                                     <div class="single-input position-relative">
-                                        <input type="text" id="kode" name="kode"
-                                            class="form-input @error('kode') is-invalid @enderror" placeholder="Kode Surat"
-                                            value="{{ old('kode', $jenisSurat->kode) }}">
-                                        <i class="lni lni-key position-absolute"
+                                        <input type="text" id="name" name="name"
+                                            class="form-input @error('name') is-invalid @enderror" placeholder="Nama User"
+                                            value="{{ old('name', $user->name) }}">
+                                        <i class="lni lni-user position-absolute"
                                             style="top:50%; right:15px; transform:translateY(-50%);"></i>
-                                        @error('kode')
+                                        @error('name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
-                                {{-- Nama Jenis Surat --}}
+                                {{-- Email --}}
                                 <div class="col-md-6">
                                     <div class="single-input position-relative">
-                                        <input type="text" id="nama_jenis" name="nama_jenis"
-                                            class="form-input @error('nama_jenis') is-invalid @enderror"
-                                            placeholder="Nama Jenis Surat"
-                                            value="{{ old('nama_jenis', $jenisSurat->nama_jenis) }}">
+                                        <input type="email" id="email" name="email"
+                                            class="form-input @error('email') is-invalid @enderror" placeholder="Email"
+                                            value="{{ old('email', $user->email) }}">
                                         <i class="lni lni-envelope position-absolute"
                                             style="top:50%; right:15px; transform:translateY(-50%);"></i>
-                                        @error('nama_jenis')
+                                        @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
-                                {{-- Syarat --}}
-                                <div class="col-md-12">
+                                {{-- Password (kosongkan jika tidak ingin ganti) --}}
+                                <div class="col-md-6">
                                     <div class="single-input position-relative">
-                                        <textarea id="syarat_json" name="syarat_json" class="form-input @error('syarat_json') is-invalid @enderror"
-                                            placeholder="Syarat (pisahkan setiap syarat dengan koma)" rows="4">{{ old('syarat_json', $jenisSurat->syarat_json ? implode(', ', $jenisSurat->syarat_json) : '') }}</textarea>
-                                        <i class="lni lni-list position-absolute"
+                                        <input type="password" class="form-control" id="password" name="password"
+                                            value="{{ old('password', $user->password) }}">
+                                        <i class="lni lni-lock position-absolute"
                                             style="top:50%; right:15px; transform:translateY(-50%);"></i>
-                                        @error('syarat_json')
+                                        @error('password')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <small class="text-muted">Pisahkan setiap syarat dengan koma.</small>
+                                </div>
+
+                                {{-- Konfirmasi Password --}}
+                                <div class="col-md-6">
+                                    <div class="single-input position-relative">
+                                       <input type="password" class="form-control" id="password" name="password"
+                                            value="{{ old('password', $user->password) }}">
+                                        <i class="lni lni-lock position-absolute"
+                                            style="top:50%; right:15px; transform:translateY(-50%);"></i>
+                                        @error('password_confirmation')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 {{-- Tombol --}}
                                 <div class="col-md-12">
                                     <div class="d-flex justify-content-end gap-2 mt-3">
-                                        <a href="{{ route('jenis_surat.index') }}" class="btn btn-danger">
+                                        <a href="{{ route('user.index') }}" class="btn btn-danger">
                                             <i class="lni lni-cross-circle"></i> Batal
                                         </a>
                                         <button type="submit" class="btn btn-success">
