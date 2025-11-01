@@ -13,17 +13,17 @@ class WargaController extends Controller
     public function index()
     {
         $warga = Warga::all();
-        return view('guest.warga.index', compact('warga'));
+        return view('pages.warga.index', compact('warga'));
     }
 
 
-    
+
     /**
      * Form tambah data warga.
      */
     public function create()
     {
-        return view('guest.warga.create');
+        return view('pages.warga.create');
     }
 
     /**
@@ -51,8 +51,8 @@ class WargaController extends Controller
      */
     public function edit($id)
     {
-        $warga = Warga::findOrFail($id);
-        return view('guest.warga.edit', compact('warga'));
+        $data['warga'] = Warga::findOrFail($id);
+    return view('pages.warga.edit', $data);
     }
 
     /**
@@ -60,21 +60,21 @@ class WargaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $warga = Warga::findOrFail($id);
+    $warga_id = $id;
+    $warga = Warga::findOrFail($warga_id);
 
-        $validated = $request->validate([
-            'no_ktp' => 'required|max:16|unique:warga,no_ktp,' . $warga->warga_id . ',warga_id',
-            'nama' => 'required|string|max:100',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'agama' => 'required|string|max:50',
-            'pekerjaan' => 'nullable|string|max:100',
-            'telp' => 'nullable|string|max:15',
-            'email' => 'nullable|email|unique:warga,email,' . $warga->warga_id . ',warga_id',
-        ]);
+    $warga->no_ktp = $request->no_ktp;
+    $warga->nama = $request->nama;
+    $warga->jenis_kelamin = $request->jenis_kelamin;
+    $warga->agama = $request->agama;
+    $warga->pekerjaan = $request->pekerjaan;
+    $warga->telp = $request->telp;
+    $warga->email = $request->email;
 
-        $warga->update($validated);
+    $warga->save();
 
-        return redirect()->route('warga.index')->with('success', 'Data warga berhasil diperbarui!');
+    return redirect()->route('warga.index')->with('success', 'Perubahan Data Warga Berhasil!');
+
     }
 
     /**

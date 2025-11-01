@@ -16,9 +16,19 @@
 
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarNav">
                                 <ul class="navbar-nav ms-auto">
-                                    <li class="nav-item"><a class="page-scroll active" href="#home">Home</a></li>
-                                    <li class="nav-item"><a class="page-scroll" href="#about">About</a></li>
-                                    <li class="nav-item"><a class="page-scroll" href="#layanan">Layanan</a></li>
+                                    <li class="nav-item">
+                                       <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
+                                        href="{{ route('dashboard.index') }}#home">
+                                        Home
+                                    </a></li>
+                                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
+                                        href="{{ route('dashboard.index') }}#about">
+                                        About
+                                    </a></li>
+                                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
+                                        href="{{ route('dashboard.index') }}#layanan">
+                                        Layanan
+                                    </a></li>
                                     <li class="nav-item"><a class="page-scroll" href="#login">Login</a></li>
                                 </ul>
                             </div>

@@ -8,9 +8,11 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="hero-content-wrapper">
-                            <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">Selamat Datang di Layanan Mandiri Bina Desa</h2>
+                            <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">Selamat Datang di Layanan Mandiri Bina Desa
+                            </h2>
                             <p class="mb-30 wow fadeInUp" data-wow-delay=".4s">
-                                Sistem layanan mandiri berbasis digital yang membantu masyarakat dalam pengurusan surat dan administrasi desa secara cepat, mudah, dan transparan.
+                                Sistem layanan mandiri berbasis digital yang membantu masyarakat dalam pengurusan surat dan
+                                administrasi desa secara cepat, mudah, dan transparan.
                             </p>
                             <a href="#layanan" class="button button-lg radius-50 wow fadeInUp" data-wow-delay=".6s">
                                 Lihat Layanan <i class="lni lni-chevron-right"></i>
@@ -37,10 +39,13 @@
                         <div class="section-title mb-30">
                             <h3 class="mb-25 wow fadeInUp" data-wow-delay=".2s">Tentang Layanan Mandiri Bina Desa</h3>
                             <p class="wow fadeInUp" data-wow-delay=".3s">
-                                <strong>Layanan Mandiri Bina Desa</strong> adalah sistem digital yang dirancang untuk memudahkan masyarakat dalam mengakses berbagai pelayanan administratif desa, seperti pembuatan surat keterangan, surat domisili, dan layanan kependudukan lainnya secara online.
+                                <strong>Layanan Mandiri Bina Desa</strong> adalah sistem digital yang dirancang untuk
+                                memudahkan masyarakat dalam mengakses berbagai pelayanan administratif desa, seperti
+                                pembuatan surat keterangan, surat domisili, dan layanan kependudukan lainnya secara online.
                             </p>
                             <p class="wow fadeInUp" data-wow-delay=".35s">
-                                Melalui platform ini, warga dapat melakukan pengajuan dokumen tanpa harus datang langsung ke kantor desa, cukup dengan beberapa klik dari perangkat Anda.
+                                Melalui platform ini, warga dapat melakukan pengajuan dokumen tanpa harus datang langsung ke
+                                kantor desa, cukup dengan beberapa klik dari perangkat Anda.
                             </p>
                         </div>
                         <ul>
@@ -85,35 +90,44 @@
             <div class="row justify-content-center">
                 <!-- Jenis Surat -->
                 <div class="col-lg-4 col-md-6">
-                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".2s">
-                        <div class="icon mb-3">
-                            <i class="lni lni-envelope"></i>
+                    <a href="{{ route('jenis_surat.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay=".2s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-envelope"></i>
+                            </div>
+                            <h5>Jenis Surat</h5>
+                            <p>Kelola berbagai jenis surat dan dokumen resmi yang dikeluarkan oleh desa.</p>
                         </div>
-                        <h5>Jenis Surat</h5>
-                        <p>Kelola berbagai jenis surat dan dokumen resmi yang dikeluarkan oleh desa.</p>
-                    </div>
+                    </a>
                 </div>
+
                 <!-- User -->
                 <div class="col-lg-4 col-md-6">
-                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".4s">
-                        <div class="icon mb-3">
-                            <i class="lni lni-user"></i>
+                    <a href="{{ route('user.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay=".4s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-user"></i>
+                            </div>
+                            <h5>User</h5>
+                            <p>Data akun pengguna yang memiliki akses ke sistem layanan mandiri.</p>
                         </div>
-                        <h5>User</h5>
-                        <p>Data akun pengguna yang memiliki akses ke sistem layanan mandiri.</p>
-                    </div>
+                    </a>
                 </div>
+
                 <!-- Warga -->
                 <div class="col-lg-4 col-md-6">
-                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".6s">
-                        <div class="icon mb-3">
-                            <i class="lni lni-users"></i>
+                    <a href="{{ route('warga.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay=".6s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-users"></i>
+                            </div>
+                            <h5>Warga</h5>
+                            <p>Informasi lengkap warga desa untuk mendukung pelayanan digital yang terintegrasi.</p>
                         </div>
-                        <h5>Warga</h5>
-                        <p>Informasi lengkap warga desa untuk mendukung pelayanan digital yang terintegrasi.</p>
-                    </div>
+                    </a>
                 </div>
             </div>
+
         </div>
     </section>
 @endsection
