@@ -4,3 +4,4 @@
 <link rel="stylesheet" href="{{ asset('assets/assets-admin/css/animate.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/assets-admin/css/lindy-uikit.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/assets-admin/css/bglog.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/assets-admin/css/floating-wa.css') }}">

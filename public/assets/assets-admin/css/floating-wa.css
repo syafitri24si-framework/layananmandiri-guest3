@@ -1,0 +1,12 @@
+  .whatsapp-float {
+    position: fixed;       /* tetap mengikuti scroll */
+    bottom: 20px;          /* jarak dari bawah layar */
+    right: 20px;           /* jarak dari kanan layar */
+    z-index: 1000;         /* pastikan selalu di atas */
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1); /* efek hover */
+}
