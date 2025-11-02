@@ -1,0 +1,23 @@
+.auth-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background:url('/assets/assets-admin/img/hero/hero-5/bg-login.png') no-repeat center center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+.auth-section .blur-overlay {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.auth-section .container {
+    position: relative;
+    z-index: 2;
+}

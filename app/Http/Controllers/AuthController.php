@@ -2,87 +2,103 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    // ================= LOGIN PAGE =================
+    /**
+     * Tampilkan halaman login
+     */
     public function index()
     {
-        return view('login');
+        return view('pages.auth.login');
     }
 
-    // ================= LOGIN PROCESS =================
-    public function login(Request $request)
+    /**
+     * Tampilkan halaman register
+     */
+    public function create()
     {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|min:6',
-        ], [
-            'email.required'    => 'Email wajib diisi!',
-            'email.email'       => 'Format email tidak valid!',
-            'password.required' => 'Password wajib diisi!',
-            'password.min'      => 'Password minimal 6 karakter!',
-        ]);
+        return view('pages.auth.register');
+    }
 
-        $user = User::where('email', $request->email)->first();
+    /**
+     * Proses login & register (tergantung tombol yang ditekan)
+     */
+    public function store(Request $request)
+    {
+        // Jika tombol login ditekan
+        if ($request->has('login')) {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|min:3',
+            ], [
+                'email.required' => 'Email tidak boleh kosong',
+                'email.email' => 'Format email tidak valid',
+                'password.required' => 'Password tidak boleh kosong',
+                'password.min' => 'Password minimal 3 karakter',
+            ]);
 
-        if (! $user) {
-            return back()->withErrors(['email' => 'Email tidak ditemukan!'])->withInput();
+            // Cek apakah email ada di tabel user
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                Auth::login($user);
+                $request->session()->regenerate();
+                return redirect()->route('dashboard.index')->with('success', 'Login berhasil!');
+            }
+
+            return back()->with('error', 'Email atau password salah');
         }
 
-        if (! Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => 'Password salah!'])->withInput();
+        // Jika tombol register ditekan
+        if ($request->has('register')) {
+            $request->validate([
+                'name' => 'required|string|max:50',
+                'email' => 'required|email|unique:users',
+                'password' => [
+                    'required',
+                    'min:3',
+                    'regex:/[A-Z]/', // harus ada huruf besar
+                    'confirmed',     // pastikan ada field password_confirmation
+                ],
+            ], [
+                'name.required' => 'Nama wajib diisi',
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.unique' => 'Email sudah digunakan',
+                'password.required' => 'Password wajib diisi',
+                'password.min' => 'Password minimal 3 karakter',
+                'password.regex' => 'Password harus mengandung minimal satu huruf kapital',
+                'password.confirmed' => 'Konfirmasi password tidak cocok',
+            ]);
+
+            // Simpan ke tabel users
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            return redirect()->route('auth.index')->with('success', 'Akun berhasil dibuat, silakan login!');
         }
 
-        Auth::login($user);
-
-        return redirect()->route('dashboard')->with('success', 'Login berhasil!');
+        // Jika tidak ada aksi
+        return back()->with('error', 'Aksi tidak dikenali.');
     }
 
-    // ================= REGISTER PAGE =================
-    public function showRegister()
-    {
-        return view('register');
-    }
-
-    // ================= REGISTER PROCESS =================
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
-        ], [
-            'name.required'     => 'Nama wajib diisi!',
-            'email.required'    => 'Email wajib diisi!',
-            'email.email'       => 'Format email tidak valid!',
-            'email.unique'      => 'Email sudah digunakan!',
-            'password.required' => 'Password wajib diisi!',
-            'password.min'      => 'Password minimal 6 karakter!',
-            'password.confirmed'=> 'Konfirmasi password tidak cocok!',
-        ]);
-
-        // SIMPAN KE DATABASE
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // LOGIN LANGSUNG SETELAH REGISTER
-        Auth::login($user);
-
-        return redirect()->route('dashboard')->with('success', 'Registrasi berhasil!');
-    }
-
-    // ================= LOGOUT =================
-    public function logout()
+    /**
+     * Logout user
+     */
+    public function destroy(Request $request)
     {
         Auth::logout();
-        return redirect()->route('login')->with('success', 'Logout berhasil!');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('auth.index')->with('success', 'Anda telah logout.');
     }
 }

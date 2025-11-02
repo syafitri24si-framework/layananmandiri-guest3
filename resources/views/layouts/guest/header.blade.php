@@ -26,7 +26,7 @@
                     <div class="col-lg-12">
                         <nav class="navbar navbar-expand-lg">
                             <a class="navbar-brand" href="#home">
-                                <img src="{{ asset('assets/assets-admin/img/logo/logo.svg') }}" alt="Logo">
+                                <img src="{{ asset('assets/img/logo/logo.png') }}" alt="Logo" height="60">
                             </a>
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,11 @@
                                         href="{{ route('dashboard.index') }}#layanan">
                                         Layanan
                                     </a></li>
-                                    <li class="nav-item"><a class="page-scroll" href="#login">Login</a></li>
+                                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
+                                        href="{{ route('dashboard.index') }}#kontak">
+                                        Kontak
+                                    </a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="{{route('auth.index')}}">Login</a></li>
                                 </ul>
                             </div>
                         </nav>
