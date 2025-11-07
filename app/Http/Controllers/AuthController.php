@@ -15,6 +15,7 @@ class AuthController extends Controller
     public function index()
     {
         return view('pages.auth.login');
+
     }
 
     /**
@@ -52,6 +53,7 @@ class AuthController extends Controller
             }
 
             return back()->with('error', 'Email atau password salah');
+
         }
 
         // Jika tombol register ditekan

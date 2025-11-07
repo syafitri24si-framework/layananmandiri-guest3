@@ -1,4 +1,4 @@
-     <div class="preloader">
+<div class="preloader">
       <div class="loader">
         <div class="spinner">
           <div class="spinner-container">
@@ -34,7 +34,6 @@
                                 <span class="toggler-icon"></span>
                                 <span class="toggler-icon"></span>
                             </button>
-
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarNav">
                                 <ul class="navbar-nav ms-auto">
                                     <li class="nav-item">
@@ -55,6 +54,7 @@
                                         Kontak
                                     </a></li>
                                     <li class="nav-item"><a class="page-scroll" href="{{route('auth.index')}}">Login</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="{{route('auth.index')}}">Logout</a></li>
                                 </ul>
                             </div>
                         </nav>
