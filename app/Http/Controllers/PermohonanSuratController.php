@@ -12,7 +12,7 @@ class PermohonanSuratController extends Controller
     // INDEX – tampilkan semua permohonan surat
     public function index()
     {
-        $data = PermohonanSurat::with(['warga', 'jenis_surat'])->get();
+        $data = PermohonanSurat::with(['warga', 'jenisSurat'])->get();
 
         return view('pages.permohonan_surat.index', compact('data'));
     }
