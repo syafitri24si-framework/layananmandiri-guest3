@@ -13,7 +13,6 @@ class PermohonanSuratController extends Controller
     public function index()
     {
         $data = PermohonanSurat::with(['warga', 'jenisSurat'])->get();
-
         return view('pages.permohonan_surat.index', compact('data'));
     }
 
@@ -22,7 +21,6 @@ class PermohonanSuratController extends Controller
     {
         $warga = Warga::all();
         $jenisSurat = JenisSurat::all();
-
         return view('pages.permohonan_surat.create', compact('warga', 'jenisSurat'));
     }
 
@@ -34,61 +32,42 @@ class PermohonanSuratController extends Controller
             'warga_id' => 'required|exists:warga,warga_id',
             'jenis_id' => 'required|exists:jenis_surat,jenis_id',
             'tanggal_pengajuan' => 'required|date',
-            'status' => 'required',
+            'status' => 'required|in:pending,diproses,selesai,ditolak',
         ]);
 
-        PermohonanSurat::create([
-            'nomor_permohonan' => $request->nomor_permohonan,
-            'warga_id' => $request->warga_id,
-            'jenis_id' => $request->jenis_id,
-            'tanggal_pengajuan' => $request->tanggal_pengajuan,
-            'status' => $request->status,
-            'catatan' => $request->catatan,
-        ]);
+        PermohonanSurat::create($request->all());
 
         return redirect()->route('permohonan_surat.index')->with('success', 'Data berhasil ditambahkan.');
     }
 
-    // EDIT – form edit
-    public function edit($id)
+    // EDIT – form edit - ✅ ROUTE MODEL BINDING
+    public function edit(PermohonanSurat $permohonan_surat)
     {
-        $data = PermohonanSurat::findOrFail($id);
         $warga = Warga::all();
         $jenisSurat = JenisSurat::all();
-
-        return view('pages.permohonan_surat.edit', compact('data', 'warga', 'jenisSurat'));
+        return view('pages.permohonan_surat.edit', compact('permohonan_surat', 'warga', 'jenisSurat'));
     }
 
-    // UPDATE – update data
-    public function update(Request $request, $id)
+    // UPDATE – update data - ✅ ROUTE MODEL BINDING
+    public function update(Request $request, PermohonanSurat $permohonan_surat)
     {
-        $data = PermohonanSurat::findOrFail($id);
-
         $request->validate([
-            'nomor_permohonan' => 'required|unique:permohonan_surat,nomor_permohonan,' . $id . ',permohonan_id',
+            'nomor_permohonan' => 'required|unique:permohonan_surat,nomor_permohonan,' . $permohonan_surat->permohonan_id . ',permohonan_id',
             'warga_id' => 'required|exists:warga,warga_id',
             'jenis_id' => 'required|exists:jenis_surat,jenis_id',
             'tanggal_pengajuan' => 'required|date',
-            'status' => 'required',
+            'status' => 'required|in:pending,diproses,selesai,ditolak',
         ]);
 
-        $data->update([
-            'nomor_permohonan' => $request->nomor_permohonan,
-            'warga_id' => $request->warga_id,
-            'jenis_id' => $request->jenis_id,
-            'tanggal_pengajuan' => $request->tanggal_pengajuan,
-            'status' => $request->status,
-            'catatan' => $request->catatan,
-        ]);
+        $permohonan_surat->update($request->all());
 
         return redirect()->route('permohonan_surat.index')->with('success', 'Data berhasil diperbarui.');
     }
 
-    // DELETE – hapus data
-    public function destroy($id)
+    // DELETE – hapus data - ✅ ROUTE MODEL BINDING
+    public function destroy(PermohonanSurat $permohonan_surat)
     {
-        PermohonanSurat::findOrFail($id)->delete();
-
+        $permohonan_surat->delete();
         return redirect()->route('permohonan_surat.index')->with('success', 'Data berhasil dihapus.');
     }
 }
