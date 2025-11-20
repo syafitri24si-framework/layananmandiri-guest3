@@ -9,11 +9,11 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="hero-content-wrapper">
-                                @if (session('success'))
-                                    <div class="alert alert-success">
-                                        {{ session('success') }}
-                                    </div>
-                                @endif
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
                             <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">
                                 Selamat Datang di Layanan Mandiri Bina Desa
                             </h2>
@@ -139,6 +139,20 @@
                             </div>
                             <h5>User</h5>
                             <p>Data akun pengguna yang memiliki akses ke sistem layanan mandiri.</p>
+                        </div>
+                    </a>
+                </div>
+
+
+                <!-- Permohonan Surat -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="{{ route('permohonan_surat.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay=".8s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-clipboard"></i>
+                            </div>
+                            <h5>Permohonan Surat</h5>
+                            <p>Kelola pengajuan surat dari warga, mulai dari pengajuan hingga status selesai.</p>
                         </div>
                     </a>
                 </div>

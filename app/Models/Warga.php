@@ -23,4 +23,10 @@ class Warga extends Model
         'email',
     ];
 
+    // Relasi ke permohonan_surat (1 warga -> banyak permohonan)
+    public function permohonanSurat()
+    {
+        return $this->hasMany(PermohonanSurat::class, 'warga_id', 'warga_id');
+    }
+
 }

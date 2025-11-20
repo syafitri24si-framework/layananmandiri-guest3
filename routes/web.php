@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WargaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JenisSuratController;
+use App\Http\Controllers\PermohonanSuratController;
 
  Route::get('/', function () {
    return view('pages.dashboard');
@@ -20,6 +21,7 @@ Route::resource('warga', WargaController::class);
 Route::resource('auth', AuthController::class);
 Route::resource('jenis_surat', JenisSuratController::class);
 Route::resource('dashboard', DashboardController::class);
+Route::resource('permohonan_surat', PermohonanSuratController::class);
 
 
 

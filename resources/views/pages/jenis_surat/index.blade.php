@@ -29,6 +29,7 @@
             @forelse($jenisSurat as $item)
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
+
                         <div class="card-body">
                             <h5 class="card-title">{{ $item->nama_jenis }}</h5>
                             <p class="card-text mb-1"><strong>Kode:</strong> {{ $item->kode }}</p>
@@ -41,12 +42,21 @@
                                 </ul>
                             @endif
                         </div>
+
                         <div class="card-footer text-end bg-transparent border-top-0">
-                            <a href="{{ route('jenis_surat.edit', $item->jenis_id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('jenis_surat.destroy', $item->jenis_id) }}" method="POST" class="d-inline">
+                            <a href="{{ route('jenis_surat.edit', $item->jenis_id) }}"
+                               class="btn btn-sm btn-primary me-2">
+                                <i class="lni lni-pencil-alt me-1"></i> Edit
+                            </a>
+                            <form action="{{ route('jenis_surat.destroy', $item->jenis_id) }}"
+                                  method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus jenis surat ini?')">Hapus</button>
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Hapus jenis surat ini?')">
+                                    <i class="lni lni-trash"></i> Hapus
+                                </button>
                             </form>
                         </div>
                     </div>

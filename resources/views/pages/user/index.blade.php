@@ -33,11 +33,19 @@
                             <p class="card-text mb-1"><strong>Password:</strong> {{ $item->password }}</p>
                         </div>
                         <div class="card-footer text-end bg-transparent border-top-0">
-                            <a href="{{ route('user.edit', $item->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('user.destroy', $item->id) }}" method="POST" class="d-inline">
+                            <a href="{{ route('user.edit', $item->id) }}"
+                               class="btn btn-sm btn-primary me-2">
+                                <i class="lni lni-pencil-alt me-1"></i> Edit
+                            </a>
+                            <form action="{{ route('user.destroy', $item->id) }}"
+                                  method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus user ini?')">Hapus</button>
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Hapus user ini?')">
+                                    <i class="lni lni-trash"></i> Hapus
+                                </button>
                             </form>
                         </div>
                     </div>

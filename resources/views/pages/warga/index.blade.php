@@ -45,11 +45,19 @@
 
                         </div>
                          <div class="card-footer text-end bg-transparent border-top-0">
-                            <a href="{{ route('warga.edit', $item->warga_id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('warga.destroy', $item->warga_id) }}" method="POST" class="d-inline">
+                            <a href="{{ route('warga.edit', $item->warga_id) }}"
+                               class="btn btn-sm btn-primary me-2">
+                                <i class="lni lni-pencil-alt me-1"></i> Edit
+                            </a>
+                            <form action="{{ route('warga.destroy', $item->warga_id) }}"
+                                  method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus data warga ini?')">Hapus</button>
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Hapus data warga ini?')">
+                                    <i class="lni lni-trash"></i> Hapus
+                                </button>
                             </form>
                         </div>
                     </div>

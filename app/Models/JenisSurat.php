@@ -44,4 +44,11 @@ class JenisSurat extends Model
     {
         $this->attributes['syarat_json'] = is_array($value) ? json_encode($value) : $value;
     }
+
+     // Relasi ke permohonan_surat
+    public function permohonanSurat()
+    {
+        return $this->hasMany(PermohonanSurat::class, 'jenis_id', 'jenis_id');
+    }
+
 }
