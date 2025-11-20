@@ -14,7 +14,7 @@
 
                 <div class="col-md-6 text-center text-md-end">
                     <a href="{{ route('permohonan_surat.create') }}" class="btn btn-success">
-                        <i class="lni lni-plus"></i> Tambah Permohonan
+                        <i class="lni lni-plus"></i> Tambah Permohonann
                     </a>
                 </div>
             </div>
