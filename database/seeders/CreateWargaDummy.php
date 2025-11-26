@@ -24,7 +24,7 @@ class CreateWargaDummy extends Seeder
             'Buruh', 'Ibu Rumah Tangga', 'Pelajar/Mahasiswa', 'Pensiunan',
         ];
 
-        foreach (range(1, 10) as $index) {
+        foreach (range(1, 200) as $index) {
             $jenisKelamin = $faker->randomElement(['Laki-laki', 'Perempuan']);
             $firstName    = $jenisKelamin === 'Laki-laki' ? $faker->firstNameMale : $faker->firstNameFemale;
 

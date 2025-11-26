@@ -10,11 +10,31 @@ class JenisSuratController extends Controller
     /**
      * Tampilkan semua jenis surat.
      */
-    public function index()
-    {
-        $jenisSurat = JenisSurat::all();
-        return view('pages.jenis_surat.index', compact('jenisSurat'));
+  public function index(Request $request)
+{
+    $query = JenisSurat::query();
+
+    // Apply existing filter
+    if ($request->filled('kode')) {
+        $query->where('kode', $request->input('kode'));
     }
+
+    // Apply search
+    if ($request->filled('search')) {
+        $searchTerm = $request->input('search');
+        $query->where(function($q) use ($searchTerm) {
+            $q->where('nama_jenis', 'like', '%' . $searchTerm . '%')
+              ->orWhere('kode', 'like', '%' . $searchTerm . '%');
+        });
+    }
+
+    $jenisSurat = $query->paginate(5)->withQueryString();
+
+    // Ambil semua kode surat yang ada di database untuk dropdown
+    $kodeSurat = JenisSurat::select('kode')->distinct()->orderBy('kode')->get();
+
+    return view('pages.jenis_surat.index', compact('jenisSurat', 'kodeSurat'));
+}
 
     /**
      * Form tambah jenis surat.

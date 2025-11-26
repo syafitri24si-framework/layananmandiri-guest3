@@ -10,9 +10,37 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['user'] = User::all();
+        $query = User::query();
+
+        // Apply filters
+        if ($request->filled('name')) {
+            $query->where('name', $request->input('name'));
+        }
+
+        if ($request->filled('email')) {
+            $query->where('email', $request->input('email'));
+        }
+
+        // Apply search
+        $searchableColumns = ['name', 'email'];
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm, $searchableColumns) {
+                foreach ($searchableColumns as $column) {
+                    $q->orWhere($column, 'like', '%' . $searchTerm . '%');
+                }
+            });
+        }
+
+        // Get unique values for dropdown filters
+        $data['user_names'] = User::select('name')->distinct()->orderBy('name')->pluck('name');
+        $data['user_emails'] = User::select('email')->distinct()->orderBy('email')->pluck('email');
+
+        $data['user'] = $query->paginate(12);
+        $data['filters'] = $request->all();
+
         return view('pages.user.index', $data);
     }
 
@@ -29,24 +57,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
         $validated = $request->validate([
-            'name'     => 'required|string|max:20|',
-            'email'    => 'required|string|max:100',
-            'password' => 'required|string|max:20', Hash::make($request->password),
-
+            'name'     => 'required|string|max:20',
+            'email'    => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|min:8|max:20',
         ]);
+
+        $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
         return redirect()->route('user.index')->with('success', 'Penambahan Data Berhasil!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**
@@ -63,14 +83,21 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
-        $id             = $id;
-        $user           = User::findOrFail($id);
-        $user->name     = $request->name;
-        $user->email    = $request->email;
-        $user->password = $request->password;
+        $user = User::findOrFail($id);
 
-        $user->save();
+        $validated = $request->validate([
+            'name'     => 'required|string|max:20',
+            'email'    => 'required|string|email|max:100|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|max:20',
+        ]);
+
+        if ($request->filled('password')) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        $user->update($validated);
         return redirect()->route('user.index')->with('success', 'Perubahan Data Berhasil!');
     }
 
@@ -79,9 +106,7 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
         $user = User::findOrFail($id);
-
         $user->delete();
         return redirect()->route('user.index')->with('success', 'Data user berhasil dihapus');
     }

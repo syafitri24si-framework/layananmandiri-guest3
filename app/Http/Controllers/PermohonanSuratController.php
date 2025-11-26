@@ -9,18 +9,45 @@ use Illuminate\Http\Request;
 
 class PermohonanSuratController extends Controller
 {
-    // INDEX – tampilkan semua permohonan surat
-    public function index()
-    {
-        $data = PermohonanSurat::with(['warga', 'jenisSurat'])->get();
+    public function index(Request $request)
+{
+    $query = PermohonanSurat::with(['warga', 'jenisSurat']);
 
-        return view('pages.permohonan_surat.index', compact('data'));
+    // Apply existing filters
+    $filterableColumns = ['status', 'jenis_id', 'warga_id'];
+    foreach ($filterableColumns as $column) {
+        if ($request->filled($column)) {
+            $query->where($column, $request->input($column));
+        }
     }
+
+    // Apply search
+    if ($request->filled('search')) {
+        $searchTerm = $request->input('search');
+        $query->where(function($q) use ($searchTerm) {
+            $q->where('nomor_permohonan', 'like', '%' . $searchTerm . '%')
+              ->orWhereHas('warga', function($wargaQuery) use ($searchTerm) {
+                  $wargaQuery->where('nama', 'like', '%' . $searchTerm . '%');
+              })
+              ->orWhereHas('jenisSurat', function($jenisQuery) use ($searchTerm) {
+                  $jenisQuery->where('nama_jenis', 'like', '%' . $searchTerm . '%');
+              });
+        });
+    }
+
+    $data = $query->paginate(12)->withQueryString();
+
+    // Data untuk dropdown filter
+    $warga = Warga::orderBy('nama', 'asc')->get();
+    $jenisSurat = JenisSurat::all();
+
+    return view('pages.permohonan_surat.index', compact('data', 'warga', 'jenisSurat'));
+}
 
     // CREATE – tampilkan form tambah
     public function create()
     {
-        $warga = Warga::all();
+        $warga = Warga::orderBy('nama', 'asc')->get();
         $jenisSurat = JenisSurat::all();
 
         return view('pages.permohonan_surat.create', compact('warga', 'jenisSurat'));
@@ -53,7 +80,7 @@ class PermohonanSuratController extends Controller
     public function edit($id)
     {
         $data = PermohonanSurat::findOrFail($id);
-        $warga = Warga::all();
+        $warga = Warga::orderBy('nama', 'asc')->get();
         $jenisSurat = JenisSurat::all();
 
         return view('pages.permohonan_surat.edit', compact('data', 'warga', 'jenisSurat'));

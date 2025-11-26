@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder; // ✅ TAMBAHKAN INI
 
 class PermohonanSurat extends Model
 {
@@ -28,5 +29,16 @@ class PermohonanSurat extends Model
     public function jenisSurat()
     {
         return $this->belongsTo(JenisSurat::class, 'jenis_id', 'jenis_id');
+    }
+
+    // ✅ TAMBAHKAN SCOPE FILTER
+    public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+    {
+        foreach ($filterableColumns as $column) {
+            if ($request->filled($column)) {
+                $query->where($column, $request->input($column));
+            }
+        }
+        return $query;
     }
 }

@@ -17,7 +17,7 @@ class CreatePermohonanSuratDummy extends Seeder
         // Data status permohonan
         $statusList = ['Pending', 'Diproses', 'Selesai', 'Ditolak'];
 
-        foreach (range(1, 20) as $index) {
+        foreach (range(1, 200) as $index) {
             // Ambil random warga_id dari tabel warga
             $warga = DB::table('warga')->inRandomOrder()->first();
 

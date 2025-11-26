@@ -25,7 +25,6 @@ class CreateJenisSuratDummy extends Seeder
             'Surat Keterangan Kelahiran',
             'Surat Keterangan Kematian',
             'Surat Pengantar Nikah',
-            'Surat Keterangan Beda Nama',
             'Surat Keterangan Penghasilan'
         ];
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder; // ✅ TAMBAHKAN INI
 
 class JenisSurat extends Model
 {
@@ -45,10 +46,21 @@ class JenisSurat extends Model
         $this->attributes['syarat_json'] = is_array($value) ? json_encode($value) : $value;
     }
 
-     // Relasi ke permohonan_surat
+    // Relasi ke permohonan_surat
     public function permohonanSurat()
     {
         return $this->hasMany(PermohonanSurat::class, 'jenis_id', 'jenis_id');
     }
 
+    // ✅ TAMBAHKAN SCOPE FILTER
+    // Di app/Models/JenisSurat.php - scopeFilter tetap sama
+public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+{
+    foreach ($filterableColumns as $column) {
+        if ($request->filled($column)) {
+            $query->where($column, $request->input($column));
+        }
+    }
+    return $query;
+}
 }
