@@ -10,7 +10,7 @@ class RiwayatStatusSurat extends Model
 {
     use HasFactory;
 
-    protected $table = 'riwayat_status_surat';
+    protected $table      = 'riwayat_status_surat';
     protected $primaryKey = 'riwayat_id';
 
     // NONAKTIFKAN TIMESTAMPS OTOMATIS
@@ -25,11 +25,11 @@ class RiwayatStatusSurat extends Model
         'status',
         'petugas_warga_id',
         'waktu', // PASTIKAN ADA
-        'keterangan'
+        'keterangan',
     ];
 
     protected $casts = [
-        'waktu' => 'datetime'
+        'waktu' => 'datetime',
     ];
 
     // Relasi ke PermohonanSurat
@@ -43,4 +43,11 @@ class RiwayatStatusSurat extends Model
     {
         return $this->belongsTo(Warga::class, 'petugas_warga_id', 'warga_id');
     }
+
+    public function mediaFiles()
+    {
+        return $this->hasMany(Media::class, 'ref_id')
+            ->where('ref_table', 'riwayat_status_surat');
+    }
+
 }

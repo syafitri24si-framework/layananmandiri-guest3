@@ -41,6 +41,7 @@ Route::group(['middleware' => ['checkislogin']], function () {
 
         Route::resource('permohonan_surat', PermohonanSuratController::class);
         Route::resource('berkas_persyaratan', BerkasPersyaratanController::class);
+        Route::resource('riwayat_status', RiwayatStatusController::class);
 
 // Route khusus untuk create dengan parameter (optional)
         Route::get('/berkas_persyaratan/create/{permohonan_id?}', [BerkasPersyaratanController::class, 'create'])
@@ -57,6 +58,7 @@ Route::group(['middleware' => ['checkislogin']], function () {
             ->name('riwayat_status.index');
         Route::post('/riwayat-status/{id}/upload', [RiwayatStatusController::class, 'upload'])
             ->name('riwayat_status.upload');
+
     });
 
     Route::group(['middleware' => ['checkrole:Admin,Warga']], function () {
@@ -65,6 +67,7 @@ Route::group(['middleware' => ['checkislogin']], function () {
         Route::resource('permohonan_surat', PermohonanSuratController::class)->only(['index', 'show', 'create', 'store']);
         Route::resource('berkas_persyaratan', BerkasPersyaratanController::class)->only(['index', 'show', 'create', 'store']);
         Route::resource('jenis_surat', JenisSuratController::class)->only(['index', 'show', 'create', 'store']);
+        Route::resource('riwayat_status', RiwayatStatusController::class)->only(['index', 'show', 'create', 'store']);
         // Jenis Surat Routes - Tambahan khusus
         Route::get('/jenis_surat/{id}', [JenisSuratController::class, 'show'])->name('jenis_surat.show');
         Route::get('/jenis_surat/download/{id}', [JenisSuratController::class, 'downloadTemplate'])->name('jenis_surat.download_template');

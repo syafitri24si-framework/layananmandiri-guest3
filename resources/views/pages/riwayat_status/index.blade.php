@@ -183,11 +183,11 @@
                                         {{ $riwayat->waktu->format('d M Y') }}
                                     </div>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('permohonan_surat.show', $riwayat->permohonan_id) }}"
+                                        <a href="{{ route('riwayat_status.show', $riwayat->permohonan_id) }}"
                                            class="btn btn-outline-primary">
                                             <i class="lni lni-eye me-1"></i> Lihat
                                         </a>
-                                        @if(in_array(auth()->user()->role, ['admin', 'petugas']))
+                                        @if(in_array(auth()->user()->role, ['Admin']))
                                             <button type="button" class="btn btn-outline-info"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalFile{{ $riwayat->riwayat_id }}">
@@ -201,7 +201,7 @@
                     </div>
 
                     {{-- MODAL UPLOAD FILE --}}
-                    @if(in_array(auth()->user()->role, ['admin', 'petugas']))
+                    @if(in_array(auth()->user()->role, ['Admin']))
                     <div class="modal fade" id="modalFile{{ $riwayat->riwayat_id }}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
