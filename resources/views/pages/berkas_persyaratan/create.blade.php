@@ -1,4 +1,4 @@
-{{-- resources/views/pages/jenis_surat/create.blade.php --}}
+{{-- resources/views/pages/berkas_persyaratan/create.blade.php --}}
 @extends('layouts.guest.app')
 
 @section('content')
@@ -8,8 +8,8 @@
             <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                 <div class="section-title text-center mb-50">
                     <br><br>
-                    <h3 class="mb-15">Tambah Jenis Surat</h3>
-                    <p>Silahkan isi form berikut untuk menambah jenis surat baru</p>
+                    <h3 class="mb-15">Tambah Berkas Persyaratan</h3>
+                    <p>Silahkan isi form berikut untuk menambah berkas persyaratan</p>
                 </div>
             </div>
         </div>
@@ -38,104 +38,100 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('jenis_surat.store') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    
+
+                    <form action="{{ route('berkas_persyaratan.store') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
                         @csrf
                         <div class="row g-4">
 
-                            {{-- Kode Surat --}}
+                            {{-- Permohonan Surat --}}
                             <div class="col-md-6">
                                 <div class="position-relative">
-                                    <label class="form-label mb-2">Kode Surat <span class="text-danger">*</span></label>
-                                    <div class="single-input position-relative">
-                                        <input type="text" id="kode" name="kode"
-                                               class="form-input @error('kode') is-invalid @enderror"
-                                               placeholder="Contoh: SKTM, SKU, SKCK"
-                                               value="{{ old('kode') }}" required>
-                                        <i class="lni lni-key position-absolute"
-                                           style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                        @error('kode')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <small class="text-muted">Kode unik untuk jenis surat (huruf kapital)</small>
+                                    <label class="form-label mb-2">Permohonan Surat <span class="text-danger">*</span></label>
+                                    <select name="permohonan_id" class="form-select @error('permohonan_id') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Permohonan Surat --</option>
+                                        @foreach ($permohonanList as $permohonan)
+                                            <option value="{{ $permohonan->permohonan_id }}"
+                                                {{ old('permohonan_id', $selectedPermohonanId) == $permohonan->permohonan_id ? 'selected' : '' }}>
+                                                #{{ $permohonan->nomor_permohonan }} - {{ $permohonan->warga->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('permohonan_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
-                            {{-- Nama Jenis Surat --}}
+                            {{-- Nama Berkas --}}
                             <div class="col-md-6">
                                 <div class="position-relative">
-                                    <label class="form-label mb-2">Nama Jenis Surat <span class="text-danger">*</span></label>
-                                    <div class="single-input position-relative">
-                                        <input type="text" id="nama_jenis" name="nama_jenis"
-                                               class="form-input @error('nama_jenis') is-invalid @enderror"
-                                               placeholder="Contoh: Surat Keterangan Tidak Mampu"
-                                               value="{{ old('nama_jenis') }}" required>
-                                        <i class="lni lni-text-format position-absolute"
-                                           style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                        @error('nama_jenis')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <small class="text-muted">Nama lengkap jenis surat</small>
+                                    <label class="form-label mb-2">Nama Berkas <span class="text-danger">*</span></label>
+                                    <select name="nama_berkas" id="nama_berkas" class="form-select @error('nama_berkas') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Jenis Berkas --</option>
+                                        <option value="KTP" {{ old('nama_berkas') == 'KTP' ? 'selected' : '' }}>KTP</option>
+                                        <option value="KK" {{ old('nama_berkas') == 'KK' ? 'selected' : '' }}>Kartu Keluarga (KK)</option>
+                                        <option value="Surat Pengantar RT/RW" {{ old('nama_berkas') == 'Surat Pengantar RT/RW' ? 'selected' : '' }}>Surat Pengantar RT/RW</option>
+                                        <option value="Pas Foto" {{ old('nama_berkas') == 'Pas Foto' ? 'selected' : '' }}>Pas Foto</option>
+                                        <option value="Surat Keterangan" {{ old('nama_berkas') == 'Surat Keterangan' ? 'selected' : '' }}>Surat Keterangan</option>
+                                        <option value="Ijazah" {{ old('nama_berkas') == 'Ijazah' ? 'selected' : '' }}>Ijazah</option>
+                                        <option value="Akte Kelahiran" {{ old('nama_berkas') == 'Akte Kelahiran' ? 'selected' : '' }}>Akte Kelahiran</option>
+                                        <option value="Akte Nikah" {{ old('nama_berkas') == 'Akte Nikah' ? 'selected' : '' }}>Akte Nikah</option>
+                                        <option value="NPWP" {{ old('nama_berkas') == 'NPWP' ? 'selected' : '' }}>NPWP</option>
+                                        <option value="Lainnya" {{ old('nama_berkas') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    </select>
+                                    @error('nama_berkas')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
-                            {{-- Syarat (Dinamis) --}}
-                            <div class="col-md-12">
+                            {{-- Nama Berkas Custom --}}
+                            <div class="col-md-6">
+                                <div class="single-input position-relative">
+                                    <label class="form-label mb-2">Nama Berkas Kustom</label>
+                                    <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
+                                           class="form-input @error('nama_berkas_custom') is-invalid @enderror"
+                                           placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
+                                           value="{{ old('nama_berkas_custom') }}"
+                                           disabled>
+                                    <i class="lni lni-edit position-absolute"
+                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                    @error('nama_berkas_custom')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- Status Validasi --}}
+                            <div class="col-md-6">
                                 <div class="position-relative">
-                                    <label class="form-label mb-2 d-flex justify-content-between align-items-center">
-                                        <span>Syarat <span class="text-danger">*</span></span>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" id="addSyaratBtn">
-                                            <i class="lni lni-plus me-1"></i> Tambah Syarat
-                                        </button>
-                                    </label>
-                                    <div id="syaratContainer">
-                                        @if(old('syarat_json'))
-                                            @foreach(old('syarat_json') as $index => $syarat)
-                                                <div class="input-group mb-2 syarat-item">
-                                                    <input type="text" name="syarat_json[]"
-                                                           class="form-control"
-                                                           placeholder="Masukkan syarat"
-                                                           value="{{ $syarat }}" required>
-                                                    <button type="button" class="btn btn-outline-danger remove-syarat">
-                                                        <i class="lni lni-close"></i>
-                                                    </button>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="input-group mb-2 syarat-item">
-                                                <input type="text" name="syarat_json[]"
-                                                       class="form-control"
-                                                       placeholder="Contoh: Fotokopi KTP" required>
-                                                <button type="button" class="btn btn-outline-danger remove-syarat">
-                                                    <i class="lni lni-close"></i>
-                                                </button>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @error('syarat_json')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    <label class="form-label mb-2">Status Validasi <span class="text-danger">*</span></label>
+                                    <select name="valid" class="form-select @error('valid') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Status --</option>
+                                        <option value="menunggu" {{ old('valid') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
+                                        <option value="valid" {{ old('valid') == 'valid' ? 'selected' : '' }}>Valid</option>
+                                        <option value="tidak_valid" {{ old('valid') == 'tidak_valid' ? 'selected' : '' }}>Tidak Valid</option>
+                                    </select>
+                                    @error('valid')
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    @error('syarat_json.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Tambahkan syarat yang diperlukan untuk jenis surat ini</small>
                                 </div>
                             </div>
 
-                            {{-- MULTIPLE FILE UPLOAD UNTUK TEMPLATE SURAT --}}
+                            {{-- MULTIPLE FILE UPLOAD --}}
                             <div class="col-md-12">
                                 <div class="position-relative">
                                     <label class="form-label mb-3 d-flex align-items-center">
                                         <i class="lni lni-cloud-upload me-2"></i>
-                                        Upload File Template/Contoh (Multiple) <span class="text-muted">(Opsional)</span>
+                                        Upload File (Multiple) <span class="text-danger">*</span>
                                     </label>
 
                                     {{-- File Input yang Tersembunyi --}}
-                                    <input type="file" name="template_files[]" id="templateFiles"
-                                           class="d-none @error('template_files') is-invalid @enderror"
-                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                           multiple>
+                                    <input type="file" name="files[]" id="files"
+                                           class="d-none @error('files') is-invalid @enderror"
+                                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                                           multiple required>
 
                                     {{-- Area Upload yang Dapat Diklik --}}
                                     <div class="file-upload-area border rounded p-5 mb-4" id="uploadArea">
@@ -151,16 +147,16 @@
                                             <div class="mt-3">
                                                 <small class="text-muted">
                                                     <i class="lni lni-info-circle me-1"></i>
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
+                                                    Format yang didukung: PDF, JPG, PNG, DOC, XLS | Maks: 10MB per file
                                                 </small>
                                             </div>
                                         </div>
                                     </div>
 
-                                    @error('template_files')
+                                    @error('files')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    @error('template_files.*')
+                                    @error('files.*')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
 
@@ -168,7 +164,7 @@
                                     <div id="filePreviewContainer" class="mt-4" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h6 class="mb-0">
-                                                <i class="lni lni-files me-2"></i> File Template yang Dipilih
+                                                <i class="lni lni-files me-2"></i> File yang Dipilih
                                                 <span class="badge bg-primary ms-2" id="fileCount">0</span>
                                             </h6>
                                             <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
@@ -182,14 +178,31 @@
                                 </div>
                             </div>
 
+                            {{-- Informasi Warga --}}
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title d-flex align-items-center">
+                                            <i class="lni lni-user me-2"></i> Informasi Warga
+                                        </h6>
+                                        <div id="wargaInfo" class="text-muted">
+                                            <div class="text-center py-3">
+                                                <i class="lni lni-information display-5 text-muted mb-3"></i>
+                                                <p class="mb-0">Pilih permohonan surat terlebih dahulu untuk melihat informasi warga</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- Tombol --}}
                             <div class="col-md-12">
                                 <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                    <a href="{{ route('jenis_surat.index') }}" class="btn btn-outline-danger px-4">
+                                    <a href="{{ route('berkas_persyaratan.index') }}" class="btn btn-outline-danger px-4">
                                         <i class="lni lni-cross-circle me-2"></i> Batal
                                     </a>
                                     <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Simpan Jenis Surat
+                                        <i class="lni lni-telegram-original me-2"></i> Simpan Berkas
                                     </button>
                                 </div>
                             </div>
@@ -361,20 +374,6 @@
         text-align: center;
         padding: 3rem;
     }
-
-    /* Syarat Input Styles */
-    .syarat-item .form-control {
-        border-right: 0;
-    }
-    .syarat-item .btn-outline-danger {
-        border-left: 0;
-        border-color: #ced4da;
-    }
-    .syarat-item .btn-outline-danger:hover {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: white;
-    }
 </style>
 
 <script>
@@ -382,8 +381,31 @@
     let uploadedFiles = [];
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Handle custom nama berkas
+        const namaBerkasSelect = document.getElementById('nama_berkas');
+        const namaBerkasCustomInput = document.getElementById('nama_berkas_custom');
+
+        namaBerkasSelect.addEventListener('change', function() {
+            if (this.value === 'Lainnya') {
+                namaBerkasCustomInput.disabled = false;
+                namaBerkasCustomInput.required = true;
+                namaBerkasCustomInput.placeholder = "Masukkan nama berkas kustom";
+            } else {
+                namaBerkasCustomInput.disabled = true;
+                namaBerkasCustomInput.required = false;
+                namaBerkasCustomInput.value = '';
+                namaBerkasCustomInput.placeholder = "Masukkan nama berkas jika memilih 'Lainnya'";
+            }
+        });
+
+        // Initialize jika sudah ada value dari old input
+        if (namaBerkasSelect.value === 'Lainnya') {
+            namaBerkasCustomInput.disabled = false;
+            namaBerkasCustomInput.required = true;
+        }
+
         // Multiple file upload handling
-        const fileInput = document.getElementById('templateFiles');
+        const fileInput = document.getElementById('files');
         const uploadArea = document.getElementById('uploadArea');
         const browseBtn = document.getElementById('browseBtn');
         const fileList = document.getElementById('fileList');
@@ -395,47 +417,6 @@
         const previewModalBody = document.getElementById('previewModalBody');
         const downloadPreviewBtn = document.getElementById('downloadPreviewBtn');
 
-        // Syarat Dinamis
-        const addSyaratBtn = document.getElementById('addSyaratBtn');
-        const syaratContainer = document.getElementById('syaratContainer');
-
-        // ========== SYARAT DINAMIS ==========
-        // Tambah syarat baru
-        addSyaratBtn.addEventListener('click', function() {
-            const newSyarat = document.createElement('div');
-            newSyarat.className = 'input-group mb-2 syarat-item';
-            newSyarat.innerHTML = `
-                <input type="text" name="syarat_json[]"
-                       class="form-control"
-                       placeholder="Masukkan syarat" required>
-                <button type="button" class="btn btn-outline-danger remove-syarat">
-                    <i class="lni lni-close"></i>
-                </button>
-            `;
-            syaratContainer.appendChild(newSyarat);
-
-            // Attach event listener untuk tombol hapus
-            newSyarat.querySelector('.remove-syarat').addEventListener('click', function() {
-                if (syaratContainer.children.length > 1) {
-                    newSyarat.remove();
-                } else {
-                    alert('Minimal harus ada satu syarat');
-                }
-            });
-        });
-
-        // Attach event listener untuk tombol hapus syarat yang sudah ada
-        document.querySelectorAll('.remove-syarat').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (syaratContainer.children.length > 1) {
-                    this.closest('.syarat-item').remove();
-                } else {
-                    alert('Minimal harus ada satu syarat');
-                }
-            });
-        });
-
-        // ========== FILE UPLOAD ==========
         // Event untuk klik tombol browse
         browseBtn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -510,7 +491,7 @@
                         <div class="mt-3">
                             <small class="text-muted">
                                 <i class="lni lni-info-circle me-1"></i>
-                                Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
+                                Format yang didukung: PDF, JPG, PNG, DOC, XLS | Maks: 10MB per file
                             </small>
                         </div>
                     </div>
@@ -784,7 +765,7 @@
                         </button>
                     </div>
                 </div>
-            `;
+    `;
             previewModal.show();
         }
 
@@ -899,74 +880,52 @@
             unhighlight();
         }, false);
 
-        // ========== VALIDASI FORM SEBELUM SUBMIT ==========
-        const uploadForm = document.getElementById('uploadForm');
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', function(e) {
-                // Validasi minimal 1 syarat yang diisi
-                const syaratInputs = document.querySelectorAll('input[name="syarat_json[]"]');
-                let hasValidSyarat = false;
+        // Permohonan select handler - untuk menampilkan info warga
+        const permohonanSelect = document.querySelector('[name="permohonan_id"]');
+        const wargaInfo = document.getElementById('wargaInfo');
 
-                syaratInputs.forEach(input => {
-                    if (input.value.trim() !== '') {
-                        hasValidSyarat = true;
-                    }
-                });
-
-                if (!hasValidSyarat) {
-                    e.preventDefault();
-                    alert('Minimal harus ada satu syarat yang diisi!');
-                    return false;
+        permohonanSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const text = selectedOption.text;
+                const parts = text.split(' - ');
+                if (parts.length >= 2) {
+                    wargaInfo.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-user text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Nama Warga</small>
+                                        <strong>${parts[1]}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-tag text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">No. Permohonan</small>
+                                        <strong>${parts[0].replace('#', '')}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }
+            } else {
+                wargaInfo.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="lni lni-information display-5 text-muted mb-3"></i>
+                        <p class="mb-0">Pilih permohonan surat terlebih dahulu untuk melihat informasi warga</p>
+                    </div>
+                `;
+            }
+        });
 
-                // Validasi semua syarat harus diisi jika ada
-                let allSyaratFilled = true;
-                syaratInputs.forEach((input, index) => {
-                    if (input.value.trim() === '') {
-                        allSyaratFilled = false;
-                        input.focus();
-                    }
-                });
-
-                if (!allSyaratFilled) {
-                    e.preventDefault();
-                    alert('Semua field syarat harus diisi!');
-                    return false;
-                }
-
-                // Validasi kode surat (huruf kapital)
-                const kodeInput = document.getElementById('kode');
-                if (kodeInput && kodeInput.value !== kodeInput.value.toUpperCase()) {
-                    const confirmSubmit = confirm('Kode surat sebaiknya menggunakan huruf kapital. Lanjutkan?');
-                    if (!confirmSubmit) {
-                        e.preventDefault();
-                        kodeInput.focus();
-                        return false;
-                    }
-                }
-
-                // Validasi file size
-                let totalSize = 0;
-                uploadedFiles.forEach(file => {
-                    totalSize += file.size;
-                });
-
-                const maxTotalSize = 50 * 1024 * 1024; // 50MB total
-                if (totalSize > maxTotalSize) {
-                    e.preventDefault();
-                    alert(`Total ukuran file melebihi 50MB. Ukuran saat ini: ${formatFileSize(totalSize)}`);
-                    return false;
-                }
-
-                // Show loading
-                const submitBtn = document.getElementById('submitBtn');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="lni lni-spinner-solid spin me-2"></i> Menyimpan...';
-                }
-
-                return true;
-            });
+        // Initialize jika sudah ada value dari old input
+        if (permohonanSelect.value) {
+            permohonanSelect.dispatchEvent(new Event('change'));
         }
     });
 </script>

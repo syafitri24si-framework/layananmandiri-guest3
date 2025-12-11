@@ -36,6 +36,7 @@
                             </button>
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarNav">
                                 <ul class="navbar-nav ms-auto">
+                                    @if(Auth::check())
                                     <li class="nav-item">
                                        <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
                                         href="{{ route('dashboard.index') }}#home">
@@ -53,8 +54,10 @@
                                         href="{{ route('dashboard.index') }}#kontak">
                                         Kontak
                                     </a></li>
-                                    <li class="nav-item"><a class="page-scroll" href="{{route('auth.index')}}">Login</a></li>
-                                    <li class="nav-item"><a class="page-scroll" href="{{route('auth.index')}}">Logout</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="{{route('auth.logout')}}">Logout</a></li>
+                                    @else
+                                    <li class="nav-item"><a class="btn btn-primary" href="{{route('auth.index')}}">Login</a></li>
+                                    @endif
                                 </ul>
                             </div>
                         </nav>

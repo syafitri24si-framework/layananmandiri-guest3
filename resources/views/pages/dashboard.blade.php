@@ -88,6 +88,14 @@
                                 <i class="lni lni-checkmark-circle"></i>
                                 Pelayanan terbuka, transparan, dan mudah digunakan oleh semua kalangan.
                             </li>
+                            <li class="wow fadeInUp" data-wow-delay=".55s">
+                                <i class="lni lni-checkmark-circle"></i>
+                                Upload multiple file untuk berkas pendukung dengan mudah.
+                            </li>
+                            <li class="wow fadeInUp" data-wow-delay=".6s">
+                                <i class="lni lni-checkmark-circle"></i>
+                                Lacak riwayat status permohonan secara real-time.
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -143,7 +151,6 @@
                     </a>
                 </div>
 
-
                 <!-- Permohonan Surat -->
                 <div class="col-lg-4 col-md-6">
                     <a href="{{ route('permohonan_surat.index') }}" class="text-decoration-none text-dark">
@@ -169,10 +176,124 @@
                         </div>
                     </a>
                 </div>
+
+                <!-- Berkas Persyaratan -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="{{ route('berkas_persyaratan.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay="1.0s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-folder"></i>
+                            </div>
+                            <h5>Berkas Persyaratan</h5>
+                            <p>Kelola dokumen dan berkas pendukung untuk setiap permohonan surat.</p>
+                            <small class="text-muted d-block mt-2">
+                                <i class="lni lni-upload"></i> Upload multiple file
+                            </small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Riwayat Status -->
+                <div class="col-lg-4 col-md-6">
+                    <a href="{{ route('riwayat_status.index') }}" class="text-decoration-none text-dark">
+                        <div class="single-feature wow fadeInUp text-center" data-wow-delay="1.2s">
+                            <div class="icon mb-3">
+                                <i class="lni lni-history"></i>
+                            </div>
+                            <h5>Riwayat Status</h5>
+                            <p>Lacak perkembangan dan riwayat status setiap permohonan surat.</p>
+                            <small class="text-muted d-block mt-2">
+                                <i class="lni lni-timer"></i> Real-time tracking
+                            </small>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
     <!-- ========================= Layanan Section end ========================= -->
+
+    <!-- ========================= Fitur Upload Section start ========================= -->
+    <section id="fitur-upload" class="feature-section feature-style-3 pt-100 pb-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xxl-5 col-xl-6 col-lg-7 col-md-8">
+                    <div class="section-title text-center mb-60">
+                        <h3 class="mb-15 wow fadeInUp" data-wow-delay=".2s">Fitur Unggulan</h3>
+                        <p class="wow fadeInUp" data-wow-delay=".4s">
+                            Sistem upload file multiple untuk mendukung administrasi digital desa.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <!-- Upload Multiple File -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".2s">
+                        <div class="icon mb-3">
+                            <i class="lni lni-cloud-upload"></i>
+                        </div>
+                        <h5>Upload Multiple File</h5>
+                        <p>Upload beberapa file sekaligus untuk kelengkapan berkas persyaratan.</p>
+                        <div class="feature-list mt-3">
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> JPG, PNG, PDF, DOC</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Max 5MB per file</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Organize by category</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Management -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".4s">
+                        <div class="icon mb-3">
+                            <i class="lni lni-database"></i>
+                        </div>
+                        <h5>Sistem Media Terpusat</h5>
+                        <p>Semua file tersimpan dalam satu database dengan pengelolaan yang mudah.</p>
+                        <div class="feature-list mt-3">
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Tabel media terintegrasi</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Kategorisasi otomatis</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Pencarian cepat</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Tracking -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="single-feature wow fadeInUp text-center" data-wow-delay=".6s">
+                        <div class="icon mb-3">
+                            <i class="lni lni-map"></i>
+                        </div>
+                        <h5>Pelacakan Riwayat</h5>
+                        <p>Monitor setiap perubahan status dengan timeline yang jelas dan detail.</p>
+                        <div class="feature-list mt-3">
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Timeline visual</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> File pendukung status</small><br>
+                            <small><i class="lni lni-checkmark-circle text-success me-1"></i> Notifikasi real-time</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-8 text-center">
+                    <div class="alert alert-info wow fadeInUp" data-wow-delay=".8s">
+                        <h6><i class="lni lni-information me-2"></i> Cara Menggunakan Fitur Upload:</h6>
+                        <ol class="text-start mt-3" style="display: inline-block;">
+                            <li>Masuk ke menu <strong>Berkas Persyaratan</strong> atau <strong>Riwayat Status</strong></li>
+                            <li>Klik tombol <strong>"Upload File"</strong> atau <strong>"Tambah Berkas"</strong></li>
+                            <li>Pilih file yang ingin diupload (bisa multiple)</li>
+                            <li>Tambahkan keterangan jika diperlukan</li>
+                            <li>File akan otomatis tersimpan dan terorganisir</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ========================= Fitur Upload Section end ========================= -->
 
     <!-- ========================= Kontak Section start ========================= -->
     <section id="kontak" class="contact-section contact-style-5 pt-100 pb-100">

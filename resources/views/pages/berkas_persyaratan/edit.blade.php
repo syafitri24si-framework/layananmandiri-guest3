@@ -1,4 +1,4 @@
-{{-- resources/views/pages/jenis_surat/edit.blade.php --}}
+{{-- resources/views/pages/berkas_persyaratan/edit.blade.php --}}
 @extends('layouts.guest.app')
 
 @section('content')
@@ -8,8 +8,8 @@
             <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                 <div class="section-title text-center mb-50">
                     <br><br>
-                    <h3 class="mb-15">Edit Jenis Surat</h3>
-                    <p>Silahkan perbarui data jenis surat di bawah</p>
+                    <h3 class="mb-15">Edit Berkas Persyaratan</h3>
+                    <p>Silahkan perbarui data berkas persyaratan di bawah</p>
                 </div>
             </div>
         </div>
@@ -38,211 +38,178 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('jenis_surat.update', $jenisSurat->jenis_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <form action="{{ route('berkas_persyaratan.update', $berkas->berkas_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
                         @csrf
                         @method('PUT')
                         <div class="row g-4">
 
-                            {{-- Kode Surat --}}
+                            {{-- Informasi Permohonan (Readonly) --}}
                             <div class="col-md-6">
                                 <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Kode Surat <span class="text-danger">*</span></label>
-                                    <input type="text" id="kode" name="kode"
-                                           class="form-input @error('kode') is-invalid @enderror"
-                                           placeholder="Contoh: SKTM, SKU, SKCK"
-                                           value="{{ old('kode', $jenisSurat->kode) }}" required>
-                                    <i class="lni lni-key position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('kode')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Kode unik untuk jenis surat</small>
+                                    <label class="form-label mb-2">Permohonan Surat</label>
+                                    <input type="text" class="form-input bg-light" readonly
+                                           value="#{{ $berkas->permohonan->nomor_permohonan }} - {{ $berkas->permohonan->warga->nama }}">
+                                    <i class="lni lni-notepad position-absolute"
+                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                    <input type="hidden" name="permohonan_id" value="{{ $berkas->permohonan_id }}">
+                                    <small class="text-muted">Permohonan tidak dapat diubah</small>
                                 </div>
                             </div>
 
-                            {{-- Nama Jenis Surat --}}
+                            {{-- Status Validasi --}}
                             <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Nama Jenis Surat <span class="text-danger">*</span></label>
-                                    <input type="text" id="nama_jenis" name="nama_jenis"
-                                           class="form-input @error('nama_jenis') is-invalid @enderror"
-                                           placeholder="Contoh: Surat Keterangan Tidak Mampu"
-                                           value="{{ old('nama_jenis', $jenisSurat->nama_jenis) }}" required>
-                                    <i class="lni lni-text-format position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('nama_jenis')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Nama lengkap jenis surat</small>
-                                </div>
-                            </div>
-
-                            {{-- Syarat (Dinamis) --}}
-                            <div class="col-md-12">
                                 <div class="position-relative">
-                                    <label class="form-label mb-2 d-flex justify-content-between align-items-center">
-                                        <span>Syarat <span class="text-danger">*</span></span>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" id="addSyaratBtn">
-                                            <i class="lni lni-plus me-1"></i> Tambah Syarat
-                                        </button>
-                                    </label>
-                                    <div id="syaratContainer">
-                                        @php
-                                            // FIX: Ambil data syarat dari model (sudah di-decode oleh accessor)
-                                            $syaratArray = old('syarat_json') ?? $jenisSurat->syarat_json ?? [];
-                                            // Pastikan selalu array
-                                            if (is_string($syaratArray)) {
-                                                // Jika masih string, coba decode JSON
-                                                $decoded = json_decode($syaratArray, true);
-                                                $syaratArray = is_array($decoded) ? $decoded : explode(',', $syaratArray);
-                                            }
-                                            $syaratArray = array_map('trim', $syaratArray);
-                                        @endphp
-
-                                        @if(count($syaratArray) > 0)
-                                            @foreach($syaratArray as $index => $syarat)
-                                                <div class="input-group mb-2 syarat-item">
-                                                    <input type="text" name="syarat_json[]"
-                                                           class="form-control"
-                                                           placeholder="Masukkan syarat"
-                                                           value="{{ $syarat }}" required>
-                                                    <button type="button" class="btn btn-outline-danger remove-syarat">
-                                                        <i class="lni lni-close"></i>
-                                                    </button>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="input-group mb-2 syarat-item">
-                                                <input type="text" name="syarat_json[]"
-                                                       class="form-control"
-                                                       placeholder="Contoh: Fotokopi KTP" required>
-                                                <button type="button" class="btn btn-outline-danger remove-syarat">
-                                                    <i class="lni lni-close"></i>
-                                                </button>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @error('syarat_json')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    <label class="form-label mb-2">Status Validasi <span class="text-danger">*</span></label>
+                                    <select name="valid" class="form-select @error('valid') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Status --</option>
+                                        <option value="menunggu" {{ old('valid', $berkas->valid) == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
+                                        <option value="valid" {{ old('valid', $berkas->valid) == 'valid' ? 'selected' : '' }}>Valid</option>
+                                        <option value="tidak_valid" {{ old('valid', $berkas->valid) == 'tidak_valid' ? 'selected' : '' }}>Tidak Valid</option>
+                                    </select>
+                                    @error('valid')
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    @error('syarat_json.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Tambahkan syarat yang diperlukan untuk jenis surat ini</small>
                                 </div>
                             </div>
 
-                            {{-- FILE TEMPLATE YANG SUDAH ADA --}}
+                            {{-- Nama Berkas --}}
+                            <div class="col-md-6">
+                                <div class="position-relative">
+                                    <label class="form-label mb-2">Nama Berkas <span class="text-danger">*</span></label>
+                                    <select name="nama_berkas" id="nama_berkas" class="form-select @error('nama_berkas') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Jenis Berkas --</option>
+                                        <option value="KTP" {{ old('nama_berkas', $berkas->nama_berkas) == 'KTP' ? 'selected' : '' }}>KTP</option>
+                                        <option value="KK" {{ old('nama_berkas', $berkas->nama_berkas) == 'KK' ? 'selected' : '' }}>Kartu Keluarga (KK)</option>
+                                        <option value="Surat Pengantar RT/RW" {{ old('nama_berkas', $berkas->nama_berkas) == 'Surat Pengantar RT/RW' ? 'selected' : '' }}>Surat Pengantar RT/RW</option>
+                                        <option value="Pas Foto" {{ old('nama_berkas', $berkas->nama_berkas) == 'Pas Foto' ? 'selected' : '' }}>Pas Foto</option>
+                                        <option value="Surat Keterangan" {{ old('nama_berkas', $berkas->nama_berkas) == 'Surat Keterangan' ? 'selected' : '' }}>Surat Keterangan</option>
+                                        <option value="Ijazah" {{ old('nama_berkas', $berkas->nama_berkas) == 'Ijazah' ? 'selected' : '' }}>Ijazah</option>
+                                        <option value="Akte Kelahiran" {{ old('nama_berkas', $berkas->nama_berkas) == 'Akte Kelahiran' ? 'selected' : '' }}>Akte Kelahiran</option>
+                                        <option value="Akte Nikah" {{ old('nama_berkas', $berkas->nama_berkas) == 'Akte Nikah' ? 'selected' : '' }}>Akte Nikah</option>
+                                        <option value="NPWP" {{ old('nama_berkas', $berkas->nama_berkas) == 'NPWP' ? 'selected' : '' }}>NPWP</option>
+                                        <option value="Lainnya" {{ old('nama_berkas', $berkas->nama_berkas) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    </select>
+                                    @error('nama_berkas')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- Nama Berkas Custom --}}
+                            <div class="col-md-6">
+                                <div class="single-input position-relative">
+                                    <label class="form-label mb-2">Nama Berkas Kustom</label>
+                                    <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
+                                           class="form-input @error('nama_berkas_custom') is-invalid @enderror"
+                                           placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
+                                           value="{{ $berkas->nama_berkas == 'Lainnya' ? $berkas->nama_berkas : '' }}"
+                                           {{ $berkas->nama_berkas == 'Lainnya' ? '' : 'disabled' }}>
+                                    <i class="lni lni-edit position-absolute"
+                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                    @error('nama_berkas_custom')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- File yang Sudah Ada --}}
                             <div class="col-md-12">
                                 <div class="position-relative">
                                     <label class="form-label mb-3 d-flex align-items-center">
                                         <i class="lni lni-files me-2"></i>
-                                        File Template yang Sudah Ada
-                                        @if($jenisSurat->mediaFiles && $jenisSurat->mediaFiles->count() > 0)
-                                            <span class="badge bg-primary ms-2">{{ $jenisSurat->mediaFiles->count() }}</span>
-                                        @endif
+                                        File yang Sudah Ada
+                                        <span class="badge bg-primary ms-2">{{ $mediaFiles->count() }}</span>
                                     </label>
 
-                                    @if($jenisSurat->mediaFiles && $jenisSurat->mediaFiles->count() > 0)
+                                    @if($mediaFiles->count() > 0)
                                         <div id="existingFilesContainer" class="mt-4">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h6 class="mb-0">
-                                                    <i class="lni lni-folder me-2"></i> File Template Terupload
+                                                    <i class="lni lni-folder me-2"></i> File Terupload
                                                 </h6>
                                                 <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
                                                     <i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus
                                                 </button>
                                             </div>
                                             <div id="existingFileList" class="row g-3">
-                                                @foreach($jenisSurat->mediaFiles as $media)
-                                                    <div class="col-md-6 col-lg-4">
-                                                        <div class="file-card p-3 position-relative border border-primary" data-file-id="{{ $media->media_id }}">
-                                                            <div class="form-check position-absolute top-0 end-0 m-2">
-                                                                <input type="checkbox"
-                                                                       class="form-check-input delete-checkbox"
-                                                                       name="delete_files[]"
-                                                                       id="delete_file_{{ $media->media_id }}"
-                                                                       value="{{ $media->media_id }}">
-                                                                <label class="form-check-label" for="delete_file_{{ $media->media_id }}"></label>
+                                                @foreach($mediaFiles as $index => $media)
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="file-card p-3 position-relative border border-primary" data-file-id="{{ $media->media_id }}">
+                                                        <div class="form-check position-absolute top-0 end-0 m-2">
+                                                            <input type="checkbox"
+                                                                   class="form-check-input delete-checkbox"
+                                                                   name="delete_media[{{ $media->media_id }}]"
+                                                                   id="delete_media_{{ $media->media_id }}"
+                                                                   value="1">
+                                                            <label class="form-check-label" for="delete_media_{{ $media->media_id }}"></label>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-start">
+                                                            <div class="file-icon-wrapper {{ $media->mime_type == 'application/pdf' ? 'pdf' : (str_contains($media->mime_type, 'image/') ? 'image' : 'other') }} me-3">
+                                                                <i class="{{ $media->mime_type == 'application/pdf' ? 'lni lni-empty-file' : (str_contains($media->mime_type, 'image/') ? 'lni lni-image' : 'lni lni-file') }}"></i>
                                                             </div>
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="mb-1" title="{{ $media->file_name }}">
+                                                                    {{ strlen($media->file_name) > 20 ? substr($media->file_name, 0, 17) . '...' : $media->file_name }}
+                                                                </h6>
+                                                                <small class="text-muted d-block">
+                                                                    {{ $media->mime_type }}
+                                                                </small>
+                                                                <small class="text-muted">
+                                                                    {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
+                                                                </small>
 
-                                                            <div class="d-flex align-items-start">
-                                                                <div class="file-icon-wrapper
-                                                                    @if($media->mime_type == 'application/pdf') pdf
-                                                                    @elseif(str_contains($media->mime_type, 'image/')) image
-                                                                    @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) word
-                                                                    @else other @endif
-                                                                    me-3">
-                                                                    <i class="
-                                                                        @if($media->mime_type == 'application/pdf') lni lni-empty-file
-                                                                        @elseif(str_contains($media->mime_type, 'image/')) lni lni-image
-                                                                        @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) lni lni-files
-                                                                        @else lni lni-file @endif
-                                                                    "></i>
+                                                                <div class="mt-3">
+                                                                    <input type="text"
+                                                                           name="existing_captions[{{ $media->media_id }}]"
+                                                                           class="form-control form-control-sm caption-input"
+                                                                           placeholder="Caption (opsional)"
+                                                                           value="{{ old('existing_captions.' . $media->media_id, $media->caption) }}">
                                                                 </div>
-                                                                <div class="flex-grow-1">
-                                                                    <h6 class="mb-1" title="{{ $media->file_name }}">
-                                                                        {{ Str::limit($media->file_name, 20) }}
-                                                                    </h6>
-                                                                    <small class="text-muted d-block">
-                                                                        {{ $media->mime_type }}
-                                                                    </small>
-                                                                    <small class="text-muted">
-                                                                        {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
-                                                                    </small>
 
-                                                                    <div class="mt-3">
-                                                                        <input type="text"
-                                                                               name="captions[{{ $media->media_id }}]"
-                                                                               class="form-control form-control-sm caption-input"
-                                                                               placeholder="Caption (opsional)"
-                                                                               value="{{ old('captions.' . $media->media_id, $media->caption) }}">
-                                                                    </div>
-
-                                                                    <div class="d-flex flex-wrap gap-2 mt-3">
-                                                                        @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
-                                                                            <button type="button"
-                                                                                    class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
-                                                                                    data-media-id="{{ $media->media_id }}"
-                                                                                    data-filename="{{ $media->file_name }}"
-                                                                                    data-mimetype="{{ $media->mime_type }}"
-                                                                                    data-url="{{ asset('storage/templates/jenis_surat/' . $media->file_name) }}">
-                                                                                <i class="lni lni-eye me-1"></i> Preview
-                                                                            </button>
-                                                                        @endif
-                                                                        <a href="{{ route('jenis_surat.download_template', $media->media_id) }}"
-                                                                           class="btn btn-outline-success btn-sm btn-file-action"
-                                                                           download="{{ $media->file_name }}">
-                                                                            <i class="lni lni-download me-1"></i> Download
-                                                                        </a>
-                                                                    </div>
+                                                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                                                    @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
+                                                                    <button type="button"
+                                                                            class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
+                                                                            data-media-id="{{ $media->media_id }}"
+                                                                            data-filename="{{ $media->file_name }}"
+                                                                            data-mimetype="{{ $media->mime_type }}"
+                                                                            data-url="{{ asset('storage/uploads/berkas_persyaratan/' . $media->file_name) }}">
+                                                                        <i class="lni lni-eye me-1"></i> Preview
+                                                                    </button>
+                                                                    @endif
+                                                                    <a href="{{ route('berkas_persyaratan.download', $media->media_id) }}"
+                                                                       class="btn btn-outline-success btn-sm btn-file-action">
+                                                                        <i class="lni lni-download me-1"></i> Download
+                                                                    </a>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
                                                 @endforeach
                                             </div>
                                         </div>
                                     @else
                                         <div class="alert alert-warning">
-                                            <i class="lni lni-warning me-2"></i> Belum ada file template yang diupload.
+                                            <i class="lni lni-warning me-2"></i> Belum ada file yang diupload.
                                         </div>
                                     @endif
                                 </div>
                             </div>
 
-                            {{-- TAMBAH FILE TEMPLATE BARU --}}
+                            {{-- TAMBAH FILE BARU --}}
                             <div class="col-md-12">
                                 <div class="position-relative">
                                     <label class="form-label mb-3 d-flex align-items-center">
                                         <i class="lni lni-cloud-upload me-2"></i>
-                                        Tambah File Template Baru (Optional)
+                                        Tambah File Baru (Optional)
                                     </label>
 
                                     {{-- File Input yang Tersembunyi --}}
-                                    <input type="file" name="template_files[]" id="templateFiles"
-                                           class="d-none @error('template_files') is-invalid @enderror"
-                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                    <input type="file" name="files[]" id="files"
+                                           class="d-none @error('files') is-invalid @enderror"
+                                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
                                            multiple>
 
                                     {{-- Area Upload yang Dapat Diklik --}}
@@ -252,23 +219,23 @@
                                                 <i class="lni lni-plus display-4 text-primary"></i>
                                             </div>
                                             <h5 class="mb-2">Seret & Lepas File di Sini</h5>
-                                            <p class="text-muted mb-3">Atau klik untuk menambah file template baru</p>
+                                            <p class="text-muted mb-3">Atau klik untuk menambah file baru</p>
                                             <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
                                                 <i class="lni lni-folder me-1"></i> Browse Files
                                             </button>
                                             <div class="mt-3">
                                                 <small class="text-muted">
                                                     <i class="lni lni-info-circle me-1"></i>
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
+                                                    Format yang didukung: PDF, JPG, PNG, DOC, XLS | Maks: 10MB per file
                                                 </small>
                                             </div>
                                         </div>
                                     </div>
 
-                                    @error('template_files')
+                                    @error('files')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    @error('template_files.*')
+                                    @error('files.*')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
 
@@ -276,7 +243,7 @@
                                     <div id="filePreviewContainer" class="mt-4" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h6 class="mb-0">
-                                                <i class="lni lni-plus-circle me-2"></i> File Template Baru
+                                                <i class="lni lni-plus-circle me-2"></i> File Baru
                                                 <span class="badge bg-success ms-2" id="fileCount">0</span>
                                             </h6>
                                             <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
@@ -290,14 +257,66 @@
                                 </div>
                             </div>
 
+                            {{-- Informasi Warga --}}
+                            <div class="col-md-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title d-flex align-items-center">
+                                            <i class="lni lni-user me-2"></i> Informasi Warga
+                                        </h6>
+                                        <div id="wargaInfo">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="lni lni-user text-primary me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted d-block">Nama Warga</small>
+                                                            <strong>{{ $berkas->permohonan->warga->nama }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="lni lni-tag text-primary me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted d-block">No. Permohonan</small>
+                                                            <strong>{{ $berkas->permohonan->nomor_permohonan }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="lni lni-envelope text-primary me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted d-block">Jenis Surat</small>
+                                                            <strong>{{ $berkas->permohonan->jenisSurat->nama_jenis ?? 'N/A' }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="lni lni-calendar text-primary me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted d-block">Tanggal Permohonan</small>
+                                                            <strong>{{ \Carbon\Carbon::parse($berkas->permohonan->created_at)->format('d/m/Y') }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- Tombol --}}
                             <div class="col-md-12">
                                 <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                    <a href="{{ route('jenis_surat.index') }}" class="btn btn-outline-danger px-4">
+                                    <a href="{{ route('berkas_persyaratan.index', ['permohonan_id' => $berkas->permohonan_id]) }}"
+                                       class="btn btn-outline-danger px-4">
                                         <i class="lni lni-cross-circle me-2"></i> Batal
                                     </a>
                                     <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Perbarui Jenis Surat
+                                        <i class="lni lni-telegram-original me-2"></i> Perbarui Berkas
                                     </button>
                                 </div>
                             </div>
@@ -470,34 +489,10 @@
         padding: 3rem;
     }
 
-    /* Syarat Input Styles */
-    .syarat-item .form-control {
-        border-right: 0;
-    }
-    .syarat-item .btn-outline-danger {
-        border-left: 0;
-        border-color: #ced4da;
-    }
-    .syarat-item .btn-outline-danger:hover {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: white;
-    }
-
     /* Checkbox style for deletion */
     .form-check-input:checked {
         background-color: #dc3545;
         border-color: #dc3545;
-    }
-
-    /* Loading spinner */
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .spin {
-        animation: spin 1s linear infinite;
     }
 </style>
 
@@ -506,47 +501,35 @@
     let newFiles = [];
 
     document.addEventListener('DOMContentLoaded', function() {
-        // ========== SYARAT DINAMIS ==========
-        const addSyaratBtn = document.getElementById('addSyaratBtn');
-        const syaratContainer = document.getElementById('syaratContainer');
+        // Handle custom nama berkas
+        const namaBerkasSelect = document.getElementById('nama_berkas');
+        const namaBerkasCustomInput = document.getElementById('nama_berkas_custom');
 
-        // Tambah syarat baru
-        addSyaratBtn.addEventListener('click', function() {
-            const newSyarat = document.createElement('div');
-            newSyarat.className = 'input-group mb-2 syarat-item';
-            newSyarat.innerHTML = `
-                <input type="text" name="syarat_json[]"
-                       class="form-control"
-                       placeholder="Masukkan syarat" required>
-                <button type="button" class="btn btn-outline-danger remove-syarat">
-                    <i class="lni lni-close"></i>
-                </button>
-            `;
-            syaratContainer.appendChild(newSyarat);
-
-            // Attach event listener untuk tombol hapus
-            newSyarat.querySelector('.remove-syarat').addEventListener('click', function() {
-                if (syaratContainer.children.length > 1) {
-                    newSyarat.remove();
-                } else {
-                    alert('Minimal harus ada satu syarat');
-                }
-            });
+        namaBerkasSelect.addEventListener('change', function() {
+            if (this.value === 'Lainnya') {
+                namaBerkasCustomInput.disabled = false;
+                namaBerkasCustomInput.required = true;
+                namaBerkasCustomInput.placeholder = "Masukkan nama berkas";
+                namaBerkasCustomInput.focus();
+            } else {
+                namaBerkasCustomInput.disabled = true;
+                namaBerkasCustomInput.required = false;
+                namaBerkasCustomInput.value = '';
+                namaBerkasCustomInput.placeholder = "Masukkan nama berkas jika memilih 'Lainnya'";
+            }
         });
 
-        // Attach event listener untuk tombol hapus syarat yang sudah ada
-        document.querySelectorAll('.remove-syarat').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (syaratContainer.children.length > 1) {
-                    this.closest('.syarat-item').remove();
-                } else {
-                    alert('Minimal harus ada satu syarat');
-                }
-            });
-        });
+        // Initialize jika sudah ada value
+        if (namaBerkasSelect.value === 'Lainnya') {
+            namaBerkasCustomInput.disabled = false;
+            namaBerkasCustomInput.required = true;
+            if (namaBerkasCustomInput.value === '') {
+                namaBerkasCustomInput.value = '{{ $berkas->nama_berkas }}';
+            }
+        }
 
-        // ========== FILE UPLOAD UNTUK FILE BARU ==========
-        const fileInput = document.getElementById('templateFiles');
+        // Multiple file upload handling untuk file baru
+        const fileInput = document.getElementById('files');
         const uploadArea = document.getElementById('uploadArea');
         const browseBtn = document.getElementById('browseBtn');
         const fileList = document.getElementById('fileList');
@@ -631,7 +614,7 @@
                         <div class="mt-3">
                             <small class="text-muted">
                                 <i class="lni lni-info-circle me-1"></i>
-                                Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
+                                Format yang didukung: PDF, JPG, PNG, DOC, XLS | Maks: 10MB per file
                             </small>
                         </div>
                     </div>
@@ -754,9 +737,17 @@
                     removeNewFile(index);
                 });
             });
+
+            // Caption input change handler untuk file baru
+            document.querySelectorAll('.caption-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    showToast('Success', 'Caption berhasil diubah', 'success');
+                });
+            });
         }
 
-        // ========== PREVIEW FILE YANG SUDAH ADA ==========
+        // Preview untuk file yang sudah ada
         document.querySelectorAll('.preview-existing-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const mediaId = this.getAttribute('data-media-id');
@@ -1115,76 +1106,6 @@
                 this.innerHTML = allChecked
                     ? '<i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus'
                     : '<i class="lni lni-checkmark-circle me-1"></i> Batalkan Pilihan Semua';
-            });
-        }
-
-        // ========== VALIDASI FORM SEBELUM SUBMIT ==========
-        const uploadForm = document.getElementById('uploadForm');
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', function(e) {
-                // Validasi minimal 1 syarat yang diisi
-                const syaratInputs = document.querySelectorAll('input[name="syarat_json[]"]');
-                let hasValidSyarat = false;
-
-                syaratInputs.forEach(input => {
-                    if (input.value.trim() !== '') {
-                        hasValidSyarat = true;
-                    }
-                });
-
-                if (!hasValidSyarat) {
-                    e.preventDefault();
-                    alert('Minimal harus ada satu syarat yang diisi!');
-                    return false;
-                }
-
-                // Validasi semua syarat harus diisi jika ada
-                let allSyaratFilled = true;
-                syaratInputs.forEach((input, index) => {
-                    if (input.value.trim() === '') {
-                        allSyaratFilled = false;
-                        input.focus();
-                    }
-                });
-
-                if (!allSyaratFilled) {
-                    e.preventDefault();
-                    alert('Semua field syarat harus diisi!');
-                    return false;
-                }
-
-                // Validasi kode surat (huruf kapital)
-                const kodeInput = document.getElementById('kode');
-                if (kodeInput && kodeInput.value !== kodeInput.value.toUpperCase()) {
-                    const confirmSubmit = confirm('Kode surat sebaiknya menggunakan huruf kapital. Lanjutkan?');
-                    if (!confirmSubmit) {
-                        e.preventDefault();
-                        kodeInput.focus();
-                        return false;
-                    }
-                }
-
-                // Validasi file size total
-                let totalSize = 0;
-                newFiles.forEach(file => {
-                    totalSize += file.size;
-                });
-
-                const maxTotalSize = 50 * 1024 * 1024; // 50MB total
-                if (totalSize > maxTotalSize) {
-                    e.preventDefault();
-                    alert(`Total ukuran file melebihi 50MB. Ukuran saat ini: ${formatFileSize(totalSize)}`);
-                    return false;
-                }
-
-                // Show loading
-                const submitBtn = document.getElementById('submitBtn');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="lni lni-spinner-solid spin me-2"></i> Memperbarui...';
-                }
-
-                return true;
             });
         }
     });

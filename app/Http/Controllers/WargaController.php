@@ -10,37 +10,35 @@ class WargaController extends Controller
     /**
      * Tampilkan semua data warga.
      */
-   public function index(Request $request)
-{
-    $query = Warga::query();
+    public function index(Request $request)
+    {
+        $query = Warga::query();
 
-    // Apply existing filters
-    if ($request->filled('jenis_kelamin')) {
-        $query->where('jenis_kelamin', $request->input('jenis_kelamin'));
+        // Apply existing filters
+        if ($request->filled('jenis_kelamin')) {
+            $query->where('jenis_kelamin', $request->input('jenis_kelamin'));
+        }
+
+        if ($request->filled('agama')) {
+            $query->where('agama', $request->input('agama'));
+        }
+
+        // Apply search
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('nama', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('no_ktp', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('telp', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('pekerjaan', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $warga = $query->paginate(12);
+
+        return view('pages.warga.index', compact('warga'));
     }
-
-    if ($request->filled('agama')) {
-        $query->where('agama', $request->input('agama'));
-    }
-
-    // Apply search
-    if ($request->filled('search')) {
-        $searchTerm = $request->input('search');
-        $query->where(function($q) use ($searchTerm) {
-            $q->where('nama', 'like', '%' . $searchTerm . '%')
-              ->orWhere('no_ktp', 'like', '%' . $searchTerm . '%')
-              ->orWhere('email', 'like', '%' . $searchTerm . '%')
-              ->orWhere('telp', 'like', '%' . $searchTerm . '%')
-              ->orWhere('pekerjaan', 'like', '%' . $searchTerm . '%');
-        });
-    }
-
-    $warga = $query->paginate(12);
-
-    return view('pages.warga.index', compact('warga'));
-}
-
-
 
     /**
      * Form tambah data warga.
@@ -71,12 +69,21 @@ class WargaController extends Controller
     }
 
     /**
+     * Tampilkan detail warga.
+     */
+    public function show($id)
+    {
+        $data['warga'] = Warga::findOrFail($id);
+        return view('pages.warga.show', $data);
+    }
+
+    /**
      * Form edit data warga.
      */
     public function edit($id)
     {
         $data['warga'] = Warga::findOrFail($id);
-    return view('pages.warga.edit', $data);
+        return view('pages.warga.edit', $data);
     }
 
     /**
@@ -84,21 +91,20 @@ class WargaController extends Controller
      */
     public function update(Request $request, $id)
     {
-    $warga_id = $id;
-    $warga = Warga::findOrFail($warga_id);
+        $warga_id = $id;
+        $warga = Warga::findOrFail($warga_id);
 
-    $warga->no_ktp = $request->no_ktp;
-    $warga->nama = $request->nama;
-    $warga->jenis_kelamin = $request->jenis_kelamin;
-    $warga->agama = $request->agama;
-    $warga->pekerjaan = $request->pekerjaan;
-    $warga->telp = $request->telp;
-    $warga->email = $request->email;
+        $warga->no_ktp = $request->no_ktp;
+        $warga->nama = $request->nama;
+        $warga->jenis_kelamin = $request->jenis_kelamin;
+        $warga->agama = $request->agama;
+        $warga->pekerjaan = $request->pekerjaan;
+        $warga->telp = $request->telp;
+        $warga->email = $request->email;
 
-    $warga->save();
+        $warga->save();
 
-    return redirect()->route('warga.index')->with('success', 'Perubahan Data Warga Berhasil!');
-
+        return redirect()->route('warga.index')->with('success', 'Perubahan Data Warga Berhasil!');
     }
 
     /**

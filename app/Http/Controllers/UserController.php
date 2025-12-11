@@ -60,6 +60,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
             'email'    => 'required|string|email|max:100|unique:users',
+            'role'     => 'required|string|max:200',
             'password' => 'required|string|min:8|max:20',
         ]);
 
@@ -67,6 +68,15 @@ class UserController extends Controller
 
         $user = User::create($validated);
         return redirect()->route('user.index')->with('success', 'Penambahan Data Berhasil!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $data['user'] = User::findOrFail($id);
+        return view('pages.user.show', $data);
     }
 
     /**
@@ -88,6 +98,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
             'email'    => 'required|string|email|max:100|unique:users,email,' . $id,
+            'role'     => 'required|string|max:200',
             'password' => 'nullable|string|min:8|max:20',
         ]);
 
