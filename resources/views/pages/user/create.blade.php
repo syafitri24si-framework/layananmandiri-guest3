@@ -40,7 +40,8 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('user.store') }}" method="POST">
+                        {{-- PERUBAHAN: Tambah enctype="multipart/form-data" --}}
+                        <form action="{{ route('user.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row g-4">
 
@@ -77,23 +78,19 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 {{-- Role --}}
                                 <div class="col-md-6">
                                     <div class="position-relative">
                                         <label class="form-label mb-2">Pilih Role <span class="text-danger">*</span></label>
                                         <div class="single-input position-relative">
-
                                             <select name="role" id="role"
                                                 class="form-input select-input @error('role') is-invalid @enderror"
                                                 required>
                                                 <option value="">-- Pilih Role --</option>
-                                                <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin
-                                                </option>
-                                                <option value="Warga" {{ old('role') == 'Warga' ? 'selected' : '' }}>Warga
-                                                </option>
+                                                <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin</option>
+                                                <option value="Warga" {{ old('role') == 'Warga' ? 'selected' : '' }}>Warga</option>
                                             </select>
-
-
                                             @error('role')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -101,6 +98,35 @@
                                     </div>
                                 </div>
 
+                                {{-- PERUBAHAN: Tambah Field Upload Foto Profil --}}
+                                {{-- Foto Profil --}}
+                                <div class="col-md-6">
+                                    <div class="position-relative">
+                                        <label class="form-label mb-2">Foto Profil</label>
+                                        <div class="single-input position-relative">
+                                            <input type="file" id="profile_picture" name="profile_picture"
+                                                   class="form-input @error('profile_picture') is-invalid @enderror"
+                                                   accept="image/*">
+                                            <i class="lni lni-image position-absolute"
+                                               style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                            @error('profile_picture')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <small class="text-muted mt-1">
+                                            <i class="lni lni-info-circle me-1"></i>
+                                            Format: JPG, PNG, JPEG, GIF, WEBP. Maksimal 2MB
+                                        </small>
+
+                                        {{-- Preview gambar --}}
+                                        <div id="imagePreview" class="mt-3 d-none">
+                                            <p class="mb-2"><small>Preview:</small></p>
+                                            <img id="previewImage" src="#" alt="Preview"
+                                                 class="rounded-circle border"
+                                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {{-- Password --}}
                                 <div class="col-md-6">
@@ -123,18 +149,19 @@
                                     </div>
                                 </div>
 
+                                {{-- PERUBAHAN: Ganti nama field menjadi password_confirmation --}}
                                 {{-- Konfirmasi Password --}}
                                 <div class="col-md-6">
                                     <div class="position-relative">
                                         <label class="form-label mb-2">Konfirmasi Password <span
                                                 class="text-danger">*</span></label>
                                         <div class="single-input position-relative">
-                                            <input type="password" id="konfirmasi_password" name="konfirmasi_password"
-                                                class="form-input @error('konfirmasi_password') is-invalid @enderror"
+                                            <input type="password" id="password_confirmation" name="password_confirmation"
+                                                class="form-input @error('password_confirmation') is-invalid @enderror"
                                                 placeholder="Masukkan ulang password" required>
                                             <i class="lni lni-lock position-absolute"
                                                 style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                            @error('konfirmasi_password')
+                                            @error('password_confirmation')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -154,7 +181,7 @@
                                             </h6>
                                             <div class="text-muted">
                                                 <div class="row">
-                                                    <div class="col-md-6 mb-3">
+                                                    <div class="col-md-4 mb-3">
                                                         <div class="d-flex align-items-center">
                                                             <i class="lni lni-key text-primary me-2"></i>
                                                             <div>
@@ -166,14 +193,24 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6 mb-3">
+                                                    <div class="col-md-4 mb-3">
                                                         <div class="d-flex align-items-center">
                                                             <i class="lni lni-verified text-primary me-2"></i>
                                                             <div>
                                                                 <small class="text-muted d-block">Verifikasi Email</small>
                                                                 <span class="badge bg-warning text-dark">
-                                                                    <i class="lni lni-timer me-1"></i> Akan dikirim
-                                                                    otomatis
+                                                                    <i class="lni lni-timer me-1"></i> Akan dikirim otomatis
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="lni lni-image text-primary me-2"></i>
+                                                            <div>
+                                                                <small class="text-muted d-block">Foto Profil</small>
+                                                                <span class="badge bg-info">
+                                                                    <i class="lni lni-image me-1"></i> Opsional
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -187,9 +224,9 @@
                                                                 <strong>Catatan:</strong> Setelah user dibuat, sistem akan:
                                                                 <ul class="mb-0 mt-2">
                                                                     <li>Mengenkripsi password menggunakan hashing</li>
-                                                                    <li>Mengirim email verifikasi ke alamat email yang
-                                                                        diinput</li>
+                                                                    <li>Mengirim email verifikasi ke alamat email yang diinput</li>
                                                                     <li>Membuat token remember untuk session</li>
+                                                                    <li>Menyimpan foto profil ke storage jika diupload</li>
                                                                 </ul>
                                                             </small>
                                                         </div>
@@ -312,6 +349,16 @@
             box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
         }
 
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
         .alert-info {
             background-color: #e8f4fc;
             border-color: #b6e0fe;
@@ -348,13 +395,41 @@
         .select-input::-ms-expand {
             display: none;
         }
+
+        /* PERUBAHAN: Style untuk input file */
+        input[type="file"] {
+            padding: 12px !important;
+            line-height: 1.5;
+            height: auto !important;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        /* Style untuk preview image */
+        #previewImage {
+            border: 3px solid #f8f9fa;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Validasi password match
             const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('konfirmasi_password');
+            const confirmPasswordInput = document.getElementById('password_confirmation');
             const submitBtn = document.getElementById('submitBtn');
 
             function validatePassword() {
@@ -362,11 +437,15 @@
                     confirmPasswordInput.classList.add('is-invalid');
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="lni lni-warning me-2"></i> Password tidak cocok';
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-danger');
                     return false;
                 } else {
                     confirmPasswordInput.classList.remove('is-invalid');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="lni lni-telegram-original me-2"></i> Simpan User';
+                    submitBtn.classList.remove('btn-danger');
+                    submitBtn.classList.add('btn-success');
                     return true;
                 }
             }
@@ -374,10 +453,43 @@
             passwordInput.addEventListener('input', validatePassword);
             confirmPasswordInput.addEventListener('input', validatePassword);
 
-            // Validasi awal
-            validatePassword();
+            // Preview image sebelum upload
+            const profilePictureInput = document.getElementById('profile_picture');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
 
-            // Toggle password visibility (opsional)
+            profilePictureInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validasi ukuran file (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Ukuran file maksimal 2MB');
+                        this.value = '';
+                        imagePreview.classList.add('d-none');
+                        return;
+                    }
+
+                    // Validasi tipe file
+                    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Format file tidak didukung. Gunakan JPG, PNG, GIF, atau WEBP.');
+                        this.value = '';
+                        imagePreview.classList.add('d-none');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        imagePreview.classList.remove('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.classList.add('d-none');
+                }
+            });
+
+            // Toggle password visibility
             const togglePasswordBtns = document.querySelectorAll('.single-input i.lni-lock');
             togglePasswordBtns.forEach(icon => {
                 icon.style.cursor = 'pointer';
@@ -394,6 +506,9 @@
                     }
                 });
             });
+
+            // Validasi awal
+            validatePassword();
         });
     </script>
 @endsection

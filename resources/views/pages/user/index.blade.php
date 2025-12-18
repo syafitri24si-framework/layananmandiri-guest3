@@ -6,14 +6,112 @@
     <div class="container">
         {{-- Header Section --}}
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">
-            <div class="col-md-6 text-center text-md-start">
+            <div class="col-md-8 text-center text-md-start">
                 <h3 class="mb-2" style="margin-bottom: 20px !important;">
                     <i class="lni lni-users me-2"></i> Daftar User
                 </h3>
-                <p class="text-muted mb-0">Kelola data user sistem Bina Desa.</p>
+                <p class="text-muted mb-2">
+                    Kelola data user sistem Bina Desa.
+                </p>
+                {{-- Informasi Jumlah Data --}}
+                <div class="data-info-container mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="data-info-card p-3 rounded border">
+                                <div class="d-flex align-items-center">
+                                    <div class="data-icon me-3">
+                                        <i class="lni lni-database text-primary" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="data-label text-muted small">Total User</div>
+                                        <div class="data-value h4 mb-0 text-primary">{{ $user->total() }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="data-info-card p-3 rounded border">
+                                <div class="d-flex align-items-center">
+                                    <div class="data-icon me-3">
+                                        <i class="lni lni-checkmark-circle text-success" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="data-label text-muted small">Terverifikasi</div>
+                                        <div class="data-value h4 mb-0 text-success">
+                                            {{ $user->whereNotNull('email_verified_at')->count() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="data-info-card p-3 rounded border">
+                                <div class="d-flex align-items-center">
+                                    <div class="data-icon me-3">
+                                        <i class="lni lni-users text-info" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="data-label text-muted small">Admin</div>
+                                        <div class="data-value h4 mb-0 text-info">
+                                            {{ $user->where('role', 'Admin')->count() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="data-info-card p-3 rounded border">
+                                <div class="d-flex align-items-center">
+                                    <div class="data-icon me-3">
+                                        <i class="lni lni-user text-warning" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="data-label text-muted small">Warga</div>
+                                        <div class="data-value h4 mb-0 text-warning">
+                                            {{ $user->where('role', 'Warga')->count() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Informasi Pagination --}}
+                    @if($user->total() > 0)
+                        <div class="mt-3">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <div class="pagination-info">
+                                    <span class="badge bg-primary">
+                                        <i class="lni lni-list me-1"></i>
+                                        Halaman {{ $user->currentPage() }} dari {{ $user->lastPage() }}
+                                    </span>
+                                </div>
+                                <div class="pagination-info">
+                                    <span class="badge bg-secondary">
+                                        <i class="lni lni-layers me-1"></i>
+                                        Menampilkan {{ $user->count() }} dari {{ $user->total() }} data
+                                        @if(request()->hasAny(['name', 'email', 'search']))
+                                            <span class="ms-1">
+                                                (Hasil filter)
+                                            </span>
+                                        @endif
+                                    </span>
+                                </div>
+                                @if($user->count() < $user->total())
+                                    <div class="pagination-info">
+                                        <span class="badge bg-info">
+                                            <i class="lni lni-files me-1"></i>
+                                            {{ $user->perPage() }} data per halaman
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            <div class="col-md-6 text-center text-md-end">
+            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
                 <a href="{{ route('user.create') }}" class="btn btn-success">
                     <i class="lni lni-plus"></i> Tambah User
                 </a>
@@ -96,21 +194,64 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body">
-                            {{-- Header dengan Nama User --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title mb-0">
-                                    <i class="lni lni-user me-1"></i>
-                                    {{ $item->name }}
-                                </h5>
-                                <span class="badge
-                                    @if ($item->email_verified_at) bg-success
-                                    @else bg-warning text-dark @endif">
-                                    @if ($item->email_verified_at)
-                                        <i class="lni lni-checkmark-circle me-1"></i> Verified
-                                    @else
-                                        <i class="lni lni-timer me-1"></i> Unverified
+                            {{-- Header dengan Foto Profil --}}
+                            <div class="d-flex align-items-start mb-3">
+                                {{-- Foto Profil --}}
+                                <div class="me-3 position-relative">
+                                    <div class="avatar-container">
+                                        @if($item->has_default_avatar)
+                                            {{-- Default Avatar: Kepala + Badan --}}
+                                            <div class="default-avatar-placeholder rounded-circle border shadow-sm d-flex align-items-center justify-content-center"
+                                                 style="width: 60px; height: 60px; background-color: #f8f9fa;">
+                                                <div class="avatar-icon">
+                                                    <svg width="40" height="40" viewBox="0 0 40 40">
+                                                        <!-- Kepala -->
+                                                        <circle cx="20" cy="15" r="8" fill="none" stroke="#6c757d" stroke-width="2"/>
+                                                        <!-- Badan -->
+                                                        <path d="M12,25 Q20,30 28,25" fill="none" stroke="#6c757d" stroke-width="2"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        @else
+                                            {{-- Foto Custom --}}
+                                            <img src="{{ $item->profile_picture_url }}"
+                                                 alt="{{ $item->name }}"
+                                                 class="rounded-circle border shadow-sm custom-avatar"
+                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                        @endif
+                                    </div>
+                                    {{-- Badge untuk default avatar --}}
+                                    @if($item->has_default_avatar)
+                                        <span class="badge bg-light text-dark position-absolute"
+                                              style="bottom: -5px; right: -5px; font-size: 8px; padding: 2px 5px; border: 1px solid #dee2e6;">
+                                            <i class="lni lni-user" style="font-size: 8px;"></i>
+                                        </span>
                                     @endif
-                                </span>
+                                </div>
+
+                                {{-- Info User --}}
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">
+                                        {{ $item->name }}
+                                    </h5>
+                                    <p class="text-muted mb-1 small">{{ $item->email }}</p>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge
+                                            @if($item->role == 'Admin') bg-danger
+                                            @else bg-primary @endif">
+                                            {{ $item->role }}
+                                        </span>
+                                        <span class="badge
+                                            @if ($item->email_verified_at) bg-success
+                                            @else bg-warning text-dark @endif small">
+                                            @if ($item->email_verified_at)
+                                                <i class="lni lni-checkmark-circle me-1"></i> Terverifikasi
+                                            @else
+                                                <i class="lni lni-timer me-1"></i> Belum
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
                             {{-- Informasi Dasar --}}
@@ -119,18 +260,28 @@
                                     <div class="col-6">
                                         <div class="d-flex align-items-center text-muted mb-1">
                                             <i class="lni lni-id-card me-2"></i>
-                                            <small>User ID and Role</small>
+                                            <small>User ID</small>
                                         </div>
                                         <p class="mb-0">
-                                            <strong>#{{ $item->id }},{{$item->role}}</strong>
+                                            <strong>#{{ $item->id }}</strong>
                                         </p>
                                     </div>
                                     <div class="col-6">
                                         <div class="d-flex align-items-center text-muted mb-1">
-                                            <i class="lni lni-envelope me-2"></i>
-                                            <small>Email</small>
+                                            <i class="lni lni-image me-2"></i>
+                                            <small>Foto Profil</small>
                                         </div>
-                                        <p class="mb-0 text-truncate">{{ $item->email }}</p>
+                                        <p class="mb-0">
+                                            @if($item->profile_picture)
+                                                <span class="badge bg-success">
+                                                    <i class="lni lni-checkmark-circle me-1"></i> Custom
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">
+                                                    <i class="lni lni-user me-1"></i> Default
+                                                </span>
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -148,7 +299,7 @@
                                             @if ($item->email_verified_at)
                                                 <span class="text-success">Terverifikasi</span>
                                             @else
-                                                <span class="text-warning">Belum Verifikasi</span>
+                                                <span class="text-warning">Belum</span>
                                             @endif
                                         </p>
                                     </div>
@@ -165,21 +316,35 @@
                                 </div>
                             </div>
 
-                            {{-- Password Information --}}
+                            {{-- Keamanan Akun --}}
                             <div class="mb-3">
                                 <div class="d-flex align-items-center text-muted mb-1">
                                     <i class="lni lni-lock me-2"></i>
-                                    <small>Password</small>
+                                    <small>Keamanan Akun</small>
                                 </div>
                                 <div class="bg-light p-2 rounded">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <small class="text-muted">Status Password</small>
-                                        <span class="badge bg-success">
-                                            <i class="lni lni-checkmark-circle me-1"></i> Terenkripsi
-                                        </span>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Password</small>
+                                            <span class="badge bg-success">
+                                                <i class="lni lni-lock me-1"></i> Terenkripsi
+                                            </span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Avatar</small>
+                                            @if($item->profile_picture)
+                                                <span class="badge bg-primary">
+                                                    <i class="lni lni-image me-1"></i> Custom
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-dark border">
+                                                    <i class="lni lni-user me-1"></i> Default
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="lni lni-key me-1"></i> Terakhir diubah: {{ $item->updated_at->format('d M Y') }}
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="lni lni-history me-1"></i> Update: {{ $item->updated_at->format('d M Y') }}
                                     </small>
                                 </div>
                             </div>
@@ -209,22 +374,22 @@
                                 </a>
 
                                 {{-- TOMBOL EDIT --}}
-                            @if (Auth::check() && Auth::user()->role === 'Admin')
-                                <a href="{{ route('user.edit', $item->id) }}"
-                                   class="btn btn-sm btn-outline-warning">
-                                    <i class="lni lni-pencil-alt me-1"></i> Edit
-                                </a>
+                                @if (Auth::check() && Auth::user()->role === 'Admin')
+                                    <a href="{{ route('user.edit', $item->id) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="lni lni-pencil-alt me-1"></i> Edit
+                                    </a>
 
-                                {{-- TOMBOL HAPUS --}}
-                                <form action="{{ route('user.destroy', $item->id) }}"
-                                      method="POST" class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Hapus user ini?')">
-                                        <i class="lni lni-trash me-1"></i> Hapus
-                                    </button>
-                                </form>
-                            @endif
+                                    {{-- TOMBOL HAPUS --}}
+                                    <form action="{{ route('user.destroy', $item->id) }}"
+                                          method="POST" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Hapus user ini?')">
+                                            <i class="lni lni-trash me-1"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -314,11 +479,143 @@
     .card-body {
         padding: 1.25rem;
     }
+
+    /* ✅ STYLE KHUSUS UNTUK DEFAULT AVATAR (KEPALA+BADAN) */
+    .default-avatar-placeholder {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6 !important;
+    }
+
+    .default-avatar-placeholder:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd !important;
+    }
+
+    .avatar-icon svg {
+        opacity: 0.7;
+    }
+
+    .avatar-icon svg:hover {
+        opacity: 1;
+    }
+
+    /* Style untuk foto custom */
+    .custom-avatar {
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .custom-avatar:hover {
+        border-color: #3498db;
+        transform: scale(1.05);
+    }
+
+    /* Style untuk badge kecil */
+    .badge.small {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    /* Badge untuk default avatar */
+    .position-relative .badge {
+        border: 1px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* ✅ STYLE UNTUK INFORMASI DATA */
+    .data-info-card {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .data-info-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-color: #3498db;
+    }
+
+    .data-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .data-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    .data-value {
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .pagination-info .badge {
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('User index page loaded');
+
+        // Hover effect untuk foto custom
+        const customAvatars = document.querySelectorAll('.custom-avatar');
+        customAvatars.forEach(img => {
+            img.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+                this.style.borderColor = '#3498db';
+            });
+
+            img.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+                this.style.borderColor = '#e9ecef';
+            });
+        });
+
+        // Hover effect untuk default avatar
+        const defaultAvatars = document.querySelectorAll('.default-avatar-placeholder');
+        defaultAvatars.forEach(div => {
+            div.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#e9ecef';
+                this.style.borderColor = '#adb5bd !important';
+                this.querySelector('svg').style.opacity = '1';
+            });
+
+            div.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '#f8f9fa';
+                this.style.borderColor = '#dee2e6 !important';
+                this.querySelector('svg').style.opacity = '0.7';
+            });
+        });
+
+        // Hover effect untuk data info cards
+        const dataInfoCards = document.querySelectorAll('.data-info-card');
+        dataInfoCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.08)';
+                this.style.borderColor = '#3498db';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+                this.style.borderColor = '#e9ecef';
+            });
+        });
     });
 </script>
 @endsection

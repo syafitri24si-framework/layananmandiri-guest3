@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -57,17 +58,38 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi input
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
             'email'    => 'required|string|email|max:100|unique:users',
-            'role'     => 'required|string|max:200',
-            'password' => 'required|string|min:8|max:20',
+            'role'     => 'required|string|in:Admin,Warga',
+            'password' => 'required|string|min:8|max:20|confirmed',
+            'password_confirmation' => 'required|string|same:password',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // ✅ TAMBAH VALIDASI
         ]);
 
+        // Upload foto profil jika ada
+        if ($request->hasFile('profile_picture')) {
+            // Validasi file gambar
+            $request->validate([
+                'profile_picture' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+            ]);
+
+            // Simpan file ke storage
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = $path;
+        }
+
+        // Hash password
         $validated['password'] = Hash::make($validated['password']);
 
+        // Hapus field konfirmasi password karena tidak perlu di database
+        unset($validated['password_confirmation']);
+
+        // Buat user
         $user = User::create($validated);
-        return redirect()->route('user.index')->with('success', 'Penambahan Data Berhasil!');
+
+        return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan!');
     }
 
     /**
@@ -95,13 +117,31 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        // Validasi
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
             'email'    => 'required|string|email|max:100|unique:users,email,' . $id,
-            'role'     => 'required|string|max:200',
+            'role'     => 'required|string|in:Admin,Warga',
             'password' => 'nullable|string|min:8|max:20',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
+        // Upload foto profil baru jika ada
+        if ($request->hasFile('profile_picture')) {
+            // Hapus foto lama jika ada
+            $user->deleteProfilePicture();
+
+            // Simpan file baru
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = $path;
+        }
+        // Hapus foto jika user memilih checkbox "hapus foto"
+        elseif ($request->has('remove_profile_picture')) {
+            $user->deleteProfilePicture();
+            $validated['profile_picture'] = null;
+        }
+
+        // Update password jika diisi
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
@@ -109,7 +149,7 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        return redirect()->route('user.index')->with('success', 'Perubahan Data Berhasil!');
+        return redirect()->route('user.index')->with('success', 'Data user berhasil diperbarui!');
     }
 
     /**
@@ -118,6 +158,10 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
+
+        // Hapus foto profil jika ada
+        $user->deleteProfilePicture();
+
         $user->delete();
         return redirect()->route('user.index')->with('success', 'Data user berhasil dihapus');
     }
