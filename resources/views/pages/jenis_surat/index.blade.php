@@ -2,10 +2,10 @@
 @extends('layouts.guest.app')
 
 @section('content')
-    <section class="jenis-surat-section py-5">
+    <section class="jenis-surat-section" style="padding-top: 120px; min-height: 100vh;">
         <div class="container">
             {{-- HEADER --}}
-            <div class="row mb-4 align-items-center" style="margin-top: 30px;">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-6 text-center text-md-start">
                     <h3 class="mb-2" style="margin-bottom: 20px !important;">
                         <i class="lni lni-files me-2"></i> Jenis Surat
@@ -106,9 +106,7 @@
                                         <small>Syarat</small>
                                     </div>
                                     @php
-                                        // Karena sudah ada accessor di Model, syarat_json otomatis jadi array
                                         $syaratArray = $item->syarat_json ?? [];
-                                        // Pastikan selalu array
                                         if (is_string($syaratArray)) {
                                             $syaratArray = json_decode($syaratArray, true) ?? [];
                                         }
@@ -119,7 +117,6 @@
                                         <div class="syarat-list">
                                             @foreach ($syaratArray as $index => $syarat)
                                                 @if ($index < 3)
-                                                    {{-- Tampilkan maksimal 3 syarat --}}
                                                     <div class="d-flex align-items-center mb-1">
                                                         <i class="lni lni-checkmark-circle text-success me-2"
                                                             style="font-size: 0.8rem;"></i>
@@ -226,7 +223,7 @@
                             {{-- FOOTER - ACTION BUTTONS --}}
                             <div class="card-footer bg-transparent border-top-0 pt-0">
                                 <div class="d-flex justify-content-between">
-                                    {{-- TOMBOL DETAIL (MENGARAH KE SHOW PAGE) --}}
+                                    {{-- TOMBOL DETAIL --}}
                                     <a href="{{ route('jenis_surat.show', $item->jenis_id) }}"
                                         class="btn btn-sm btn-outline-info">
                                         <i class="lni lni-eye me-1"></i> Detail
@@ -278,6 +275,11 @@
     </section>
 
     <style>
+        .jenis-surat-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding-bottom: 60px;
+        }
+
         .select-wrapper {
             position: relative;
         }
@@ -354,11 +356,66 @@
         .syarat-list .lni-checkmark-circle {
             font-size: 0.8rem;
         }
+
+        /* Perbaikan spacing untuk header */
+        html {
+            scroll-padding-top: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .jenis-surat-section {
+                padding-top: 100px !important;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group .btn {
+                width: 100%;
+                margin-top: 5px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .jenis-surat-section {
+                padding-top: 90px !important;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .d-flex.justify-content-between .btn {
+                width: 100%;
+            }
+        }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Jenis surat index page loaded');
+            // Fungsi untuk adjust spacing
+            function adjustHeaderSpacing() {
+                const header = document.querySelector('header');
+                const section = document.querySelector('.jenis-surat-section');
+
+                if (header && section) {
+                    const headerHeight = header.offsetHeight;
+                    const newPaddingTop = headerHeight + 40; // 40px buffer
+                    section.style.paddingTop = newPaddingTop + 'px';
+
+                    // Update scroll padding
+                    document.documentElement.style.scrollPaddingTop = (headerHeight + 20) + 'px';
+                }
+            }
+
+            // Initial adjustment
+            adjustHeaderSpacing();
+
+            // Adjust on resize dan load
+            window.addEventListener('resize', adjustHeaderSpacing);
+            window.addEventListener('load', adjustHeaderSpacing);
         });
     </script>
 @endsection

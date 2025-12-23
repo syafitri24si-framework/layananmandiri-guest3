@@ -2,7 +2,7 @@
 @extends('layouts.guest.app')
 
 @section('content')
-<section class="warga-section py-5">
+<section class="warga-show" style="padding-top: 120px; min-height: 100vh;">
     <div class="container">
         {{-- Header Section --}}
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">

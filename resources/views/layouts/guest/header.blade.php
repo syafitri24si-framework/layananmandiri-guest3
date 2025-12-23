@@ -25,7 +25,7 @@
                     <div class="col-lg-12">
                         <nav class="navbar navbar-expand-lg">
                             <!-- Logo dan Nama Website -->
-                            <a class="navbar-brand d-flex align-items-center" href="#home">
+                            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
                                 <!-- Logo -->
                                 <img src="{{ asset('assets/img/logo/logohorizontal.png') }}" alt="Bina Desa"
                                     style="height: 100px; width: auto; max-width: 900px;">
@@ -48,30 +48,32 @@
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarNav">
                                 <ul class="navbar-nav ms-auto">
                                     @if (Auth::check())
+                                        <!-- Untuk user yang sudah login -->
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
-                                                href="{{ route('dashboard.index') }}#home">
+                                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                                                href="{{ route('dashboard') }}">
                                                 Home
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
-                                                href="{{ route('dashboard.index') }}#about">
+                                            <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}"
+                                                href="{{ route('about') }}">
                                                 About
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
-                                                href="{{ route('dashboard.index') }}#layanan">
+                                            <a class="nav-link {{ request()->routeIs('layanan') ? 'active' : '' }}"
+                                                href="{{ route('layanan') }}">
                                                 Layanan
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}"
-                                                href="{{ route('dashboard.index') }}#kontak">
+                                            <a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}"
+                                                href="{{ route('contact') }}">
                                                 Kontak
                                             </a>
                                         </li>
+
 
                                         <!-- Dropdown User Profile -->
                                         <li class="nav-item dropdown ms-3">
@@ -146,7 +148,7 @@
                                                 <!-- Menu Dashboard Admin (hanya untuk Admin) -->
                                                 @if(Auth::user()->role === 'Admin')
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('dashboard.index') }}">
+                                                    <a class="dropdown-item" href="{{ route('dashboard') }}">
                                                         <i class="lni lni-dashboard me-2"></i> Dashboard Admin
                                                     </a>
                                                 </li>
@@ -164,6 +166,37 @@
                                         </li>
 
                                     @else
+                                        <!-- Untuk user belum login -->
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                                                href="{{ route('home') }}">
+                                                Home
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}"
+                                                href="{{ route('about') }}">
+                                                About
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->routeIs('layanan') ? 'active' : '' }}"
+                                                href="{{ route('layanan') }}">
+                                                Layanan
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->routeIs('slideshow') ? 'active' : '' }}"
+                                                href="{{ route('slideshow') }}">
+                                                Galeri
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->routeIs('pengembang') ? 'active' : '' }}"
+                                                href="{{ route('pengembang') }}">
+                                                Pengembang
+                                            </a>
+                                        </li>
                                         <li class="nav-item">
                                             <a class="btn btn-primary" href="{{ route('auth.index') }}">
                                                 Login
@@ -362,30 +395,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add active class to current nav link
-    const currentPath = window.location.pathname + window.location.hash;
+    const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        const linkPath = new URL(link.href).pathname + new URL(link.href).hash;
-        if (currentPath.includes(linkPath) && linkPath !== '/#') {
+        if (link.href === window.location.href) {
             link.classList.add('active');
         }
-    });
-
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href !== '#') {
-                e.preventDefault();
-                const targetElement = document.querySelector(href);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
     });
 });
 </script>

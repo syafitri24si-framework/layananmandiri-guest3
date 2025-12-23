@@ -2,7 +2,7 @@
 @extends('layouts.guest.app')
 
 @section('content')
-<section class="user-section py-5">
+<section class="user-show" style="padding-top: 120px; min-height: 100vh;">
     <div class="container">
         {{-- Header Section --}}
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">

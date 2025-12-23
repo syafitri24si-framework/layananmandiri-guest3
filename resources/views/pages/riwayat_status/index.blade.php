@@ -2,7 +2,7 @@
 @extends('layouts.guest.app')
 
 @section('content')
-<section class="riwayat-section py-5">
+<section class="riwayat-status-show" style="padding-top: 120px; min-height: 100vh;">
     <div class="container">
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">
             <div class="col-md-6 text-center text-md-start">

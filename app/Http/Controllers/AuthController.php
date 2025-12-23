@@ -14,7 +14,6 @@ class AuthController extends Controller
     public function index()
     {
         return view('pages.auth.login');
-
     }
 
     /**
@@ -48,11 +47,12 @@ class AuthController extends Controller
             if ($user && Hash::check($request->password, $user->password)) {
                 Auth::login($user);
                 $request->session()->regenerate();
-                return redirect()->route('dashboard.index')->with('success', 'Login berhasil!');
+
+                // PERUBAHAN DI SINI: ganti dari dashboard.index menjadi dashboard
+                return redirect()->route('dashboard')->with('success', 'Login berhasil!');
             }
 
             return back()->with('error', 'Email atau password salah');
-
         }
 
         // Jika tombol register ditekan
@@ -98,7 +98,6 @@ class AuthController extends Controller
     /**
      * Logout user
      */
-
     public function logout(Request $request)
     {
         Auth::logout();

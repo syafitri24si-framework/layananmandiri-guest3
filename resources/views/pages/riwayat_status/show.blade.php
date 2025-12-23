@@ -1,7 +1,7 @@
 @extends('layouts.guest.app')
 
 @section('content')
-    <section class="contact-section contact-style-3 py-5">
+<section class="riwayat-status-show" style="padding-top: 120px; min-height: 100vh;">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">

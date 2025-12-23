@@ -2,7 +2,7 @@
 @extends('layouts.guest.app')
 
 @section('content')
-<section class="contact-section contact-style-3 py-5">
+<section class="jenis-surat-show" style="padding-top: 120px; min-height: 100vh;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -141,9 +141,7 @@
                                 </h6>
 
                                 @php
-                                    // FIX: Karena sudah ada accessor di Model, syarat_json otomatis jadi array
                                     $syaratArray = $jenisSurat->syarat_json ?? [];
-                                    // Pastikan selalu array
                                     if (is_string($syaratArray)) {
                                         $syaratArray = json_decode($syaratArray, true) ?? [];
                                     }
@@ -319,6 +317,11 @@
 </div>
 
 <style>
+    .jenis-surat-show {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding-bottom: 60px;
+    }
+
     .breadcrumb {
         background: transparent;
         padding: 0;
@@ -404,11 +407,67 @@
         padding: 4px 10px;
         font-size: 12px;
     }
+
+    /* Perbaikan spacing untuk header */
+    html {
+        scroll-padding-top: 120px;
+    }
+
+    @media (max-width: 768px) {
+        .jenis-surat-show {
+            padding-top: 100px !important;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .d-flex.gap-2 {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .d-flex.gap-2 .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .jenis-surat-show {
+            padding-top: 90px !important;
+        }
+
+        .col-md-6, .col-lg-4 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Show page loaded for Jenis Surat');
+    // Fungsi untuk adjust spacing
+    function adjustHeaderSpacing() {
+        const header = document.querySelector('header');
+        const section = document.querySelector('.jenis-surat-show');
+
+        if (header && section) {
+            const headerHeight = header.offsetHeight;
+            const newPaddingTop = headerHeight + 40; // 40px buffer
+            section.style.paddingTop = newPaddingTop + 'px';
+
+            // Update scroll padding
+            document.documentElement.style.scrollPaddingTop = (headerHeight + 20) + 'px';
+        }
+    }
+
+    // Initial adjustment
+    adjustHeaderSpacing();
+
+    // Adjust on resize dan load
+    window.addEventListener('resize', adjustHeaderSpacing);
+    window.addEventListener('load', adjustHeaderSpacing);
 
     const previewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'));
     const previewModalTitle = document.getElementById('previewModalTitle');
@@ -422,15 +481,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileName = this.getAttribute('data-filename');
             const mimeType = this.getAttribute('data-mimetype');
 
-            // Set modal title
             previewModalTitle.innerHTML = `<i class="lni lni-eye me-2"></i> Preview: ${fileName}`;
-
-            // Set download button
             downloadPreviewBtn.href = fileUrl;
             downloadPreviewBtn.download = fileName;
 
             if (mimeType.startsWith('image/')) {
-                // Preview gambar
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <img src="${fileUrl}" class="preview-image" alt="${fileName}"
@@ -438,7 +493,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             } else if (mimeType === 'application/pdf') {
-                // Preview PDF
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
@@ -465,7 +519,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             } else {
-                // File lain
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
