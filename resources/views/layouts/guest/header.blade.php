@@ -186,15 +186,9 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('slideshow') ? 'active' : '' }}"
-                                                href="{{ route('slideshow') }}">
-                                                Galeri
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('pengembang') ? 'active' : '' }}"
-                                                href="{{ route('pengembang') }}">
-                                                Pengembang
+                                            <a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}"
+                                                href="{{ route('contact') }}">
+                                                Kontak
                                             </a>
                                         </li>
                                         <li class="nav-item">

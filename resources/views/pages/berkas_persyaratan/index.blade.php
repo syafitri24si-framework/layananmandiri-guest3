@@ -7,18 +7,64 @@
             <div class="row mb-4 align-items-center" style="margin-top: 30px;">
                 <div class="col-md-6 text-center text-md-start">
                     <h3 class="mb-2" style="margin-bottom: 20px !important;">
-                        <i class="lni lni-folder me-2"></i> Berkas Persyaratan
+                        <i class="lni lni-folder me-2"></i>
+                        @if(Auth::user()->isAdmin())
+                            Berkas Persyaratan
+                        @else
+                            Berkas Saya
+                        @endif
                     </h3>
-                    <p class="text-muted mb-0">Kelola berkas persyaratan untuk setiap permohonan surat.</p>
+                    <p class="text-muted mb-0">
+                        @if(Auth::user()->isAdmin())
+                            Kelola berkas persyaratan untuk setiap permohonan surat.
+                        @else
+                            Kelola berkas persyaratan untuk permohonan Anda.
+                        @endif
+                    </p>
                 </div>
 
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="{{ route('berkas_persyaratan.create', ['permohonan_id' => request('permohonan_id')]) }}"
-                        class="btn btn-success">
-                        <i class="lni lni-plus"></i> Tambah Berkas
-                    </a>
+                    {{-- WARGA HANYA BISA TAMBAH BERKAS JIKA SUDAH PUNYA DATA DAN PERMOHONAN --}}
+                    @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->hasWargaData() && Auth::user()->permohonanSurat()->count() > 0))
+                        <a href="{{ route('berkas_persyaratan.create', ['permohonan_id' => request('permohonan_id')]) }}"
+                            class="btn btn-success">
+                            <i class="lni lni-plus"></i>
+                            @if(Auth::user()->isAdmin())
+                                Tambah Berkas
+                            @else
+                                Tambah Berkas
+                            @endif
+                        </a>
+                    @elseif(Auth::user()->isWarga() && Auth::user()->hasWargaData() && Auth::user()->permohonanSurat()->count() == 0)
+                        <button class="btn btn-success" disabled title="Silakan buat permohonan terlebih dahulu">
+                            <i class="lni lni-plus"></i> Tambah Berkas
+                        </button>
+                    @elseif(Auth::user()->isWarga())
+                        <button class="btn btn-success" disabled title="Silakan lengkapi data warga terlebih dahulu">
+                            <i class="lni lni-plus"></i> Tambah Berkas
+                        </button>
+                    @endif
                 </div>
             </div>
+
+            {{-- INFO BOX UNTUK WARGA --}}
+            @if(Auth::user()->isWarga())
+                @if(!Auth::user()->hasWargaData())
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="lni lni-warning me-2"></i>
+                        <strong>Perhatian!</strong> Anda belum dapat mengelola berkas karena belum memiliki data warga.
+                        Silakan <a href="{{ route('warga.create') }}" class="alert-link">lengkapi data pribadi</a> terlebih dahulu.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @elseif(Auth::user()->hasWargaData() && Auth::user()->permohonanSurat()->count() == 0)
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="lni lni-info-circle me-2"></i>
+                        <strong>Info!</strong> Anda belum memiliki permohonan surat.
+                        Silakan <a href="{{ route('permohonan_surat.create') }}" class="alert-link">buat permohonan</a> terlebih dahulu untuk menambahkan berkas.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+            @endif
 
             {{-- FORM FILTER --}}
             <form method="GET" action="{{ route('berkas_persyaratan.index') }}" class="mb-4">
@@ -132,7 +178,7 @@
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <h5 class="card-title mb-0">
                                         <i class="lni lni-file me-1"></i>
-                                        {{ $berkas->nama_berkas == 'Lainnya' ? $berkas->nama_berkas_custom ?? 'Lainnya' : $berkas->nama_berkas }}
+                                        {{ $berkas->nama_berkas }}
                                     </h5>
                                     <span
                                         class="badge
@@ -178,19 +224,9 @@
                                         </div>
                                         <div class="col-6">
                                             <small class="text-muted d-block">Jenis Berkas</small>
-                                            <p class="mb-2">
-                                                {{ $berkas->nama_berkas == 'Lainnya' ? 'Berkas Kustom' : $berkas->nama_berkas }}
-                                            </p>
+                                            <p class="mb-2">{{ $berkas->nama_berkas }}</p>
                                         </div>
                                     </div>
-                                    @if ($berkas->nama_berkas == 'Lainnya' && $berkas->nama_berkas_custom)
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <small class="text-muted d-block">Nama Berkas Kustom</small>
-                                                <p class="mb-0"><em>{{ $berkas->nama_berkas_custom }}</em></p>
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
 
                                 {{-- File Upload Details --}}
@@ -291,8 +327,9 @@
                                         <i class="lni lni-eye me-1"></i> Detail
                                     </a>
 
-                                    {{-- TOMBOL EDIT --}}
-                                    @if (Auth::check() && Auth::user()->role === 'Admin')
+                                    {{-- TOMBOL EDIT & DELETE: Cek authorization --}}
+                                    @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->canAccessBerkas($berkas->berkas_id)))
+                                        {{-- TOMBOL EDIT --}}
                                         <a href="{{ route('berkas_persyaratan.edit', $berkas->berkas_id) }}"
                                             class="btn btn-sm btn-outline-warning">
                                             <i class="lni lni-pencil-alt me-1"></i> Edit
@@ -316,11 +353,34 @@
                     <div class="col-12 text-center py-5">
                         <div class="empty-state">
                             <i class="lni lni-folder text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mt-3">Belum ada berkas persyaratan</h5>
-                            <p class="text-muted">Silakan tambah berkas untuk permohonan surat</p>
-                            <a href="{{ route('berkas_persyaratan.create') }}" class="btn btn-primary mt-2">
-                                <i class="lni lni-plus"></i> Tambah Berkas Pertama
-                            </a>
+                            <h5 class="text-muted mt-3">
+                                @if(Auth::user()->isAdmin())
+                                    Belum ada berkas persyaratan
+                                @else
+                                    Anda belum memiliki berkas persyaratan
+                                @endif
+                            </h5>
+                            <p class="text-muted">
+                                @if(Auth::user()->isAdmin())
+                                    Silakan tambah berkas untuk permohonan surat
+                                @elseif(Auth::user()->isWarga() && Auth::user()->hasWargaData() && Auth::user()->permohonanSurat()->count() > 0)
+                                    Silakan tambah berkas untuk permohonan Anda
+                                @elseif(Auth::user()->isWarga() && Auth::user()->hasWargaData())
+                                    Silakan buat permohonan terlebih dahulu
+                                @else
+                                    Silakan lengkapi data pribadi terlebih dahulu
+                                @endif
+                            </p>
+                            @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->hasWargaData() && Auth::user()->permohonanSurat()->count() > 0))
+                                <a href="{{ route('berkas_persyaratan.create') }}" class="btn btn-primary mt-2">
+                                    <i class="lni lni-plus"></i>
+                                    @if(Auth::user()->isAdmin())
+                                        Tambah Berkas Pertama
+                                    @else
+                                        Tambah Berkas
+                                    @endif
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforelse

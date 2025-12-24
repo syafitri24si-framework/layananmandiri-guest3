@@ -15,14 +15,15 @@ class CreateUserDummy extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
+        // Ganti ini dari FakerFactory::create menjadi Faker::create
+        $faker = Faker::create('id_ID'); // PERUBAHAN INI!
 
         for ($i = 1; $i <= 100; $i++) {
             $userData = [
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('password123'),
-                'role' => $faker->randomElement(['Admin', 'Warga']), // TAMBAHKAN INI
+                'role' => $faker->randomElement(['Admin', 'Warga']),
                 'email_verified_at' => $faker->randomElement([now(), null]),
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
                 'updated_at' => now(),

@@ -8,19 +8,53 @@
             <div class="row mb-4 align-items-center" style="margin-top: 30px;">
                 <div class="col-md-6 text-center text-md-start">
                     <h3 class="mb-2" style="margin-bottom: 20px !important;">
-                        <i class="lni lni-files me-2"></i> Permohonan Surat
+                        <i class="lni lni-files me-2"></i>
+                        @if(Auth::user()->isAdmin())
+                            Permohonan Surat
+                        @else
+                            Permohonan Saya
+                        @endif
                     </h3>
-                    <p class="text-muted mb-0">Kelola permohonan surat yang diajukan warga.</p>
+                    <p class="text-muted mb-0">
+                        @if(Auth::user()->isAdmin())
+                            Kelola permohonan surat yang diajukan warga.
+                        @else
+                            Lihat dan kelola permohonan surat Anda.
+                        @endif
+                    </p>
                 </div>
 
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="{{ route('permohonan_surat.create') }}" class="btn btn-success">
-                        <i class="lni lni-plus"></i> Tambah Permohonan
-                    </a>
+                    {{-- WARGA HANYA BISA BUAT PERMOHONAN JIKA SUDAH PUNYA DATA WARGA --}}
+                    @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->hasWargaData()))
+                        <a href="{{ route('permohonan_surat.create') }}" class="btn btn-success">
+                            <i class="lni lni-plus"></i>
+                            @if(Auth::user()->isAdmin())
+                                Tambah Permohonan
+                            @else
+                                Ajukan Permohonan
+                            @endif
+                        </a>
+                    @elseif(Auth::user()->isWarga())
+                        <button class="btn btn-success" disabled title="Silakan lengkapi data warga terlebih dahulu">
+                            <i class="lni lni-plus"></i> Ajukan Permohonan
+                        </button>
+                    @endif
                 </div>
             </div>
 
-            {{-- FORM FILTER --}}
+            {{-- INFO BOX UNTUK WARGA YANG BELUM PUNYA DATA --}}
+            @if(Auth::user()->isWarga() && !Auth::user()->hasWargaData())
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="lni lni-warning me-2"></i>
+                    <strong>Perhatian!</strong> Anda belum dapat mengajukan permohonan karena belum memiliki data warga.
+                    Silakan <a href="{{ route('warga.create') }}" class="alert-link">lengkapi data pribadi</a> terlebih dahulu.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            {{-- FORM FILTER (Hanya untuk Admin) --}}
+            @if(Auth::user()->isAdmin())
             <form method="GET" action="{{ route('permohonan_surat.index') }}" class="mb-4">
                 <div class="row align-items-center">
                     {{-- Filter Status --}}
@@ -63,7 +97,7 @@
                             <i class="lni lni-users"></i>
                             <select class="form-select" name="warga_id">
                                 <option value="">Semua Warga</option>
-                                @foreach ($warga as $w)
+                                @foreach ($wargaList as $w)
                                     <option value="{{ $w->warga_id }}"
                                         {{ request('warga_id') == $w->warga_id ? 'selected' : '' }}>
                                         {{ $w->nama }}
@@ -94,6 +128,7 @@
                     </div>
                 </div>
             </form>
+            @endif
 
             {{-- ALERT SUCCESS --}}
             @if (session('success'))
@@ -104,7 +139,8 @@
                 </div>
             @endif
 
-            {{-- STATISTICS CARD --}}
+            {{-- STATISTICS CARD (Hanya untuk Admin) --}}
+            @if(Auth::user()->isAdmin())
             <div class="row mb-4">
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="card border-start border-primary border-4 bg-light">
@@ -167,6 +203,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- CARD GRID --}}
             <div class="row g-4">
@@ -326,29 +363,31 @@
                             <div class="card-footer bg-transparent border-top-0 pt-0">
                                 <div class="d-flex justify-content-between">
 
-                                    {{-- TOMBOL DETAIL (MENGARAH KE SHOW PAGE) --}}
+                                    {{-- TOMBOL DETAIL --}}
                                     <a href="{{ route('permohonan_surat.show', $item->permohonan_id) }}"
                                         class="btn btn-sm btn-outline-info">
                                         <i class="lni lni-eye me-1"></i> Detail
                                     </a>
-                                    {{-- TOMBOL EDIT --}}
-                                  @if (Auth::check() && Auth::user()->role === 'Admin')
-                                    <a href="{{ route('permohonan_surat.edit', $item->permohonan_id) }}"
-                                        class="btn btn-sm btn-outline-primary">
-                                        <i class="lni lni-pencil-alt me-1"></i> Edit
-                                    </a>
 
-                                    {{-- TOMBOL HAPUS --}}
-                                    <form action="{{ route('permohonan_surat.destroy', $item->permohonan_id) }}"
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Hapus permohonan ini? Semua berkas terkait juga akan dihapus.')">
-                                            <i class="lni lni-trash me-1"></i> Hapus
-                                        </button>
-                                    </form>
-                                @endif
+                                    {{-- TOMBOL EDIT & DELETE: Cek authorization --}}
+                                    @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->canAccessPermohonan($item->permohonan_id)))
+                                        {{-- TOMBOL EDIT --}}
+                                        <a href="{{ route('permohonan_surat.edit', $item->permohonan_id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="lni lni-pencil-alt me-1"></i> Edit
+                                        </a>
+
+                                        {{-- TOMBOL HAPUS --}}
+                                        <form action="{{ route('permohonan_surat.destroy', $item->permohonan_id) }}"
+                                            method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Hapus permohonan ini? Semua berkas terkait juga akan dihapus.')">
+                                                <i class="lni lni-trash me-1"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -358,11 +397,32 @@
                     <div class="col-12 text-center py-5">
                         <div class="empty-state">
                             <i class="lni lni-files text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mt-3">Belum ada permohonan surat</h5>
-                            <p class="text-muted">Silakan tambah permohonan surat baru untuk memulai</p>
-                            <a href="{{ route('permohonan_surat.create') }}" class="btn btn-primary mt-2">
-                                <i class="lni lni-plus"></i> Tambah Permohonan Pertama
-                            </a>
+                            <h5 class="text-muted mt-3">
+                                @if(Auth::user()->isAdmin())
+                                    Belum ada permohonan surat
+                                @else
+                                    Anda belum memiliki permohonan surat
+                                @endif
+                            </h5>
+                            <p class="text-muted">
+                                @if(Auth::user()->isAdmin())
+                                    Silakan tambah permohonan surat baru untuk memulai
+                                @elseif(Auth::user()->isWarga() && Auth::user()->hasWargaData())
+                                    Silakan ajukan permohonan surat pertama Anda
+                                @else
+                                    Silakan lengkapi data pribadi terlebih dahulu
+                                @endif
+                            </p>
+                            @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->hasWargaData()))
+                                <a href="{{ route('permohonan_surat.create') }}" class="btn btn-primary mt-2">
+                                    <i class="lni lni-plus"></i>
+                                    @if(Auth::user()->isAdmin())
+                                        Tambah Permohonan Pertama
+                                    @else
+                                        Ajukan Permohonan
+                                    @endif
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforelse
@@ -511,14 +571,16 @@
             const searchInput = document.querySelector('input[name="search"]');
             const searchForm = document.querySelector('form');
 
-            searchInput.addEventListener('input', function() {
-                if (this.value === '') {
-                    // Hapus parameter search dari URL tanpa reload
-                    const url = new URL(window.location);
-                    url.searchParams.delete('search');
-                    window.history.replaceState({}, '', url);
-                }
-            });
+            if (searchInput && searchForm) {
+                searchInput.addEventListener('input', function() {
+                    if (this.value === '') {
+                        // Hapus parameter search dari URL tanpa reload
+                        const url = new URL(window.location);
+                        url.searchParams.delete('search');
+                        window.history.replaceState({}, '', url);
+                    }
+                });
+            }
 
             // Konfirmasi sebelum hapus
             const deleteForms = document.querySelectorAll('form[action*="destroy"]');

@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -13,6 +14,13 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa lihat semua user
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat mengakses halaman ini.');
+        }
+
         $query = User::query();
 
         // Apply filters
@@ -50,6 +58,13 @@ class UserController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa buat user
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menambah user.');
+        }
+
         return view('pages.user.create');
     }
 
@@ -58,6 +73,13 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa buat user
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menambah user.');
+        }
+
         // Validasi input
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
@@ -97,8 +119,15 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $data['user'] = User::findOrFail($id);
-        return view('pages.user.show', $data);
+        $currentUser = Auth::user();
+        $user = User::findOrFail($id);
+
+        // Admin bisa lihat semua, warga hanya bisa lihat data sendiri
+        if ($currentUser->isWarga() && $currentUser->id != $id) {
+            return abort(403, 'Anda hanya dapat melihat data Anda sendiri.');
+        }
+
+        return view('pages.user.show', compact('user'));
     }
 
     /**
@@ -106,8 +135,15 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $data['user'] = User::findOrFail($id);
-        return view('pages.user.edit', $data);
+        $currentUser = Auth::user();
+        $user = User::findOrFail($id);
+
+        // Admin bisa edit semua, warga hanya bisa edit data sendiri
+        if ($currentUser->isWarga() && $currentUser->id != $id) {
+            return abort(403, 'Anda hanya dapat mengedit data Anda sendiri.');
+        }
+
+        return view('pages.user.edit', compact('user'));
     }
 
     /**
@@ -115,13 +151,19 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $currentUser = Auth::user();
         $user = User::findOrFail($id);
+
+        // Admin bisa update semua, warga hanya bisa update data sendiri
+        if ($currentUser->isWarga() && $currentUser->id != $id) {
+            return abort(403, 'Anda hanya dapat mengupdate data Anda sendiri.');
+        }
 
         // Validasi
         $validated = $request->validate([
             'name'     => 'required|string|max:20',
             'email'    => 'required|string|email|max:100|unique:users,email,' . $id,
-            'role'     => 'required|string|in:Admin,Warga',
+            'role'     => $currentUser->isAdmin() ? 'required|string|in:Admin,Warga' : 'nullable',
             'password' => 'nullable|string|min:8|max:20',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -148,8 +190,19 @@ class UserController extends Controller
             unset($validated['password']);
         }
 
+        // Warga tidak bisa ubah role
+        if ($currentUser->isWarga()) {
+            unset($validated['role']);
+        }
+
         $user->update($validated);
-        return redirect()->route('user.index')->with('success', 'Data user berhasil diperbarui!');
+
+        $message = 'Data user berhasil diperbarui!';
+        if ($currentUser->isWarga()) {
+            $message = 'Data profil Anda berhasil diperbarui!';
+        }
+
+        return redirect()->route('user.index')->with('success', $message);
     }
 
     /**
@@ -157,7 +210,19 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        $currentUser = Auth::user();
         $user = User::findOrFail($id);
+
+        // Hanya admin yang bisa hapus user
+        if (!$currentUser->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menghapus user.');
+        }
+
+        // Tidak boleh hapus diri sendiri
+        if ($currentUser->id == $id) {
+            return redirect()->route('user.index')
+                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
 
         // Hapus foto profil jika ada
         $user->deleteProfilePicture();

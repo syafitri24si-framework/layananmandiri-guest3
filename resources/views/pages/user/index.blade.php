@@ -8,12 +8,23 @@
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">
             <div class="col-md-8 text-center text-md-start">
                 <h3 class="mb-2" style="margin-bottom: 20px !important;">
-                    <i class="lni lni-users me-2"></i> Daftar User
+                    <i class="lni lni-users me-2"></i>
+                    @if(Auth::user()->isAdmin())
+                        Daftar User
+                    @else
+                        Profil Saya
+                    @endif
                 </h3>
                 <p class="text-muted mb-2">
-                    Kelola data user sistem Bina Desa.
+                    @if(Auth::user()->isAdmin())
+                        Kelola data user sistem Bina Desa.
+                    @else
+                        Kelola profil dan data pribadi Anda.
+                    @endif
                 </p>
-                {{-- Informasi Jumlah Data --}}
+
+                {{-- Informasi Jumlah Data (Hanya untuk Admin) --}}
+                @if(Auth::user()->isAdmin())
                 <div class="data-info-container mb-3">
                     <div class="row g-3">
                         <div class="col-md-6 col-lg-3">
@@ -109,16 +120,26 @@
                         </div>
                     @endif
                 </div>
+                @endif
             </div>
 
+            {{-- TOMBOL CREATE (Hanya untuk Admin) --}}
             <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                <a href="{{ route('user.create') }}" class="btn btn-success">
-                    <i class="lni lni-plus"></i> Tambah User
-                </a>
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('user.create') }}" class="btn btn-success">
+                        <i class="lni lni-plus"></i> Tambah User
+                    </a>
+                @else
+                    {{-- Warga bisa edit profil sendiri --}}
+                    <a href="{{ route('user.edit', Auth::id()) }}" class="btn btn-success">
+                        <i class="lni lni-pencil-alt"></i> Edit Profil
+                    </a>
+                @endif
             </div>
         </div>
 
-        {{-- FORM FILTER --}}
+        {{-- FORM FILTER (Hanya untuk Admin) --}}
+        @if(Auth::user()->isAdmin())
         <form method="GET" action="{{ route('user.index') }}" class="mb-4">
             <div class="row align-items-center">
                 {{-- Filter Nama --}}
@@ -178,6 +199,7 @@
                 </div>
             </div>
         </form>
+        @endif
 
         {{-- ALERT SUCCESS --}}
         @if (session('success'))
@@ -191,226 +213,250 @@
         {{-- CARD GRID USER --}}
         <div class="row g-4">
             @forelse ($user as $item)
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
-                            {{-- Header dengan Foto Profil --}}
-                            <div class="d-flex align-items-start mb-3">
-                                {{-- Foto Profil --}}
-                                <div class="me-3 position-relative">
-                                    <div class="avatar-container">
-                                        @if($item->has_default_avatar)
-                                            {{-- Default Avatar: Kepala + Badan --}}
-                                            <div class="default-avatar-placeholder rounded-circle border shadow-sm d-flex align-items-center justify-content-center"
-                                                 style="width: 60px; height: 60px; background-color: #f8f9fa;">
-                                                <div class="avatar-icon">
-                                                    <svg width="40" height="40" viewBox="0 0 40 40">
-                                                        <!-- Kepala -->
-                                                        <circle cx="20" cy="15" r="8" fill="none" stroke="#6c757d" stroke-width="2"/>
-                                                        <!-- Badan -->
-                                                        <path d="M12,25 Q20,30 28,25" fill="none" stroke="#6c757d" stroke-width="2"/>
-                                                    </svg>
+                {{-- WARGA HANYA BISA LIHAT DATA DIRI SENDIRI --}}
+                @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::id() == $item->id))
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+                                {{-- Header dengan Foto Profil --}}
+                                <div class="d-flex align-items-start mb-3">
+                                    {{-- Foto Profil --}}
+                                    <div class="me-3 position-relative">
+                                        <div class="avatar-container">
+                                            @if($item->has_default_avatar)
+                                                {{-- Default Avatar: Kepala + Badan --}}
+                                                <div class="default-avatar-placeholder rounded-circle border shadow-sm d-flex align-items-center justify-content-center"
+                                                     style="width: 60px; height: 60px; background-color: #f8f9fa;">
+                                                    <div class="avatar-icon">
+                                                        <svg width="40" height="40" viewBox="0 0 40 40">
+                                                            <!-- Kepala -->
+                                                            <circle cx="20" cy="15" r="8" fill="none" stroke="#6c757d" stroke-width="2"/>
+                                                            <!-- Badan -->
+                                                            <path d="M12,25 Q20,30 28,25" fill="none" stroke="#6c757d" stroke-width="2"/>
+                                                        </svg>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        @else
-                                            {{-- Foto Custom --}}
-                                            <img src="{{ $item->profile_picture_url }}"
-                                                 alt="{{ $item->name }}"
-                                                 class="rounded-circle border shadow-sm custom-avatar"
-                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                            @else
+                                                {{-- Foto Custom --}}
+                                                <img src="{{ $item->profile_picture_url }}"
+                                                     alt="{{ $item->name }}"
+                                                     class="rounded-circle border shadow-sm custom-avatar"
+                                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                            @endif
+                                        </div>
+                                        {{-- Badge untuk default avatar --}}
+                                        @if($item->has_default_avatar)
+                                            <span class="badge bg-light text-dark position-absolute"
+                                                  style="bottom: -5px; right: -5px; font-size: 8px; padding: 2px 5px; border: 1px solid #dee2e6;">
+                                                <i class="lni lni-user" style="font-size: 8px;"></i>
+                                            </span>
                                         @endif
                                     </div>
-                                    {{-- Badge untuk default avatar --}}
-                                    @if($item->has_default_avatar)
-                                        <span class="badge bg-light text-dark position-absolute"
-                                              style="bottom: -5px; right: -5px; font-size: 8px; padding: 2px 5px; border: 1px solid #dee2e6;">
-                                            <i class="lni lni-user" style="font-size: 8px;"></i>
-                                        </span>
-                                    @endif
-                                </div>
 
-                                {{-- Info User --}}
-                                <div class="flex-grow-1">
-                                    <h5 class="card-title mb-1">
-                                        {{ $item->name }}
-                                    </h5>
-                                    <p class="text-muted mb-1 small">{{ $item->email }}</p>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge
-                                            @if($item->role == 'Admin') bg-danger
-                                            @else bg-primary @endif">
-                                            {{ $item->role }}
-                                        </span>
-                                        <span class="badge
-                                            @if ($item->email_verified_at) bg-success
-                                            @else bg-warning text-dark @endif small">
-                                            @if ($item->email_verified_at)
-                                                <i class="lni lni-checkmark-circle me-1"></i> Terverifikasi
-                                            @else
-                                                <i class="lni lni-timer me-1"></i> Belum
-                                            @endif
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Informasi Dasar --}}
-                            <div class="mb-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center text-muted mb-1">
-                                            <i class="lni lni-id-card me-2"></i>
-                                            <small>User ID</small>
-                                        </div>
-                                        <p class="mb-0">
-                                            <strong>#{{ $item->id }}</strong>
-                                        </p>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center text-muted mb-1">
-                                            <i class="lni lni-image me-2"></i>
-                                            <small>Foto Profil</small>
-                                        </div>
-                                        <p class="mb-0">
-                                            @if($item->profile_picture)
-                                                <span class="badge bg-success">
-                                                    <i class="lni lni-checkmark-circle me-1"></i> Custom
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary">
-                                                    <i class="lni lni-user me-1"></i> Default
-                                                </span>
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Detail Email Verification --}}
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center text-muted mb-1">
-                                    <i class="lni lni-checkmark-circle me-2"></i>
-                                    <small>Verifikasi Email</small>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Status</small>
-                                        <p class="mb-2">
-                                            @if ($item->email_verified_at)
-                                                <span class="text-success">Terverifikasi</span>
-                                            @else
-                                                <span class="text-warning">Belum</span>
-                                            @endif
-                                        </p>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Tanggal Verifikasi</small>
-                                        <p class="mb-2">
-                                            @if ($item->email_verified_at)
-                                                {{ \Carbon\Carbon::parse($item->email_verified_at)->format('d M Y') }}
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Keamanan Akun --}}
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center text-muted mb-1">
-                                    <i class="lni lni-lock me-2"></i>
-                                    <small>Keamanan Akun</small>
-                                </div>
-                                <div class="bg-light p-2 rounded">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <small class="text-muted d-block">Password</small>
-                                            <span class="badge bg-success">
-                                                <i class="lni lni-lock me-1"></i> Terenkripsi
+                                    {{-- Info User --}}
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1">
+                                            {{ $item->name }}
+                                        </h5>
+                                        <p class="text-muted mb-1 small">{{ $item->email }}</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge
+                                                @if($item->role == 'Admin') bg-danger
+                                                @else bg-primary @endif">
+                                                {{ $item->role }}
+                                            </span>
+                                            <span class="badge
+                                                @if ($item->email_verified_at) bg-success
+                                                @else bg-warning text-dark @endif small">
+                                                @if ($item->email_verified_at)
+                                                    <i class="lni lni-checkmark-circle me-1"></i> Terverifikasi
+                                                @else
+                                                    <i class="lni lni-timer me-1"></i> Belum
+                                                @endif
                                             </span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                {{-- Informasi Dasar --}}
+                                <div class="mb-3">
+                                    <div class="row">
                                         <div class="col-6">
-                                            <small class="text-muted d-block">Avatar</small>
-                                            @if($item->profile_picture)
-                                                <span class="badge bg-primary">
-                                                    <i class="lni lni-image me-1"></i> Custom
-                                                </span>
-                                            @else
-                                                <span class="badge bg-light text-dark border">
-                                                    <i class="lni lni-user me-1"></i> Default
-                                                </span>
-                                            @endif
+                                            <div class="d-flex align-items-center text-muted mb-1">
+                                                <i class="lni lni-id-card me-2"></i>
+                                                <small>User ID</small>
+                                            </div>
+                                            <p class="mb-0">
+                                                <strong>#{{ $item->id }}</strong>
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center text-muted mb-1">
+                                                <i class="lni lni-image me-2"></i>
+                                                <small>Foto Profil</small>
+                                            </div>
+                                            <p class="mb-0">
+                                                @if($item->profile_picture)
+                                                    <span class="badge bg-success">
+                                                        <i class="lni lni-checkmark-circle me-1"></i> Custom
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary">
+                                                        <i class="lni lni-user me-1"></i> Default
+                                                    </span>
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="lni lni-history me-1"></i> Update: {{ $item->updated_at->format('d M Y') }}
-                                    </small>
+                                </div>
+
+                                {{-- Detail Email Verification --}}
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center text-muted mb-1">
+                                        <i class="lni lni-checkmark-circle me-2"></i>
+                                        <small>Verifikasi Email</small>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Status</small>
+                                            <p class="mb-2">
+                                                @if ($item->email_verified_at)
+                                                    <span class="text-success">Terverifikasi</span>
+                                                @else
+                                                    <span class="text-warning">Belum</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Tanggal Verifikasi</small>
+                                            <p class="mb-2">
+                                                @if ($item->email_verified_at)
+                                                    {{ \Carbon\Carbon::parse($item->email_verified_at)->format('d M Y') }}
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Keamanan Akun --}}
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center text-muted mb-1">
+                                        <i class="lni lni-lock me-2"></i>
+                                        <small>Keamanan Akun</small>
+                                    </div>
+                                    <div class="bg-light p-2 rounded">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Password</small>
+                                                <span class="badge bg-success">
+                                                    <i class="lni lni-lock me-1"></i> Terenkripsi
+                                                </span>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Avatar</small>
+                                                @if($item->profile_picture)
+                                                    <span class="badge bg-primary">
+                                                        <i class="lni lni-image me-1"></i> Custom
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-light text-dark border">
+                                                        <i class="lni lni-user me-1"></i> Default
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="lni lni-history me-1"></i> Update: {{ $item->updated_at->format('d M Y') }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                {{-- Timestamps --}}
+                                <div class="border-top pt-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Dibuat</small>
+                                            <small>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y H:i') }}</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Diperbarui</small>
+                                            <small>{{ \Carbon\Carbon::parse($item->updated_at)->format('d M Y H:i') }}</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {{-- Timestamps --}}
-                            <div class="border-top pt-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Dibuat</small>
-                                        <small>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y H:i') }}</small>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Diperbarui</small>
-                                        <small>{{ \Carbon\Carbon::parse($item->updated_at)->format('d M Y H:i') }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- FOOTER - ACTION BUTTONS --}}
-                        <div class="card-footer bg-transparent border-top-0 pt-0">
-                            <div class="d-flex justify-content-between">
-                                {{-- TOMBOL DETAIL --}}
-                                <a href="{{ route('user.show', $item->id) }}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="lni lni-eye me-1"></i> Detail
-                                </a>
-
-                                {{-- TOMBOL EDIT --}}
-                                @if (Auth::check() && Auth::user()->role === 'Admin')
-                                    <a href="{{ route('user.edit', $item->id) }}"
-                                       class="btn btn-sm btn-outline-warning">
-                                        <i class="lni lni-pencil-alt me-1"></i> Edit
+                            {{-- FOOTER - ACTION BUTTONS --}}
+                            <div class="card-footer bg-transparent border-top-0 pt-0">
+                                <div class="d-flex justify-content-between">
+                                    {{-- TOMBOL DETAIL --}}
+                                    <a href="{{ route('user.show', $item->id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="lni lni-eye me-1"></i> Detail
                                     </a>
 
-                                    {{-- TOMBOL HAPUS --}}
-                                    <form action="{{ route('user.destroy', $item->id) }}"
-                                          method="POST" class="d-inline">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Hapus user ini?')">
-                                            <i class="lni lni-trash me-1"></i> Hapus
-                                        </button>
-                                    </form>
-                                @endif
+                                    {{-- TOMBOL EDIT & DELETE: Cek authorization --}}
+                                    @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::id() == $item->id))
+                                        {{-- TOMBOL EDIT --}}
+                                        <a href="{{ route('user.edit', $item->id) }}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="lni lni-pencil-alt me-1"></i> Edit
+                                        </a>
+
+                                        {{-- TOMBOL HAPUS (Hanya untuk Admin, dan tidak boleh hapus diri sendiri) --}}
+                                        @if(Auth::user()->isAdmin() && Auth::id() != $item->id)
+                                            <form action="{{ route('user.destroy', $item->id) }}"
+                                                  method="POST" class="d-inline">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Hapus user ini?')">
+                                                    <i class="lni lni-trash me-1"></i> Hapus
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
             @empty
                 {{-- Empty State --}}
                 <div class="col-12 text-center py-5">
                     <div class="empty-state">
                         <i class="lni lni-users text-muted" style="font-size: 4rem;"></i>
-                        <h5 class="text-muted mt-3">Belum ada data user</h5>
-                        <p class="text-muted">Silakan tambah user baru untuk memulai</p>
-                        <a href="{{ route('user.create') }}" class="btn btn-primary mt-2">
-                            <i class="lni lni-plus"></i> Tambah User Pertama
-                        </a>
+                        <h5 class="text-muted mt-3">
+                            @if(Auth::user()->isAdmin())
+                                Belum ada data user
+                            @else
+                                Profil tidak ditemukan
+                            @endif
+                        </h5>
+                        <p class="text-muted">
+                            @if(Auth::user()->isAdmin())
+                                Silakan tambah user baru untuk memulai
+                            @else
+                                Terjadi kesalahan saat memuat profil
+                            @endif
+                        </p>
+                        @if(Auth::user()->isAdmin())
+                            <a href="{{ route('user.create') }}" class="btn btn-primary mt-2">
+                                <i class="lni lni-plus"></i> Tambah User Pertama
+                            </a>
+                        @else
+                            <a href="{{ route('user.edit', Auth::id()) }}" class="btn btn-primary mt-2">
+                                <i class="lni lni-pencil-alt"></i> Edit Profil
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforelse
         </div>
 
-        {{-- PAGINATION --}}
-        @if($user->hasPages())
+        {{-- PAGINATION (Hanya untuk Admin) --}}
+        @if(Auth::user()->isAdmin() && $user->hasPages())
             <div class="mt-5">
                 {{ $user->links('pagination::bootstrap-5') }}
             </div>

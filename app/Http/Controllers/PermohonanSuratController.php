@@ -10,13 +10,33 @@ use App\Models\BerkasPersyaratan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PermohonanSuratController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = PermohonanSurat::with(['warga', 'jenisSurat', 'mediaFiles']);
+public function index(Request $request)
+{
+    $user = Auth::user();
 
+    // Inisialisasi query
+    $query = PermohonanSurat::with(['warga', 'jenisSurat', 'mediaFiles']);
+
+    // Filter berdasarkan role
+    if ($user->isWarga()) {
+        // Warga hanya bisa lihat permohonan miliknya
+        $wargaData = $user->dataWarga();
+
+        if ($wargaData) {
+            $query->where('warga_id', $wargaData->warga_id);
+        } else {
+            // Jika tidak ada data warga, kembalikan PAGINATOR kosong, bukan Collection
+            $data = PermohonanSurat::where('warga_id', 0)->paginate(12); // Paginator kosong
+            $wargaList = Warga::orderBy('nama', 'asc')->get();
+            $jenisSurat = JenisSurat::all();
+
+            return view('pages.permohonan_surat.index', compact('data', 'wargaList', 'jenisSurat'));
+        }
+    }
         // Apply existing filters
         $filterableColumns = ['status', 'jenis_id', 'warga_id'];
         foreach ($filterableColumns as $column) {
@@ -39,19 +59,35 @@ class PermohonanSuratController extends Controller
             });
         }
 
-        $data = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
+    $data = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
 
-        // Data untuk dropdown filter
-        $warga = Warga::orderBy('nama', 'asc')->get();
-        $jenisSurat = JenisSurat::all();
+    // Data untuk dropdown filter (hanya untuk admin)
+    $wargaList = $user->isAdmin() ? Warga::orderBy('nama', 'asc')->get() : collect();
+    $jenisSurat = JenisSurat::all();
 
-        return view('pages.permohonan_surat.index', compact('data', 'warga', 'jenisSurat'));
+    return view('pages.permohonan_surat.index', compact('data', 'wargaList', 'jenisSurat'));
     }
 
     // CREATE – tampilkan form tambah
     public function create()
     {
-        $warga = Warga::orderBy('nama', 'asc')->get();
+        $user = Auth::user();
+
+        // Untuk warga, otomatis pilih warga yang login
+        if ($user->isWarga()) {
+            $wargaData = $user->dataWarga();
+
+            if (!$wargaData) {
+                return redirect()->route('warga.create')
+                    ->with('error', 'Silakan lengkapi data warga terlebih dahulu sebelum membuat permohonan.');
+            }
+
+            $warga = collect([$wargaData]);
+        } else {
+            // Admin bisa pilih semua warga
+            $warga = Warga::orderBy('nama', 'asc')->get();
+        }
+
         $jenisSurat = JenisSurat::all();
 
         // Generate nomor permohonan
@@ -63,6 +99,20 @@ class PermohonanSuratController extends Controller
     // STORE – simpan data permohonan dengan multiple upload
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Untuk warga, otomatis set warga_id
+        if ($user->isWarga()) {
+            $wargaData = $user->dataWarga();
+
+            if (!$wargaData) {
+                return redirect()->route('warga.create')
+                    ->with('error', 'Silakan lengkapi data warga terlebih dahulu.');
+            }
+
+            $request->merge(['warga_id' => $wargaData->warga_id]);
+        }
+
         $request->validate([
             'nomor_permohonan' => 'required|unique:permohonan_surat',
             'warga_id' => 'required|exists:warga,warga_id',
@@ -75,6 +125,14 @@ class PermohonanSuratController extends Controller
             'captions' => 'nullable|array',
             'captions.*' => 'nullable|string|max:100'
         ]);
+
+        // Authorization check untuk warga
+        if ($user->isWarga()) {
+            $wargaData = $user->dataWarga();
+            if ($request->warga_id != $wargaData->warga_id) {
+                return abort(403, 'Anda hanya bisa membuat permohonan untuk diri sendiri.');
+            }
+        }
 
         // Validasi ekstensi file
         if ($request->hasFile('berkas_files')) {
@@ -151,8 +209,13 @@ class PermohonanSuratController extends Controller
 
             DB::commit();
 
+            $message = 'Permohonan surat berhasil diajukan dengan ' . count($request->file('berkas_files')) . ' berkas pendukung.';
+            if ($user->isWarga()) {
+                $message = 'Permohonan surat Anda berhasil diajukan!';
+            }
+
             return redirect()->route('permohonan_surat.index')
-                ->with('success', 'Permohonan surat berhasil diajukan dengan ' . count($request->file('berkas_files')) . ' berkas pendukung.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -177,6 +240,13 @@ class PermohonanSuratController extends Controller
             'riwayatStatus.petugas'
         ])->findOrFail($id);
 
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessPermohonan($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengakses data ini.');
+        }
+
         return view('pages.permohonan_surat.show', compact('data'));
     }
 
@@ -184,7 +254,20 @@ class PermohonanSuratController extends Controller
     public function edit($id)
     {
         $data = PermohonanSurat::with(['mediaFiles'])->findOrFail($id);
-        $warga = Warga::orderBy('nama', 'asc')->get();
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessPermohonan($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengedit data ini.');
+        }
+
+        // Untuk warga, hanya tampilkan data dirinya
+        if ($user->isWarga()) {
+            $warga = collect([$user->dataWarga()]);
+        } else {
+            $warga = Warga::orderBy('nama', 'asc')->get();
+        }
+
         $jenisSurat = JenisSurat::all();
 
         return view('pages.permohonan_surat.edit', compact('data', 'warga', 'jenisSurat'));
@@ -194,6 +277,18 @@ class PermohonanSuratController extends Controller
     public function update(Request $request, $id)
     {
         $permohonan = PermohonanSurat::findOrFail($id);
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessPermohonan($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengupdate data ini.');
+        }
+
+        // Untuk warga, otomatis set warga_id
+        if ($user->isWarga()) {
+            $wargaData = $user->dataWarga();
+            $request->merge(['warga_id' => $wargaData->warga_id]);
+        }
 
         $request->validate([
             'nomor_permohonan' => 'required|unique:permohonan_surat,nomor_permohonan,' . $id . ',permohonan_id',
@@ -211,6 +306,13 @@ class PermohonanSuratController extends Controller
             'new_captions' => 'nullable|array',
             'new_captions.*' => 'nullable|string|max:100'
         ]);
+
+        // Authorization check untuk warga (status)
+        if ($user->isWarga() && $permohonan->status == 'selesai') {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Permohonan yang sudah selesai tidak dapat diubah.']);
+        }
 
         // Validasi ekstensi file baru
         if ($request->hasFile('berkas_files')) {
@@ -302,8 +404,13 @@ class PermohonanSuratController extends Controller
 
             DB::commit();
 
+            $message = 'Permohonan surat berhasil diperbarui.';
+            if ($user->isWarga()) {
+                $message = 'Permohonan surat Anda berhasil diperbarui.';
+            }
+
             return redirect()->route('permohonan_surat.index')
-                ->with('success', 'Permohonan surat berhasil diperbarui.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -317,10 +424,22 @@ class PermohonanSuratController extends Controller
     // DELETE – hapus data
     public function destroy($id)
     {
+        $permohonan = PermohonanSurat::findOrFail($id);
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessPermohonan($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk menghapus data ini.');
+        }
+
+        // Authorization check untuk warga (status)
+        if ($user->isWarga() && $permohonan->status == 'selesai') {
+            return redirect()->back()
+                ->withErrors(['error' => 'Permohonan yang sudah selesai tidak dapat dihapus.']);
+        }
+
         DB::beginTransaction();
         try {
-            $permohonan = PermohonanSurat::findOrFail($id);
-
             // Hapus semua file terkait
             $mediaFiles = Media::where('ref_table', 'permohonan_surat')
                 ->where('ref_id', $permohonan->permohonan_id)
@@ -341,8 +460,13 @@ class PermohonanSuratController extends Controller
 
             DB::commit();
 
+            $message = 'Permohonan surat dan semua berkas terkait berhasil dihapus.';
+            if ($user->isWarga()) {
+                $message = 'Permohonan surat Anda berhasil dihapus.';
+            }
+
             return redirect()->route('permohonan_surat.index')
-                ->with('success', 'Permohonan surat dan semua berkas terkait berhasil dihapus.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -9,12 +9,38 @@ use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class BerkasPersyaratanController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+
+        // Inisialisasi query
         $query = BerkasPersyaratan::with(['permohonan.warga', 'permohonan.jenisSurat']);
+
+        // Filter berdasarkan role
+        if ($user->isWarga()) {
+            // Warga hanya bisa lihat berkas miliknya
+            $wargaData = $user->dataWarga();
+
+            if ($wargaData) {
+                $permohonanIds = $wargaData->permohonanSurat->pluck('permohonan_id');
+                $query->whereIn('permohonan_id', $permohonanIds);
+            } else {
+                // Jika tidak ada data warga, kembalikan hanya data kosong
+            $berkasData = BerkasPersyaratan::where('permohonan_id', 0)->paginate(12);
+                $permohonanList = collect();
+                $selectedPermohonanId = $request->input('permohonan_id');
+
+                return view('pages.berkas_persyaratan.index', compact(
+                    'berkasData',
+                    'permohonanList',
+                    'selectedPermohonanId'
+                ));
+            }
+        }
 
         // Filter
         if ($request->filled('permohonan_id')) {
@@ -36,7 +62,15 @@ class BerkasPersyaratanController extends Controller
         }
 
         $berkasData = $query->orderBy('created_at', 'desc')->paginate(12);
-        $permohonanList = PermohonanSurat::with('warga')->get();
+
+        // Permohonan list (hanya untuk admin atau permohonan milik warga)
+        if ($user->isAdmin()) {
+            $permohonanList = PermohonanSurat::with('warga')->get();
+        } else {
+            $wargaData = $user->dataWarga();
+            $permohonanList = $wargaData ? $wargaData->permohonanSurat : collect();
+        }
+
         $selectedPermohonanId = $request->input('permohonan_id');
 
         return view('pages.berkas_persyaratan.index', compact(
@@ -48,7 +82,16 @@ class BerkasPersyaratanController extends Controller
 
     public function create(Request $request)
     {
-        $permohonanList = PermohonanSurat::with('warga', 'jenisSurat')->get();
+        $user = Auth::user();
+
+        // Permohonan list (hanya untuk admin atau permohonan milik warga)
+        if ($user->isAdmin()) {
+            $permohonanList = PermohonanSurat::with('warga', 'jenisSurat')->get();
+        } else {
+            $wargaData = $user->dataWarga();
+            $permohonanList = $wargaData ? $wargaData->permohonanSurat : collect();
+        }
+
         $selectedPermohonanId = $request->input('permohonan_id');
 
         return view('pages.berkas_persyaratan.create', compact('permohonanList', 'selectedPermohonanId'));
@@ -56,6 +99,18 @@ class BerkasPersyaratanController extends Controller
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Authorization check untuk warga
+        if ($user->isWarga()) {
+            $wargaData = $user->dataWarga();
+            $permohonan = PermohonanSurat::find($request->permohonan_id);
+
+            if (!$permohonan || $permohonan->warga_id != $wargaData->warga_id) {
+                return abort(403, 'Anda hanya bisa menambahkan berkas untuk permohonan Anda sendiri.');
+            }
+        }
+
         $request->validate([
             'permohonan_id' => 'required|exists:permohonan_surat,permohonan_id',
             'nama_berkas' => 'required|string|max:255',
@@ -70,7 +125,7 @@ class BerkasPersyaratanController extends Controller
             // 1. Simpan data berkas persyaratan
             $berkas = BerkasPersyaratan::create([
                 'permohonan_id' => $request->permohonan_id,
-                'nama_berkas' => $request->nama_berkas, // LANGSUNG PAKAI $request->nama_berkas
+                'nama_berkas' => $request->nama_berkas,
                 'valid' => $request->valid,
             ]);
 
@@ -92,7 +147,7 @@ class BerkasPersyaratanController extends Controller
                     $filePath = $file->storeAs('uploads/berkas_persyaratan', $fileName, 'public');
 
                     // Get caption for this file
-                    $caption = $request->captions[$index] ?? $request->nama_berkas; // PAKAI $request->nama_berkas
+                    $caption = $request->captions[$index] ?? $request->nama_berkas;
 
                     Media::create([
                         'ref_table' => 'berkas_persyaratan',
@@ -114,10 +169,15 @@ class BerkasPersyaratanController extends Controller
 
             DB::commit();
 
+            $message = 'Berkas persyaratan berhasil ditambahkan dengan ' . $uploadedCount . ' file!';
+            if ($user->isWarga()) {
+                $message = 'Berkas persyaratan Anda berhasil ditambahkan!';
+            }
+
             // Redirect DENGAN PARAMETER permohonan_id
             return redirect()->route('berkas_persyaratan.index', [
                 'permohonan_id' => $request->permohonan_id
-            ])->with('success', 'Berkas persyaratan berhasil ditambahkan dengan ' . $uploadedCount . ' file!');
+            ])->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -137,7 +197,20 @@ class BerkasPersyaratanController extends Controller
     public function edit($id)
     {
         $berkas = BerkasPersyaratan::findOrFail($id);
-        $permohonanList = PermohonanSurat::with('warga', 'jenisSurat')->get();
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessBerkas($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengedit data ini.');
+        }
+
+        // Permohonan list (hanya untuk admin atau permohonan milik warga)
+        if ($user->isAdmin()) {
+            $permohonanList = PermohonanSurat::with('warga', 'jenisSurat')->get();
+        } else {
+            $wargaData = $user->dataWarga();
+            $permohonanList = $wargaData ? collect([$berkas->permohonan]) : collect();
+        }
 
         // Ambil semua file media terkait
         $mediaFiles = Media::where('ref_table', 'berkas_persyaratan')
@@ -150,6 +223,14 @@ class BerkasPersyaratanController extends Controller
 
     public function update(Request $request, $id)
     {
+        $berkas = BerkasPersyaratan::findOrFail($id);
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessBerkas($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengupdate data ini.');
+        }
+
         $request->validate([
             'nama_berkas' => 'required|string|max:255',
             'valid' => 'required|in:menunggu,valid,tidak_valid',
@@ -161,9 +242,7 @@ class BerkasPersyaratanController extends Controller
 
         DB::beginTransaction();
         try {
-            $berkas = BerkasPersyaratan::findOrFail($id);
-
-            // 1. Update data berkas (LANGSUNG PAKAI $request->nama_berkas)
+            // 1. Update data berkas
             $berkas->update([
                 'nama_berkas' => $request->nama_berkas,
                 'valid' => $request->valid,
@@ -214,7 +293,7 @@ class BerkasPersyaratanController extends Controller
                     $filePath = $file->storeAs('uploads/berkas_persyaratan', $fileName, 'public');
 
                     // Get caption for this file
-                    $caption = $request->captions[$index] ?? $request->nama_berkas; // PAKAI $request->nama_berkas
+                    $caption = $request->captions[$index] ?? $request->nama_berkas;
 
                     Media::create([
                         'ref_table' => 'berkas_persyaratan',
@@ -231,15 +310,19 @@ class BerkasPersyaratanController extends Controller
 
             DB::commit();
 
+            $successMessage = 'Berkas persyaratan berhasil diperbarui!';
+            if ($newFileCount > 0) {
+                $successMessage .= ' Ditambahkan ' . $newFileCount . ' file baru.';
+            }
+
+            if ($user->isWarga()) {
+                $successMessage = 'Berkas persyaratan Anda berhasil diperbarui!';
+            }
+
             // Redirect dengan parameter permohonan_id jika ada
             $redirectParams = [];
             if ($berkas->permohonan_id) {
                 $redirectParams['permohonan_id'] = $berkas->permohonan_id;
-            }
-
-            $successMessage = 'Berkas persyaratan berhasil diperbarui!';
-            if ($newFileCount > 0) {
-                $successMessage .= ' Ditambahkan ' . $newFileCount . ' file baru.';
             }
 
             return redirect()->route('berkas_persyaratan.index', $redirectParams)
@@ -258,9 +341,16 @@ class BerkasPersyaratanController extends Controller
 
     public function destroy($id)
     {
+        $berkas = BerkasPersyaratan::findOrFail($id);
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessBerkas($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk menghapus data ini.');
+        }
+
         DB::beginTransaction();
         try {
-            $berkas = BerkasPersyaratan::findOrFail($id);
             $permohonanId = $berkas->permohonan_id; // Simpan dulu untuk redirect
 
             // Hapus semua file media terkait
@@ -278,6 +368,11 @@ class BerkasPersyaratanController extends Controller
 
             DB::commit();
 
+            $message = 'Berkas persyaratan berhasil dihapus!';
+            if ($user->isWarga()) {
+                $message = 'Berkas persyaratan Anda berhasil dihapus!';
+            }
+
             // Redirect dengan parameter permohonan_id jika ada
             $redirectParams = [];
             if ($permohonanId) {
@@ -285,7 +380,7 @@ class BerkasPersyaratanController extends Controller
             }
 
             return redirect()->route('berkas_persyaratan.index', $redirectParams)
-                ->with('success', 'Berkas persyaratan berhasil dihapus!');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -300,6 +395,12 @@ class BerkasPersyaratanController extends Controller
     public function show($id)
     {
         $berkas = BerkasPersyaratan::with(['permohonan.warga', 'permohonan.jenisSurat'])->findOrFail($id);
+        $user = Auth::user();
+
+        // Authorization check
+        if ($user->isWarga() && !$user->canAccessBerkas($id)) {
+            return abort(403, 'Anda tidak memiliki izin untuk mengakses data ini.');
+        }
 
         $mediaFiles = Media::where('ref_table', 'berkas_persyaratan')
             ->where('ref_id', $id)
@@ -312,10 +413,14 @@ class BerkasPersyaratanController extends Controller
     public function downloadFile($mediaId)
     {
         $media = Media::findOrFail($mediaId);
+        $user = Auth::user();
 
-        // Verifikasi bahwa media ini milik berkas_persyaratan
-        if ($media->ref_table !== 'berkas_persyaratan') {
-            return redirect()->back()->with('error', 'File tidak valid.');
+        // Authorization check
+        if ($media->ref_table === 'berkas_persyaratan') {
+            $berkas = BerkasPersyaratan::find($media->ref_id);
+            if ($berkas && $user->isWarga() && !$user->canAccessBerkas($berkas->berkas_id)) {
+                return abort(403, 'Anda tidak memiliki izin untuk mengakses file ini.');
+            }
         }
 
         $filePath = storage_path('app/public/uploads/berkas_persyaratan/' . $media->file_name);

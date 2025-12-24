@@ -10,17 +10,43 @@
                 <h3 class="mb-2" style="margin-bottom: 20px !important;">
                     <i class="lni lni-users me-2"></i> Daftar Warga
                 </h3>
-                <p class="text-muted mb-0">Kelola data warga sistem Bina Desa.</p>
+                <p class="text-muted mb-0">
+                    @if(Auth::user()->isAdmin())
+                        Kelola data warga sistem Bina Desa.
+                    @else
+                        Data Pribadi Anda
+                    @endif
+                </p>
             </div>
 
             <div class="col-md-6 text-center text-md-end">
-                <a href="{{ route('warga.create') }}" class="btn btn-success">
-                    <i class="lni lni-plus"></i> Tambah Data
-                </a>
+                {{-- TOMBOL CREATE: Admin bisa buat semua, Warga hanya bisa buat data sendiri --}}
+                @if(Auth::user()->isAdmin() || (!Auth::user()->hasWargaData() && Auth::user()->isWarga()))
+                    <a href="{{ route('warga.create') }}" class="btn btn-success">
+                        <i class="lni lni-plus"></i>
+                        @if(Auth::user()->isAdmin())
+                            Tambah Data
+                        @else
+                            Lengkapi Data
+                        @endif
+                    </a>
+                @endif
             </div>
         </div>
 
-        {{-- FORM FILTER --}}
+        {{-- INFO BOX UNTUK WARGA YANG BELUM PUNYA DATA --}}
+        @if(Auth::user()->isWarga() && !Auth::user()->hasWargaData())
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="lni lni-warning me-2"></i>
+                <strong>Perhatian!</strong> Anda belum memiliki data warga.
+                Silakan <a href="{{ route('warga.create') }}" class="alert-link">lengkapi data pribadi</a>
+                untuk dapat menggunakan layanan administrasi.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        {{-- FORM FILTER (Hanya untuk Admin) --}}
+        @if(Auth::user()->isAdmin())
         <form method="GET" action="{{ route('warga.index') }}" class="mb-4">
             <div class="row align-items-center">
                 {{-- Filter Jenis Kelamin --}}
@@ -78,6 +104,7 @@
                 </div>
             </div>
         </form>
+        @endif
 
         {{-- ALERT SUCCESS --}}
         @if (session('success'))
@@ -215,23 +242,25 @@
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="lni lni-eye me-1"></i> Detail
                                 </a>
-                             @if (Auth::check() && Auth::user()->role === 'Admin')
-                                {{-- TOMBOL EDIT --}}
-                                <a href="{{ route('warga.edit', $item->warga_id) }}"
-                                   class="btn btn-sm btn-outline-warning">
-                                    <i class="lni lni-pencil-alt me-1"></i> Edit
-                                </a>
 
-                                {{-- TOMBOL HAPUS --}}
-                                <form action="{{ route('warga.destroy', $item->warga_id) }}"
-                                      method="POST" class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Hapus data warga ini?')">
-                                        <i class="lni lni-trash me-1"></i> Hapus
-                                    </button>
-                                </form>
-                            @endif
+                                {{-- TOMBOL EDIT & DELETE: Cek authorization --}}
+                                @if(Auth::user()->isAdmin() || (Auth::user()->isWarga() && Auth::user()->canAccessWarga($item->warga_id)))
+                                    {{-- TOMBOL EDIT --}}
+                                    <a href="{{ route('warga.edit', $item->warga_id) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="lni lni-pencil-alt me-1"></i> Edit
+                                    </a>
+
+                                    {{-- TOMBOL HAPUS --}}
+                                    <form action="{{ route('warga.destroy', $item->warga_id) }}"
+                                          method="POST" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Hapus data warga ini?')">
+                                            <i class="lni lni-trash me-1"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -241,11 +270,30 @@
                 <div class="col-12 text-center py-5">
                     <div class="empty-state">
                         <i class="lni lni-users text-muted" style="font-size: 4rem;"></i>
-                        <h5 class="text-muted mt-3">Belum ada data warga</h5>
-                        <p class="text-muted">Silakan tambah data warga baru untuk memulai</p>
-                        <a href="{{ route('warga.create') }}" class="btn btn-primary mt-2">
-                            <i class="lni lni-plus"></i> Tambah Warga Pertama
-                        </a>
+                        <h5 class="text-muted mt-3">
+                            @if(Auth::user()->isAdmin())
+                                Belum ada data warga
+                            @else
+                                Data pribadi belum tersedia
+                            @endif
+                        </h5>
+                        <p class="text-muted">
+                            @if(Auth::user()->isAdmin())
+                                Silakan tambah data warga baru untuk memulai
+                            @else
+                                Silakan lengkapi data pribadi Anda
+                            @endif
+                        </p>
+                        @if(Auth::user()->isAdmin() || (!Auth::user()->hasWargaData() && Auth::user()->isWarga()))
+                            <a href="{{ route('warga.create') }}" class="btn btn-primary mt-2">
+                                <i class="lni lni-plus"></i>
+                                @if(Auth::user()->isAdmin())
+                                    Tambah Warga Pertama
+                                @else
+                                    Lengkapi Data
+                                @endif
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforelse
@@ -330,6 +378,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Warga index page loaded');
+
+        // Authorization check untuk warga
+        @if(Auth::user()->isWarga())
+            // Jika warga tidak punya data, focus pada create button
+            const createBtn = document.querySelector('a[href*="warga.create"]');
+            if (createBtn) {
+                createBtn.focus();
+            }
+        @endif
     });
 </script>
 @endsection

@@ -7,9 +7,20 @@
         <div class="row mb-4 align-items-center" style="margin-top: 30px;">
             <div class="col-md-6 text-center text-md-start">
                 <h3 class="mb-2" style="margin-bottom: 20px !important;">
-                    <i class="lni lni-history me-2"></i> Riwayat Status Permohonan
+                    <i class="lni lni-history me-2"></i>
+                    @if(Auth::user()->isAdmin())
+                        Riwayat Status Permohonan
+                    @else
+                        Riwayat Status Saya
+                    @endif
                 </h3>
-                <p class="text-muted mb-0">Lacak perjalanan status setiap permohonan surat.</p>
+                <p class="text-muted mb-0">
+                    @if(Auth::user()->isAdmin())
+                        Lacak perjalanan status setiap permohonan surat.
+                    @else
+                        Lacak perjalanan status permohonan Anda.
+                    @endif
+                </p>
             </div>
 
             <div class="col-md-6 text-center text-md-end">
@@ -21,6 +32,16 @@
                 @endif
             </div>
         </div>
+
+        {{-- INFO BOX UNTUK WARGA --}}
+        @if(Auth::user()->isWarga() && !Auth::user()->hasWargaData())
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="lni lni-warning me-2"></i>
+                <strong>Perhatian!</strong> Anda belum memiliki riwayat status karena belum memiliki data warga.
+                Silakan <a href="{{ route('warga.create') }}" class="alert-link">lengkapi data pribadi</a> terlebih dahulu.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         {{-- FORM FILTER --}}
         <form method="GET" action="{{ route('riwayat_status.index') }}" class="mb-4">
@@ -187,7 +208,8 @@
                                            class="btn btn-outline-primary">
                                             <i class="lni lni-eye me-1"></i> Lihat
                                         </a>
-                                        @if(in_array(auth()->user()->role, ['Admin']))
+                                        {{-- UPLOAD FILE: Hanya untuk Admin --}}
+                                        @if(Auth::user()->isAdmin())
                                             <button type="button" class="btn btn-outline-info"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalFile{{ $riwayat->riwayat_id }}">
@@ -200,8 +222,8 @@
                         </div>
                     </div>
 
-                    {{-- MODAL UPLOAD FILE --}}
-                    @if(in_array(auth()->user()->role, ['Admin']))
+                    {{-- MODAL UPLOAD FILE (Hanya untuk Admin) --}}
+                    @if(Auth::user()->isAdmin())
                     <div class="modal fade" id="modalFile{{ $riwayat->riwayat_id }}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -238,8 +260,22 @@
                     <div class="col-12 text-center py-5">
                         <div class="empty-state">
                             <i class="lni lni-history text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mt-3">Belum ada riwayat status</h5>
-                            <p class="text-muted">Riwayat akan muncul setelah ada perubahan status permohonan</p>
+                            <h5 class="text-muted mt-3">
+                                @if(Auth::user()->isAdmin())
+                                    Belum ada riwayat status
+                                @else
+                                    Belum ada riwayat status permohonan Anda
+                                @endif
+                            </h5>
+                            <p class="text-muted">
+                                @if(Auth::user()->isAdmin())
+                                    Riwayat akan muncul setelah ada perubahan status permohonan
+                                @elseif(Auth::user()->isWarga() && Auth::user()->hasWargaData())
+                                    Anda belum memiliki permohonan surat
+                                @else
+                                    Silakan lengkapi data pribadi terlebih dahulu
+                                @endif
+                            </p>
                         </div>
                     </div>
                 @endforelse

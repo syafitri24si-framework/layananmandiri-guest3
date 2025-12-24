@@ -2,9 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Warga; // TAMBAHKAN INI
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -80,15 +82,45 @@ class AuthController extends Controller
                 'password.confirmed' => 'Konfirmasi password tidak cocok',
             ]);
 
-            // Simpan ke tabel users
-            User::create([
+            // ============ PERUBAHAN PENTING DI SINI ============
+            // Buat user baru
+            $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'role'     => $request->role,
                 'password' => Hash::make($request->password),
             ]);
 
-            return redirect()->route('auth.index')->with('success', 'Akun berhasil dibuat, silakan login!');
+            // ============ JIKA ROLE = WARGA, BUAT JUGA DATA WARGA ============
+            if ($request->role == 'Warga') {
+                // Generate NIK sementara (16 digit random)
+                $nikSementara = 'TMP' . date('Ymd') . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+                // Cek apakah NIK sudah ada
+                while (Warga::where('no_ktp', $nikSementara)->exists()) {
+                    $nikSementara = 'TMP' . date('Ymd') . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+                }
+
+                // Buat data warga dengan nilai default
+                Warga::create([
+                    'no_ktp' => $nikSementara, // NIK sementara
+                    'nama' => $request->name,
+                    'jenis_kelamin' => 'Laki-laki', // Default
+                    'agama' => 'Islam', // Default
+                    'pekerjaan' => 'Warga', // Default
+                    'telp' => null, // Bisa diupdate nanti
+                    'email' => $request->email, // Sama dengan email user
+                ]);
+
+                // Pesan sukses khusus untuk warga
+                return redirect()->route('auth.index')->with([
+                    'success' => 'Akun berhasil dibuat! Silakan login.',
+                    'info' => 'Data warga telah dibuat dengan nilai default. Silakan lengkapi data Anda setelah login.'
+                ]);
+            }
+
+            // Untuk Admin
+            return redirect()->route('auth.index')->with('success', 'Akun Admin berhasil dibuat, silakan login!');
         }
 
         // Jika tidak ada aksi

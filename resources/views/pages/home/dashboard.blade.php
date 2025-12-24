@@ -2,40 +2,55 @@
 
 @section('content')
     <!-- ========================= Hero Section start ========================= -->
-    <section id="home" class="hero-section-wrapper-5">
-        <div class="hero-section hero-style-5 img-bg"
-            style="background-image: url('{{ asset('assets/assets-admin/img/hero/hero-5/hero-bg.svg') }}')">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="hero-content-wrapper">
-                            @if (session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-                            <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">
-                                Selamat Datang di Layanan Mandiri Suratku
-                            </h2>
-                            <p class="mb-30 wow fadeInUp" data-wow-delay=".4s">
-                                Sistem layanan mandiri berbasis digital yang membantu masyarakat dalam pengurusan surat dan
-                                administrasi desa secara cepat, mudah, dan transparan.
-                            </p>
-                            <a href="#layanan" class="button button-lg radius-50 wow fadeInUp" data-wow-delay=".6s">
+<section id="home" class="hero-section-wrapper-5">
+    <div class="hero-section hero-style-5 img-bg"
+        style="background-image: url('{{ asset('assets/assets-admin/img/hero/hero-5/hero-bg.svg') }}')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero-content-wrapper">
+                        @if (session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">
+                            Selamat Datang di Layanan Mandiri Suratku
+                        </h2>
+                        <p class="mb-30 wow fadeInUp" data-wow-delay=".4s">
+                            Sistem layanan mandiri berbasis digital yang membantu masyarakat dalam pengurusan surat dan
+                            administrasi desa secara cepat, mudah, dan transparan.
+                        </p>
+
+                        {{-- TOMBOL LIhat Layanan dengan conditional --}}
+                        @auth
+                            {{-- Jika sudah login --}}
+                            <a href="{{ route('layanan') }}"
+                               class="button button-lg radius-50 wow fadeInUp"
+                               data-wow-delay=".6s">
                                 Lihat Layanan <i class="lni lni-chevron-right"></i>
                             </a>
-                        </div>
+                        @else
+                            {{-- Jika belum login, arahkan ke login dulu --}}
+                            <a href="{{ route('auth.index') }}"
+                               class="button button-lg radius-50 wow fadeInUp"
+                               data-wow-delay=".6s"
+                               onclick="return confirm('Anda perlu login terlebih dahulu untuk mengakses layanan. Lanjutkan?')">
+                                Lihat Layanan <i class="lni lni-chevron-right"></i>
+                            </a>
+                        @endauth
                     </div>
-                    <div class="col-lg-6 align-self-end">
-                        <div class="hero-image wow fadeInUp" data-wow-delay=".5s">
-                            <img src="{{ asset('assets/assets-admin/img/hero/hero-5/hero-img.svg') }}" alt="">
-                        </div>
+                </div>
+                <div class="col-lg-6 align-self-end">
+                    <div class="hero-image wow fadeInUp" data-wow-delay=".5s">
+                        <img src="{{ asset('assets/assets-admin/img/hero/hero-5/hero-img.svg') }}" alt="">
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- ========================= Hero Section end ========================= -->
+    </div>
+</section>
+<!-- ========================= Hero Section end ========================= -->
 
 <!-- ========================= Slideshow Carousel Section start ========================= -->
 <section id="slideshow" class="slideshow-section py-5 bg-light">

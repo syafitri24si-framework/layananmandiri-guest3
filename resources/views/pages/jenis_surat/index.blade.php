@@ -10,17 +10,20 @@
                     <h3 class="mb-2" style="margin-bottom: 20px !important;">
                         <i class="lni lni-files me-2"></i> Jenis Surat
                     </h3>
-                    <p class="text-muted mb-0">Kelola jenis-jenis surat yang tersedia di sistem.</p>
+                    <p class="text-muted mb-0">Lihat semua jenis surat yang tersedia di sistem.</p>
                 </div>
 
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="{{ route('jenis_surat.create') }}" class="btn btn-success">
-                        <i class="lni lni-plus"></i> Tambah Jenis Surat
-                    </a>
+                    {{-- Hanya Admin yang bisa tambah jenis surat --}}
+                    @if(Auth::user()->isAdmin())
+                        <a href="{{ route('jenis_surat.create') }}" class="btn btn-success">
+                            <i class="lni lni-plus"></i> Tambah Jenis Surat
+                        </a>
+                    @endif
                 </div>
             </div>
 
-            {{-- FORM FILTER --}}
+            {{-- FORM FILTER (Semua role bisa filter) --}}
             <form method="GET" action="{{ route('jenis_surat.index') }}" class="mb-4">
                 <div class="row align-items-center">
                     {{-- Filter Kode Surat --}}
@@ -175,12 +178,12 @@
                                                     <div class="flex-grow-1">
                                                         <small class="text-truncate d-block" style="max-width: 120px;"
                                                             title="{{ $media->file_name }}">
-                                                            {{ $media->file_name }}
+                                                            {{ Str::limit($media->file_name, 20) }}
                                                         </small>
                                                         @if ($media->caption)
                                                             <small class="text-muted d-block"
                                                                 title="Caption: {{ $media->caption }}">
-                                                                {{ Str::limit($media->caption, 15) }}
+                                                                {{ Str::limit($media->caption, 20) }}
                                                             </small>
                                                         @endif
                                                     </div>
@@ -223,13 +226,15 @@
                             {{-- FOOTER - ACTION BUTTONS --}}
                             <div class="card-footer bg-transparent border-top-0 pt-0">
                                 <div class="d-flex justify-content-between">
-                                    {{-- TOMBOL DETAIL --}}
+                                    {{-- TOMBOL DETAIL (Semua role bisa lihat) --}}
                                     <a href="{{ route('jenis_surat.show', $item->jenis_id) }}"
                                         class="btn btn-sm btn-outline-info">
                                         <i class="lni lni-eye me-1"></i> Detail
                                     </a>
-                                    {{-- TOMBOL EDIT --}}
-                                    @if (Auth::check() && Auth::user()->role === 'Admin')
+
+                                    {{-- TOMBOL EDIT & DELETE (Hanya Admin) --}}
+                                    @if(Auth::user()->isAdmin())
+                                        {{-- TOMBOL EDIT --}}
                                         <a href="{{ route('jenis_surat.edit', $item->jenis_id) }}"
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="lni lni-pencil-alt me-1"></i> Edit
@@ -256,10 +261,12 @@
                         <div class="empty-state">
                             <i class="lni lni-files text-muted" style="font-size: 4rem;"></i>
                             <h5 class="text-muted mt-3">Belum ada data jenis surat</h5>
-                            <p class="text-muted">Silakan tambah jenis surat baru untuk memulai</p>
-                            <a href="{{ route('jenis_surat.create') }}" class="btn btn-primary mt-2">
-                                <i class="lni lni-plus"></i> Tambah Jenis Surat Pertama
-                            </a>
+                            <p class="text-muted">Belum ada jenis surat yang tersedia di sistem</p>
+                            @if(Auth::user()->isAdmin())
+                                <a href="{{ route('jenis_surat.create') }}" class="btn btn-primary mt-2">
+                                    <i class="lni lni-plus"></i> Tambah Jenis Surat Pertama
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforelse

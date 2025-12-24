@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/RiwayatStatusController.php
+// app/Http\Controllers/RiwayatStatusController.php
 
 namespace App\Http\Controllers;
 
@@ -7,12 +7,33 @@ use App\Models\Media;
 use App\Models\PermohonanSurat;
 use App\Models\RiwayatStatusSurat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RiwayatStatusController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = RiwayatStatusSurat::with(['permohonan.warga', 'permohonan.jenisSurat', 'petugas']);
+{
+    $user = Auth::user();
+
+    // Inisialisasi query
+    $query = RiwayatStatusSurat::with(['permohonan.warga', 'permohonan.jenisSurat', 'petugas']);
+
+    // Filter berdasarkan role
+    if ($user->isWarga()) {
+        // Warga hanya bisa lihat riwayat miliknya
+        $wargaData = $user->dataWarga();
+
+        if ($wargaData) {
+            $permohonanIds = $wargaData->permohonanSurat->pluck('permohonan_id');
+            $query->whereIn('permohonan_id', $permohonanIds);
+        } else {
+            // Kembalikan PAGINATOR kosong
+            $riwayatData = RiwayatStatusSurat::where('permohonan_id', 0)->paginate(15);
+            $permohonanList = collect();
+
+            return view('pages.riwayat_status.index', compact('riwayatData', 'permohonanList'));
+        }
+    }
 
         // Filter
         if ($request->filled('permohonan_id')) {
@@ -40,14 +61,28 @@ class RiwayatStatusController extends Controller
             });
         }
 
-        $riwayatData    = $query->orderBy('waktu', 'desc')->paginate(15);
-        $permohonanList = PermohonanSurat::with('warga')->get();
+        $riwayatData = $query->orderBy('waktu', 'desc')->paginate(15);
+
+        // Permohonan list (hanya untuk admin atau permohonan milik warga)
+        if ($user->isAdmin()) {
+            $permohonanList = PermohonanSurat::with('warga')->get();
+        } else {
+            $wargaData = $user->dataWarga();
+            $permohonanList = $wargaData ? $wargaData->permohonanSurat : collect();
+        }
 
         return view('pages.riwayat_status.index', compact('riwayatData', 'permohonanList'));
     }
 
     public function upload(Request $request, $id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa upload file riwayat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat mengupload file riwayat.');
+        }
+
         $request->validate([
             'files'   => 'required|array',
             'files.*' => 'file|max:5120',
@@ -79,6 +114,8 @@ class RiwayatStatusController extends Controller
 
     public function show($id)
     {
+        $user = Auth::user();
+
         $data = RiwayatStatusSurat::with([
             'permohonan.warga',
             'permohonan.jenisSurat',
@@ -86,7 +123,16 @@ class RiwayatStatusController extends Controller
             'mediaFiles',
         ])->findOrFail($id);
 
+        // Authorization check untuk warga
+        if ($user->isWarga()) {
+            $permohonan = $data->permohonan;
+            $wargaData = $user->dataWarga();
+
+            if (!$permohonan || !$wargaData || $permohonan->warga_id != $wargaData->warga_id) {
+                return abort(403, 'Anda tidak memiliki izin untuk mengakses data ini.');
+            }
+        }
+
         return view('pages.riwayat_status.show', compact('data'));
     }
-
 }

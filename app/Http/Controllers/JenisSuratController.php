@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisSurat;
 use App\Models\Media;
-use App\Models\PermohonanSurat; // PERHATIAN: Nama modelnya PermohonanSurat, bukan Permohonan
+use App\Models\PermohonanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class JenisSuratController extends Controller
 {
@@ -15,6 +16,7 @@ class JenisSuratController extends Controller
      */
     public function index(Request $request)
     {
+        // Semua role bisa lihat jenis surat
         $query = JenisSurat::with('mediaFiles');
 
         // Apply existing filter
@@ -42,39 +44,44 @@ class JenisSuratController extends Controller
     /**
      * Tampilkan detail jenis surat.
      */
-    /**
- * Tampilkan detail jenis surat.
- */
-public function show($id)
-{
-    // Menggunakan 'jenis_id' sebagai primary key
-    $jenisSurat = JenisSurat::with('mediaFiles')->findOrFail($id);
+    public function show($id)
+    {
+        $user = Auth::user();
 
-    // Karena sudah ada accessor di Model, syarat_json otomatis jadi array
-    $syaratArray = $jenisSurat->syarat_json;
+        // Semua role bisa lihat detail jenis surat
+        $jenisSurat = JenisSurat::with('mediaFiles')->findOrFail($id);
 
-    // Hitung statistik permohonan
-    $totalPermohonan = $jenisSurat->permohonanSurat->count() ?? 0;
-    $permohonanSelesai = $jenisSurat->permohonanSurat->where('status', 'selesai')->count() ?? 0;
+        // Karena sudah ada accessor di Model, syarat_json otomatis jadi array
+        $syaratArray = $jenisSurat->syarat_json;
 
-    // ✅ TAMBAHKAN INI: Ambil media files dan beri alias sebagai templateFiles
-    $templateFiles = $jenisSurat->mediaFiles ?? collect();
+        // Hitung statistik permohonan
+        $totalPermohonan = $jenisSurat->permohonanSurat->count() ?? 0;
+        $permohonanSelesai = $jenisSurat->permohonanSurat->where('status', 'selesai')->count() ?? 0;
 
-    return view('pages.jenis_surat.show', compact(
-        'jenisSurat',
-        'syaratArray',
-        'totalPermohonan',
-        'permohonanSelesai',
-        'templateFiles' // ✅ INI YANG PERLU DITAMBAHKAN
-    ));
-}
-    
+        // ✅ TAMBAHKAN INI: Ambil media files dan beri alias sebagai templateFiles
+        $templateFiles = $jenisSurat->mediaFiles ?? collect();
+
+        return view('pages.jenis_surat.show', compact(
+            'jenisSurat',
+            'syaratArray',
+            'totalPermohonan',
+            'permohonanSelesai',
+            'templateFiles'
+        ));
+    }
 
     /**
      * Form tambah jenis surat.
      */
     public function create()
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa buat jenis surat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menambah jenis surat.');
+        }
+
         return view('pages.jenis_surat.create');
     }
 
@@ -83,6 +90,13 @@ public function show($id)
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa buat jenis surat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menambah jenis surat.');
+        }
+
         $validated = $request->validate([
             'kode' => 'required|unique:jenis_surat,kode|max:20',
             'nama_jenis' => 'required|string|max:100',
@@ -118,7 +132,7 @@ public function show($id)
                     'path' => str_replace('public/', '', $path),
                     'caption' => $caption,
                     'ref_table' => 'jenis_surat',
-                    'ref_id' => $jenisSurat->jenis_id, // PERHATIAN: menggunakan jenis_id
+                    'ref_id' => $jenisSurat->jenis_id,
                     'sort_order' => $index,
                 ]);
             }
@@ -132,6 +146,13 @@ public function show($id)
      */
     public function edit($id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa edit jenis surat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat mengedit jenis surat.');
+        }
+
         $jenisSurat = JenisSurat::with('mediaFiles')->findOrFail($id);
         return view('pages.jenis_surat.edit', compact('jenisSurat'));
     }
@@ -141,6 +162,13 @@ public function show($id)
      */
     public function update(Request $request, $id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa update jenis surat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat mengupdate jenis surat.');
+        }
+
         $jenisSurat = JenisSurat::findOrFail($id);
 
         $validated = $request->validate([
@@ -187,7 +215,7 @@ public function show($id)
                     'path' => str_replace('public/', '', $path),
                     'caption' => $caption,
                     'ref_table' => 'jenis_surat',
-                    'ref_id' => $jenisSurat->jenis_id, // PERHATIAN: menggunakan jenis_id
+                    'ref_id' => $jenisSurat->jenis_id,
                     'sort_order' => $jenisSurat->mediaFiles()->count() + $index,
                 ]);
             }
@@ -201,7 +229,20 @@ public function show($id)
      */
     public function destroy($id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa hapus jenis surat
+        if (!$user->isAdmin()) {
+            return abort(403, 'Hanya admin yang dapat menghapus jenis surat.');
+        }
+
         $jenisSurat = JenisSurat::with('mediaFiles')->findOrFail($id);
+
+        // Cek apakah ada permohonan yang menggunakan jenis surat ini
+        if ($jenisSurat->permohonanSurat()->count() > 0) {
+            return redirect()->route('jenis_surat.index')
+                ->with('error', 'Jenis surat tidak dapat dihapus karena masih digunakan dalam permohonan.');
+        }
 
         // Hapus file template terlebih dahulu
         foreach ($jenisSurat->mediaFiles as $media) {
@@ -220,6 +261,7 @@ public function show($id)
      */
     public function downloadTemplate($id)
     {
+        // Semua role bisa download template
         $media = Media::findOrFail($id);
         $filePath = storage_path('app/public/' . $media->path);
 
