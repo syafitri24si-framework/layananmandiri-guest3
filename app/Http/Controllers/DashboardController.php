@@ -12,14 +12,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return redirect()->route('auth.index');
-        }
-
-        $stats = $user->getDashboardStats();
-
-        return view('pages.dashboard', compact('user', 'stats'));
+        // Redirect ke home agar tidak error
+        return redirect()->route('home');
     }
 }

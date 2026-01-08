@@ -4,335 +4,385 @@
 @section('content')
 <section id="contact" class="contact-section contact-style-3">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                <div class="section-title text-center mb-50">
-                    <br><br>
-                    <h3 class="mb-15">Edit Permohonan Surat</h3>
-                    <p>Silahkan perbarui data permohonan surat di bawah</p>
+        <!-- Page Header -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <div class="page-header mb-4">
+                    <h1 class="page-title mb-3">
+                        <i class="lni lni-pencil-alt text-primary me-3"></i>
+                        Edit Permohonan Surat
+                    </h1>
+                    <p class="page-subtitle text-muted">
+                        Silahkan perbarui data permohonan surat di bawah
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="contact-form-wrapper">
+            <div class="col-lg-10 col-xl-9">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4 p-md-5">
 
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="lni lni-checkmark-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="lni lni-warning me-2"></i>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('permohonan_surat.update', $data->permohonan_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
-                        @csrf
-                        @method('PUT')
-                        <div class="row g-4">
-
-                            {{-- Nomor Permohonan --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Nomor Permohonan <span class="text-danger">*</span></label>
-                                    <input type="text" id="nomor_permohonan" name="nomor_permohonan"
-                                           class="form-input @error('nomor_permohonan') is-invalid @enderror"
-                                           placeholder="Contoh: PS2024120001"
-                                           value="{{ old('nomor_permohonan', $data->nomor_permohonan) }}" required readonly>
-                                    <i class="lni lni-tag position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('nomor_permohonan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Nomor permohonan tidak dapat diubah</small>
+                        <!-- Alert Messages -->
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-checkmark-circle me-3 fs-4"></i>
+                                    <div class="flex-grow-1">
+                                        {{ session('success') }}
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
+                        @endif
 
-                            {{-- Warga --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Warga <span class="text-danger">*</span></label>
-                                    <select name="warga_id" class="form-select @error('warga_id') is-invalid @enderror" required>
-                                        <option value="">-- Pilih Warga --</option>
-                                        @foreach ($warga as $item)
-                                            <option value="{{ $item->warga_id }}"
-                                                {{ old('warga_id', $data->warga_id) == $item->warga_id ? 'selected' : '' }}>
-                                                {{ $item->nama }} ({{ $item->no_ktp }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <i class="lni lni-user position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('warga_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Warga yang mengajukan permohonan</small>
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-warning me-3 fs-4"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="alert-heading mb-2">Terjadi kesalahan:</h6>
+                                        <ul class="mb-0 ps-3">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
+                        @endif
 
-                            {{-- Jenis Surat --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Jenis Surat <span class="text-danger">*</span></label>
-                                    <select name="jenis_id" id="jenis_id" class="form-select @error('jenis_id') is-invalid @enderror" required>
-                                        <option value="">-- Pilih Jenis Surat --</option>
-                                        @foreach ($jenisSurat as $js)
-                                            <option value="{{ $js->jenis_id }}"
-                                                {{ old('jenis_id', $data->jenis_id) == $js->jenis_id ? 'selected' : '' }}
-                                                data-syarat="{{ json_encode($js->syarat_json ?? []) }}">
-                                                {{ $js->nama_jenis }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <i class="lni lni-text-format position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('jenis_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Jenis surat yang diajukan</small>
+                        <!-- Form -->
+                        <form action="{{ route('permohonan_surat.update', $data->permohonan_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                            @csrf
+                            @method('PUT')
+                            <div class="row g-4">
+
+                                <!-- Row 1: Nomor Permohonan & Warga -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-tag me-1 text-muted"></i>
+                                            Nomor Permohonan <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="text" id="nomor_permohonan" name="nomor_permohonan"
+                                                   class="form-control form-control-lg"
+                                                   value="{{ old('nomor_permohonan', $data->nomor_permohonan) }}"
+                                                   readonly>
+                                        </div>
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Nomor permohonan tidak dapat diubah
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Tanggal Pengajuan --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Tanggal Pengajuan <span class="text-danger">*</span></label>
-                                    <input type="date" id="tanggal_pengajuan" name="tanggal_pengajuan"
-                                           class="form-input @error('tanggal_pengajuan') is-invalid @enderror"
-                                           value="{{ old('tanggal_pengajuan', $data->tanggal_pengajuan) }}" required>
-                                    <i class="lni lni-calendar position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('tanggal_pengajuan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Tanggal pengajuan permohonan</small>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-user me-1 text-muted"></i>
+                                            Warga <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="warga_id" class="form-select form-select-lg @error('warga_id') is-invalid @enderror" required>
+                                            <option value="">-- Pilih Warga --</option>
+                                            @foreach ($warga as $item)
+                                                <option value="{{ $item->warga_id }}"
+                                                    {{ old('warga_id', $data->warga_id) == $item->warga_id ? 'selected' : '' }}>
+                                                    {{ $item->nama }} ({{ $item->no_ktp }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('warga_id')
+                                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Warga yang mengajukan permohonan
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Status --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Status <span class="text-danger">*</span></label>
-                                    <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="diajukan" {{ old('status', $data->status) == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
-                                        <option value="diproses" {{ old('status', $data->status) == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                        <option value="selesai" {{ old('status', $data->status) == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                        <option value="ditolak" {{ old('status', $data->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                    </select>
-                                    <i class="lni lni-stats-up position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('status')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Status permohonan saat ini</small>
+                                <!-- Row 2: Jenis Surat & Tanggal Pengajuan -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-envelope me-1 text-muted"></i>
+                                            Jenis Surat <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="jenis_id" id="jenis_id" class="form-select form-select-lg @error('jenis_id') is-invalid @enderror" required>
+                                            <option value="">-- Pilih Jenis Surat --</option>
+                                            @foreach ($jenisSurat as $js)
+                                                <option value="{{ $js->jenis_id }}"
+                                                    {{ old('jenis_id', $data->jenis_id) == $js->jenis_id ? 'selected' : '' }}
+                                                    data-syarat="{{ json_encode($js->syarat_json ?? []) }}">
+                                                    {{ $js->nama_jenis }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('jenis_id')
+                                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Jenis surat yang diajukan
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Catatan --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Catatan <span class="text-muted">(Opsional)</span></label>
-                                    <textarea name="catatan" id="catatan" rows="2"
-                                              class="form-input @error('catatan') is-invalid @enderror"
-                                              placeholder="Tambahkan catatan jika ada">{{ old('catatan', $data->catatan) }}</textarea>
-                                    <i class="lni lni-pencil position-absolute" style="top: 20%; right: 15px;"></i>
-                                    @error('catatan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Catatan tambahan untuk permohonan</small>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-calendar me-1 text-muted"></i>
+                                            Tanggal Pengajuan <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="date" id="tanggal_pengajuan" name="tanggal_pengajuan"
+                                                   class="form-control form-control-lg @error('tanggal_pengajuan') is-invalid @enderror"
+                                                   value="{{ old('tanggal_pengajuan', $data->tanggal_pengajuan) }}" required>
+                                        </div>
+                                        @error('tanggal_pengajuan')
+                                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Tanggal pengajuan permohonan
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- BERKAS YANG SUDAH ADA --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
-                                        <i class="lni lni-files me-2"></i>
-                                        Berkas Pendukung yang Sudah Ada
+                                <!-- Row 3: Status & Catatan -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-bolt me-1 text-muted"></i>
+                                            Status <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="status" id="status" class="form-select form-select-lg @error('status') is-invalid @enderror" required>
+                                            <option value="">-- Pilih Status --</option>
+                                            <option value="diajukan" {{ old('status', $data->status) == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
+                                            <option value="diproses" {{ old('status', $data->status) == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                                            <option value="selesai" {{ old('status', $data->status) == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                            <option value="ditolak" {{ old('status', $data->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                        </select>
+                                        @error('status')
+                                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Status permohonan saat ini
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            <i class="lni lni-pencil-alt me-1 text-muted"></i>
+                                            Catatan <span class="text-muted fw-normal">(Opsional)</span>
+                                        </label>
+                                        <textarea name="catatan" id="catatan" rows="2"
+                                                  class="form-control form-control-lg @error('catatan') is-invalid @enderror"
+                                                  placeholder="Tambahkan catatan jika ada">{{ old('catatan', $data->catatan) }}</textarea>
+                                        @error('catatan')
+                                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Catatan tambahan untuk permohonan
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Berkas Pendukung yang Sudah Ada -->
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-3">
+                                            <i class="lni lni-files text-primary me-2"></i>
+                                            Berkas Pendukung yang Sudah Ada
+                                            @if($data->mediaFiles && $data->mediaFiles->count() > 0)
+                                                <span class="badge bg-primary ms-2">{{ $data->mediaFiles->count() }}</span>
+                                            @endif
+                                        </label>
+
                                         @if($data->mediaFiles && $data->mediaFiles->count() > 0)
-                                            <span class="badge bg-primary ms-2">{{ $data->mediaFiles->count() }}</span>
-                                        @endif
-                                    </label>
-
-                                    @if($data->mediaFiles && $data->mediaFiles->count() > 0)
-                                        <div id="existingFilesContainer" class="mt-4">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">
-                                                    <i class="lni lni-folder me-2"></i> Berkas Terupload
-                                                </h6>
-                                                <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
-                                                    <i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus
-                                                </button>
-                                            </div>
-                                            <div id="existingFileList" class="row g-3">
-                                                @foreach($data->mediaFiles as $media)
-                                                    <div class="col-md-6 col-lg-4">
-                                                        <div class="file-card p-3 position-relative border border-primary" data-file-id="{{ $media->media_id }}">
-                                                            <div class="form-check position-absolute top-0 end-0 m-2">
-                                                                <input type="checkbox"
-                                                                       class="form-check-input delete-checkbox"
-                                                                       name="delete_files[]"
-                                                                       id="delete_file_{{ $media->media_id }}"
-                                                                       value="{{ $media->media_id }}">
-                                                                <label class="form-check-label" for="delete_file_{{ $media->media_id }}"></label>
-                                                            </div>
-
-                                                            <div class="d-flex align-items-start">
-                                                                <div class="file-icon-wrapper
-                                                                    @if($media->mime_type == 'application/pdf') pdf
-                                                                    @elseif(str_contains($media->mime_type, 'image/')) image
-                                                                    @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) word
-                                                                    @else other @endif
-                                                                    me-3">
-                                                                    <i class="
-                                                                        @if($media->mime_type == 'application/pdf') lni lni-empty-file
-                                                                        @elseif(str_contains($media->mime_type, 'image/')) lni lni-image
-                                                                        @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) lni lni-files
-                                                                        @else lni lni-file @endif
-                                                                    "></i>
+                                            <div class="existing-files-container mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0 fw-semibold">
+                                                        <i class="lni lni-folder me-2"></i> Berkas Terupload
+                                                    </h6>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
+                                                        <i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus
+                                                    </button>
+                                                </div>
+                                                <div class="row g-3">
+                                                    @foreach($data->mediaFiles as $media)
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <div class="file-card p-3 border border-primary" data-file-id="{{ $media->media_id }}">
+                                                                <div class="form-check position-absolute top-0 end-0 m-2">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input delete-checkbox"
+                                                                           name="delete_files[]"
+                                                                           id="delete_file_{{ $media->media_id }}"
+                                                                           value="{{ $media->media_id }}">
+                                                                    <label class="form-check-label" for="delete_file_{{ $media->media_id }}"></label>
                                                                 </div>
-                                                                <div class="flex-grow-1">
-                                                                    <h6 class="mb-1" title="{{ $media->file_name }}">
-                                                                        {{ Str::limit($media->file_name, 20) }}
-                                                                    </h6>
-                                                                    <small class="text-muted d-block">
-                                                                        {{ $media->mime_type }}
-                                                                    </small>
-                                                                    <small class="text-muted">
-                                                                        {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
-                                                                    </small>
 
-                                                                    <div class="mt-3">
-                                                                        <input type="text"
-                                                                               name="captions[{{ $media->media_id }}]"
-                                                                               class="form-control form-control-sm caption-input"
-                                                                               placeholder="Caption (opsional)"
-                                                                               value="{{ old('captions.' . $media->media_id, $media->caption) }}">
+                                                                <div class="d-flex align-items-start">
+                                                                    <div class="file-icon-wrapper
+                                                                        @if($media->mime_type == 'application/pdf') pdf
+                                                                        @elseif(str_contains($media->mime_type, 'image/')) image
+                                                                        @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) word
+                                                                        @else other @endif
+                                                                        me-3">
+                                                                        <i class="
+                                                                            @if($media->mime_type == 'application/pdf') lni lni-empty-file
+                                                                            @elseif(str_contains($media->mime_type, 'image/')) lni lni-image
+                                                                            @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) lni lni-files
+                                                                            @else lni lni-file @endif
+                                                                        "></i>
                                                                     </div>
+                                                                    <div class="flex-grow-1">
+                                                                        <h6 class="mb-1 fw-semibold" title="{{ $media->file_name }}">
+                                                                            {{ Str::limit($media->file_name, 20) }}
+                                                                        </h6>
+                                                                        <small class="text-muted d-block">{{ $media->mime_type }}</small>
+                                                                        <small class="text-muted">{{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}</small>
 
-                                                                    <div class="d-flex flex-wrap gap-2 mt-3">
-                                                                        @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
-                                                                            <button type="button"
-                                                                                    class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
-                                                                                    data-media-id="{{ $media->media_id }}"
-                                                                                    data-filename="{{ $media->file_name }}"
-                                                                                    data-mimetype="{{ $media->mime_type }}"
-                                                                                    data-url="{{ Storage::url('uploads/permohonan_surat/' . $media->file_name) }}">
-                                                                                <i class="lni lni-eye me-1"></i> Preview
-                                                                            </button>
-                                                                        @endif
-                                                                        <a href="{{ Storage::url('uploads/permohonan_surat/' . $media->file_name) }}"
-                                                                           class="btn btn-outline-success btn-sm btn-file-action"
-                                                                           download="{{ $media->file_name }}">
-                                                                            <i class="lni lni-download me-1"></i> Download
-                                                                        </a>
+                                                                        <div class="mt-3">
+                                                                            <input type="text"
+                                                                                   name="captions[{{ $media->media_id }}]"
+                                                                                   class="form-control form-control-sm caption-input"
+                                                                                   placeholder="Caption (opsional)"
+                                                                                   value="{{ old('captions.' . $media->media_id, $media->caption) }}">
+                                                                        </div>
+
+                                                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                                                            @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
+                                                                                        data-media-id="{{ $media->media_id }}"
+                                                                                        data-filename="{{ $media->file_name }}"
+                                                                                        data-mimetype="{{ $media->mime_type }}"
+                                                                                        data-url="{{ Storage::url('uploads/permohonan_surat/' . $media->file_name) }}">
+                                                                                    <i class="lni lni-eye me-1"></i> Preview
+                                                                                </button>
+                                                                            @endif
+                                                                            <a href="{{ Storage::url('uploads/permohonan_surat/' . $media->file_name) }}"
+                                                                               class="btn btn-outline-success btn-sm btn-file-action"
+                                                                               download="{{ $media->file_name }}">
+                                                                                <i class="lni lni-download me-1"></i> Download
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-warning">
-                                            <i class="lni lni-warning me-2"></i> Belum ada berkas pendukung yang diupload.
-                                        </div>
-                                    @endif
+                                        @else
+                                            <div class="alert alert-warning">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="lni lni-warning me-3 fs-5"></i>
+                                                    <div>Belum ada berkas pendukung yang diupload.</div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- TAMBAH BERKAS BARU --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
-                                        <i class="lni lni-cloud-upload me-2"></i>
-                                        Tambah Berkas Pendukung Baru <span class="text-muted">(Opsional)</span>
-                                    </label>
+                                <!-- Tambah Berkas Pendukung Baru -->
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-3">
+                                            <i class="lni lni-cloud-upload text-primary me-2"></i>
+                                            Tambah Berkas Pendukung Baru
+                                            <span class="text-muted fw-normal">(Opsional)</span>
+                                        </label>
 
-                                    {{-- File Input yang Tersembunyi --}}
-                                    <input type="file" name="berkas_files[]" id="berkasFiles"
-                                           class="d-none @error('berkas_files') is-invalid @enderror"
-                                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                                           multiple>
+                                        <!-- Hidden File Input -->
+                                        <input type="file" name="berkas_files[]" id="berkasFiles"
+                                               class="d-none @error('berkas_files') is-invalid @enderror"
+                                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                               multiple>
 
-                                    {{-- Area Upload yang Dapat Diklik --}}
-                                    <div class="file-upload-area border rounded p-5 mb-4" id="uploadArea">
-                                        <div class="text-center">
-                                            <div class="upload-icon mb-3">
-                                                <i class="lni lni-plus display-4 text-primary"></i>
+                                        <!-- Upload Area -->
+                                        <div class="file-upload-area border rounded-3 p-5 mb-4" id="uploadArea">
+                                            <div class="text-center py-3">
+                                                <div class="upload-icon mb-3">
+                                                    <i class="lni lni-plus display-4 text-primary"></i>
+                                                </div>
+                                                <h5 class="mb-2 fw-semibold">Seret & Lepas Berkas di Sini</h5>
+                                                <p class="text-muted mb-3">Atau klik untuk menambah berkas baru</p>
+                                                <button type="button" class="btn btn-outline-primary btn-lg px-4" id="browseBtn">
+                                                    <i class="lni lni-folder me-1"></i> Browse Files
+                                                </button>
+                                                <div class="mt-3">
+                                                    <small class="text-muted">
+                                                        <i class="lni lni-info-circle me-1"></i>
+                                                        Format yang didukung: PDF, JPG, PNG, DOC, DOCX | Maks: 5MB per file
+                                                    </small>
+                                                </div>
                                             </div>
-                                            <h5 class="mb-2">Seret & Lepas Berkas di Sini</h5>
-                                            <p class="text-muted mb-3">Atau klik untuk menambah berkas baru</p>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
-                                                <i class="lni lni-folder me-1"></i> Browse Files
-                                            </button>
-                                            <div class="mt-3">
-                                                <small class="text-muted">
-                                                    <i class="lni lni-info-circle me-1"></i>
-                                                    Format yang didukung: PDF, JPG, PNG, DOC, DOCX | Maks: 5MB per file
-                                                </small>
+                                        </div>
+
+                                        @error('berkas_files')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                        @error('berkas_files.*')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+                                        <!-- File Preview Container untuk File Baru -->
+                                        <div id="filePreviewContainer" class="mt-4" style="display: none;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0 fw-semibold">
+                                                    <i class="lni lni-plus-circle me-2"></i> Berkas Baru
+                                                    <span class="badge bg-success ms-2" id="fileCount">0</span>
+                                                </h6>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
+                                                    <i class="lni lni-trash-can me-1"></i> Hapus Semua
+                                                </button>
+                                            </div>
+                                            <div id="fileList" class="row g-3">
+                                                <!-- File previews will be inserted here -->
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    @error('berkas_files')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    @error('berkas_files.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-
-                                    {{-- File Preview Container untuk File Baru --}}
-                                    <div id="filePreviewContainer" class="mt-4" style="display: none;">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h6 class="mb-0">
-                                                <i class="lni lni-plus-circle me-2"></i> Berkas Baru
-                                                <span class="badge bg-success ms-2" id="fileCount">0</span>
-                                            </h6>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
-                                                <i class="lni lni-trash-can me-1"></i> Hapus Semua
-                                            </button>
-                                        </div>
-                                        <div id="fileList" class="row g-3">
-                                            {{-- File previews will be inserted here --}}
-                                        </div>
+                                <!-- Action Buttons -->
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end gap-3 mt-4 pt-4 border-top">
+                                        <a href="{{ route('permohonan_surat.index') }}" class="btn btn-outline-danger px-4 py-3 btn-lg">
+                                            <i class="lni lni-cross-circle me-2"></i> Batal
+                                        </a>
+                                        <button type="submit" class="btn btn-success px-4 py-3 btn-lg" id="submitBtn">
+                                            <i class="lni lni-telegram-original me-2"></i> Perbarui Permohonan
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- Tombol --}}
-                            <div class="col-md-12">
-                                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                    <a href="{{ route('permohonan_surat.index') }}" class="btn btn-outline-danger px-4">
-                                        <i class="lni lni-cross-circle me-2"></i> Batal
-                                    </a>
-                                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Perbarui Permohonan
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -341,7 +391,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="previewModalTitle">
+                <h5 class="modal-title fw-semibold" id="previewModalTitle">
                     <i class="lni lni-eye me-2"></i> Preview Berkas
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -362,59 +412,150 @@
 </div>
 
 <style>
+    /* GLOBAL STYLING */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Page Header */
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 20px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-body {
+        padding: 3rem !important;
+    }
+
+    /* Form Group Styling */
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    /* Form Label Styling */
     .form-label {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 8px;
-    }
-
-    .file-upload-area {
-        border: 2px dashed #3498db;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f8ff 100%);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        min-height: 200px;
+        margin-bottom: 12px;
+        font-size: 1rem;
         display: flex;
         align-items: center;
-        justify-content: center;
+        padding-left: 5px;
+    }
+
+    .form-label i {
+        margin-right: 10px;
+        font-size: 1.1rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    /* Input Styling - SEMUA SAMA UKURAN */
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1rem;
+        border: 2px solid #e1e5eb;
         border-radius: 12px;
-    }
-
-    .file-upload-area:hover {
-        border-color: #2ecc71;
-        background: linear-gradient(135deg, #f1f8ff 0%, #e8f5e9 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.1);
-    }
-
-    .file-upload-area.drag-over {
-        border-color: #2ecc71;
-        background: linear-gradient(135deg, #e8f5e9 0%, #d4edda 100%);
-        transform: scale(1.01);
-        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.15);
-    }
-
-    .upload-icon {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-
-    .file-card {
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        overflow: hidden;
+        background-color: #fff;
         transition: all 0.3s ease;
+        height: 56px;
+        font-weight: 500;
+    }
+
+    .form-control-lg,
+    .form-select-lg {
+        padding: 18px 22px;
+        font-size: 1.05rem;
+        height: 58px;
+    }
+
+    /* Textarea Styling */
+    textarea.form-control {
+        height: auto;
+        min-height: 58px;
+        resize: vertical;
+        line-height: 1.6;
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    /* Focus State */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+        outline: none;
+        background-color: #fff;
+    }
+
+    /* Readonly Field */
+    .form-control[readonly] {
+        background-color: #f8fafc;
+        border-color: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    /* Form Text Styling */
+    .form-text {
+        font-size: 0.9rem;
+        margin-top: 10px;
+        color: #6c757d;
+        line-height: 1.5;
+        padding-left: 5px;
+    }
+
+    .form-text i {
+        margin-right: 8px;
+        font-size: 0.95rem;
+        opacity: 0.7;
+    }
+
+    /* Invalid Feedback */
+    .invalid-feedback {
+        font-size: 0.9rem;
+        margin-top: 6px;
+        padding-left: 5px;
+    }
+
+    /* File Card Styles */
+    .file-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
         background: white;
+        transition: all 0.3s ease;
         position: relative;
+        overflow: hidden;
+        padding: 20px;
     }
 
     .file-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         border-color: #3498db;
     }
 
@@ -426,38 +567,120 @@
         align-items: center;
         justify-content: center;
         font-size: 24px;
+        flex-shrink: 0;
     }
 
-    .file-icon-wrapper.pdf { background: #ff6b6b; color: white; }
-    .file-icon-wrapper.image { background: #4ecdc4; color: white; }
-    .file-icon-wrapper.word { background: #3498db; color: white; }
-    .file-icon-wrapper.excel { background: #2ecc71; color: white; }
-    .file-icon-wrapper.other { background: #95a5a6; color: white; }
+    .file-icon-wrapper.pdf { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+    .file-icon-wrapper.image { background: linear-gradient(135deg, #4ecdc4, #6ae0d8); }
+    .file-icon-wrapper.word { background: linear-gradient(135deg, #3498db, #5dade2); }
+    .file-icon-wrapper.excel { background: linear-gradient(135deg, #2ecc71, #52d681); }
+    .file-icon-wrapper.other { background: linear-gradient(135deg, #95a5a6, #b0bec5); }
 
     .remove-file-btn {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 28px;
-        height: 28px;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        font-size: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
+        font-size: 14px;
+        opacity: 0.7;
+        transition: all 0.3s;
         z-index: 10;
     }
 
     .file-card:hover .remove-file-btn {
         opacity: 1;
+        transform: scale(1.1);
     }
 
     .btn-file-action {
-        padding: 4px 10px;
-        font-size: 12px;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .caption-input {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    /* Existing Files */
+    .existing-files-container {
+        background-color: #f8fafc;
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 2px solid #e9ecef;
+    }
+
+    .file-card.border-primary {
+        border-color: #3498db !important;
+        background-color: #f8fafc;
+    }
+
+    /* Checkbox style for deletion */
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #dee2e6;
+    }
+
+    .form-check-input:checked {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-check {
+        margin-bottom: 0;
+    }
+
+    /* File Upload Styles */
+    .file-upload-area {
+        border: 3px dashed #3498db;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f8ff 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+    }
+
+    .file-upload-area:hover {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, #f1f8ff 0%, #e8f5e9 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.15);
+    }
+
+    .file-upload-area.drag-over {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, #e8f5e9 0%, #d4edda 100%);
+        transform: scale(1.02);
+        box-shadow: 0 15px 35px rgba(46, 204, 113, 0.2);
+    }
+
+    .upload-icon {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
     }
 
     /* Preview Modal Styles */
@@ -475,32 +698,59 @@
         align-items: center;
         justify-content: center;
         overflow: auto;
+        padding: 2rem;
     }
 
     .preview-image {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .preview-pdf {
-        width: 100%;
-        height: 100%;
-        border: none;
+    /* Button Styling */
+    .btn {
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 28px;
+        font-size: 1rem;
     }
 
-    .no-preview {
-        text-align: center;
-        padding: 3rem;
+    .btn-lg {
+        padding: 16px 32px;
+        font-size: 1.05rem;
     }
 
-    /* Checkbox style for deletion */
-    .form-check-input:checked {
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-outline-danger:hover {
         background-color: #dc3545;
         border-color: #dc3545;
+        color: white;
     }
 
-    /* Loading spinner */
+    .btn-outline-primary:hover {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: white;
+    }
+
+    /* Alert Styles */
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    /* Spinner Animation */
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -509,14 +759,104 @@
     .spin {
         animation: spin 1s linear infinite;
     }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 14px 18px;
+            height: 52px;
+        }
+
+        .file-icon-wrapper {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 12px 16px;
+            height: 50px;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+        }
+
+        .file-upload-area {
+            min-height: 180px;
+            padding: 2rem !important;
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+        }
+
+        .existing-files-container {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .d-flex.justify-content-end {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .d-flex.justify-content-end .btn {
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .file-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+    }
 </style>
 
 <script>
-    // Global array untuk menyimpan file objects baru
     let newFiles = [];
 
     document.addEventListener('DOMContentLoaded', function() {
-        // ========== FILE UPLOAD UNTUK FILE BARU ==========
+        // Elements
         const fileInput = document.getElementById('berkasFiles');
         const uploadArea = document.getElementById('uploadArea');
         const browseBtn = document.getElementById('browseBtn');
@@ -528,75 +868,52 @@
         const previewModalTitle = document.getElementById('previewModalTitle');
         const previewModalBody = document.getElementById('previewModalBody');
         const downloadPreviewBtn = document.getElementById('downloadPreviewBtn');
+        const selectAllDeleteBtn = document.getElementById('selectAllDeleteBtn');
+        const uploadForm = document.getElementById('uploadForm');
 
-        // Event untuk klik tombol browse
-        browseBtn.addEventListener('click', function(e) {
+        // File Upload Handlers
+        if (browseBtn) browseBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             fileInput.click();
         });
 
-        // Event untuk klik area upload
-        uploadArea.addEventListener('click', function(e) {
+        if (uploadArea) uploadArea.addEventListener('click', (e) => {
             e.stopPropagation();
             fileInput.click();
         });
 
-        // Event untuk perubahan file input
-        fileInput.addEventListener('change', function(e) {
-            handleFiles(this.files);
-        });
+        if (fileInput) fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-        // Event untuk hapus semua file baru
-        clearAllBtn.addEventListener('click', function() {
-            if (newFiles.length > 0) {
-                if (confirm('Apakah Anda yakin ingin menghapus semua berkas baru?')) {
-                    newFiles = [];
-                    fileInput.value = '';
-                    updateFilePreview();
-                }
-            }
-        });
+        if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllFiles);
 
-        // Handle files dari input
+        // Functions
         function handleFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-
-                // Check if file already exists
-                const fileExists = newFiles.some(existingFile =>
-                    existingFile.name === file.name && existingFile.size === file.size
-                );
-
-                if (!fileExists) {
+            for (let file of files) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" melebihi ukuran maksimal 5MB`);
+                    continue;
+                }
+                if (!newFiles.some(f => f.name === file.name && f.size === file.size)) {
                     newFiles.push(file);
                 }
             }
-
-            // Update DataTransfer untuk file input
-            const dt = new DataTransfer();
-            newFiles.forEach(file => dt.items.add(file));
-            fileInput.files = dt.files;
-
             updateFilePreview();
         }
 
-        // Update preview files baru
         function updateFilePreview() {
             fileList.innerHTML = '';
 
             if (newFiles.length === 0) {
                 filePreviewContainer.style.display = 'none';
                 fileCount.textContent = '0';
-
-                // Reset area upload
                 uploadArea.innerHTML = `
                     <div class="text-center">
                         <div class="upload-icon mb-3">
                             <i class="lni lni-plus display-4 text-primary"></i>
                         </div>
-                        <h5 class="mb-2">Seret & Lepas Berkas di Sini</h5>
+                        <h5 class="mb-2 fw-semibold">Seret & Lepas Berkas di Sini</h5>
                         <p class="text-muted mb-3">Atau klik untuk menambah berkas baru</p>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                        <button type="button" class="btn btn-outline-primary btn-lg px-4" id="browseBtn">
                             <i class="lni lni-folder me-1"></i> Browse Files
                         </button>
                         <div class="mt-3">
@@ -607,81 +924,55 @@
                         </div>
                     </div>
                 `;
-
-                // Re-attach browse button event
-                document.getElementById('browseBtn').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    fileInput.click();
-                });
-
+                document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
                 return;
             }
 
-            // Update tampilan area upload
+            filePreviewContainer.style.display = 'block';
+            fileCount.textContent = newFiles.length;
             uploadArea.innerHTML = `
                 <div class="text-center">
                     <div class="upload-icon mb-3">
                         <i class="lni lni-checkmark-circle display-4 text-success"></i>
                     </div>
-                    <h5 class="mb-2 text-success">${newFiles.length} Berkas Baru Dipilih</h5>
+                    <h5 class="mb-2 text-success fw-semibold">${newFiles.length} Berkas Baru Dipilih</h5>
                     <p class="text-muted mb-3">Klik untuk menambah berkas lagi</p>
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            <i class="lni lni-reload me-1"></i>
-                            Klik area ini untuk menambah berkas lagi
-                        </small>
-                    </div>
                 </div>
             `;
 
-            // Show preview container
-            filePreviewContainer.style.display = 'block';
-            fileCount.textContent = newFiles.length;
-
-            // Render each file card untuk file baru
             newFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'col-md-6 col-lg-4';
-
-                const fileIconClass = getFileIconClass(file.type);
-                const fileIcon = getFileIcon(file.type);
-                const fileSize = formatFileSize(file.size);
-                const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
-
+                const iconClass = getFileIconClass(file.type);
+                const icon = getFileIcon(file.type);
+                const size = formatFileSize(file.size);
+                const name = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
                 const canPreview = file.type.startsWith('image/') || file.type === 'application/pdf';
 
                 fileItem.innerHTML = `
-                    <div class="file-card p-3 position-relative" data-file-index="${index}">
+                    <div class="file-card" data-file-index="${index}">
                         <button type="button" class="btn btn-danger btn-sm remove-file-btn"
                                 data-index="${index}" title="Hapus berkas">
                             <i class="lni lni-close"></i>
                         </button>
-
                         <div class="d-flex align-items-start">
-                            <div class="file-icon-wrapper ${fileIconClass} me-3">
-                                <i class="${fileIcon}"></i>
+                            <div class="file-icon-wrapper ${iconClass} me-3">
+                                <i class="${icon}"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="mb-1" title="${file.name}">${fileName}</h6>
-                                <small class="text-muted d-block">${fileSize}</small>
-                                <small class="text-muted">${file.type || 'Unknown type'}</small>
-
+                                <h6 class="mb-1 fw-semibold" title="${file.name}">${name}</h6>
+                                <small class="text-muted d-block mb-2">${size}</small>
                                 <div class="mt-3">
-                                    <input type="text"
-                                           name="new_captions[${index}]"
-                                           class="form-control form-control-sm caption-input"
+                                    <input type="text" name="new_captions[${index}]"
+                                           class="form-control caption-input"
                                            placeholder="Caption (opsional)"
-                                           data-index="${index}"
                                            value="${file.name.split('.')[0]}">
                                 </div>
-
                                 <div class="d-flex flex-wrap gap-2 mt-3">
-                                    ${canPreview ? `
-                                    <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
+                                    ${canPreview ? `<button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
                                             data-index="${index}" data-filename="${file.name}">
                                         <i class="lni lni-eye me-1"></i> Preview
-                                    </button>
-                                    ` : ''}
+                                    </button>` : ''}
                                     <button type="button" class="btn btn-outline-success btn-sm btn-file-action download-new-file-btn"
                                             data-index="${index}">
                                         <i class="lni lni-download me-1"></i> Download
@@ -691,64 +982,66 @@
                         </div>
                     </div>
                 `;
-
                 fileList.appendChild(fileItem);
             });
 
-            // Attach event listeners untuk file baru
             attachNewFileEvents();
         }
 
         function attachNewFileEvents() {
-            // Preview button untuk file baru
             document.querySelectorAll('.preview-new-file-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.getAttribute('data-index'));
-                    const fileName = this.getAttribute('data-filename');
-                    previewNewFile(index, fileName);
+                    previewNewFile(index, this.getAttribute('data-filename'));
                 });
             });
 
-            // Download button untuk file baru
             document.querySelectorAll('.download-new-file-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    downloadNewFile(index);
+                    downloadNewFile(parseInt(this.getAttribute('data-index')));
                 });
             });
 
-            // Remove file button untuk file baru
             document.querySelectorAll('.remove-file-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    const index = parseInt(this.getAttribute('data-index'));
-                    removeNewFile(index);
+                    removeNewFile(parseInt(this.getAttribute('data-index')));
                 });
             });
         }
 
-        // ========== PREVIEW BERKAS YANG SUDAH ADA ==========
+        function removeNewFile(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus berkas ini?')) {
+                newFiles.splice(index, 1);
+                updateFilePreview();
+            }
+        }
+
+        function clearAllFiles() {
+            if (newFiles.length > 0 && confirm('Apakah Anda yakin ingin menghapus semua berkas baru?')) {
+                newFiles = [];
+                fileInput.value = '';
+                updateFilePreview();
+            }
+        }
+
+        // Preview Existing Files
         document.querySelectorAll('.preview-existing-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const mediaId = this.getAttribute('data-media-id');
                 const fileName = this.getAttribute('data-filename');
                 const mimeType = this.getAttribute('data-mimetype');
                 const fileUrl = this.getAttribute('data-url');
-
                 previewExistingFile(mediaId, fileName, mimeType, fileUrl);
             });
         });
 
         function previewExistingFile(mediaId, fileName, mimeType, fileUrl) {
-            // Set modal title
             previewModalTitle.innerHTML = `<i class="lni lni-eye me-2"></i> Preview: ${fileName}`;
-
-            // Set download button
             downloadPreviewBtn.href = fileUrl;
             downloadPreviewBtn.download = fileName;
 
             if (mimeType.startsWith('image/')) {
-                // Preview gambar
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <img src="${fileUrl}" class="preview-image" alt="${fileName}" onerror="this.onerror=null; this.src='#'; showImageError()">
@@ -756,49 +1049,36 @@
                 `;
                 previewModal.show();
             } else if (mimeType === 'application/pdf') {
-                // Preview PDF (buka di tab baru)
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
-                            <div class="mb-4">
-                                <i class="lni lni-empty-file display-1 text-primary"></i>
-                            </div>
-                            <h4>${fileName}</h4>
+                            <div class="mb-4"><i class="lni lni-empty-file display-1 text-primary"></i></div>
+                            <h4 class="mb-3">${fileName}</h4>
                             <p class="text-muted mb-3">File PDF</p>
-
                             <div class="alert alert-info mb-4">
                                 <i class="lni lni-info-circle me-2"></i>
                                 Pilih cara untuk melihat file PDF:
                             </div>
-
                             <div class="d-grid gap-3">
                                 <button class="btn btn-success btn-lg" id="openExistingPdfBtn">
                                     <i class="lni lni-external-link me-2"></i>
                                     <strong>Buka PDF di Tab Baru</strong>
                                 </button>
-
                                 <a href="${fileUrl}" class="btn btn-outline-primary" download="${fileName}">
                                     <i class="lni lni-download me-2"></i>
                                     Download PDF
                                 </a>
                             </div>
                         </div>
-                    </div>
-                `;
-
+                    </div>`;
                 previewModal.show();
-
-                // Attach event untuk tombol buka PDF
-                document.getElementById('openExistingPdfBtn').addEventListener('click', function() {
-                    window.open(fileUrl, '_blank');
-                });
+                document.getElementById('openExistingPdfBtn').addEventListener('click', () => window.open(fileUrl, '_blank'));
             } else {
-                // File lain
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
                             <i class="lni lni-file display-1 text-muted mb-3"></i>
-                            <h4>${fileName}</h4>
+                            <h4 class="mb-3">${fileName}</h4>
                             <p class="text-muted mb-3">${mimeType}</p>
                             <div class="alert alert-info mb-4">
                                 <i class="lni lni-info-circle me-2"></i>
@@ -808,8 +1088,7 @@
                                 <i class="lni lni-download me-1"></i> Download Berkas
                             </a>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 previewModal.show();
             }
         }
@@ -818,77 +1097,49 @@
             const file = newFiles[index];
             if (!file) return;
 
-            // Set modal title
             previewModalTitle.innerHTML = `<i class="lni lni-eye me-2"></i> Preview: ${fileName}`;
-
-            // Set download button
             downloadPreviewBtn.href = '#';
-            downloadPreviewBtn.onclick = function(e) {
-                e.preventDefault();
-                downloadNewFile(index);
-            };
+            downloadPreviewBtn.onclick = (e) => { e.preventDefault(); downloadNewFile(index); };
             downloadPreviewBtn.download = fileName;
 
-            const isImage = file.type.startsWith('image/');
-            const isPDF = file.type === 'application/pdf';
-            const fileSize = formatFileSize(file.size);
-
-            if (isImage) {
+            if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewModalBody.innerHTML = `
-                        <div class="preview-container">
-                            <img src="${e.target.result}" class="preview-image" alt="${fileName}">
-                        </div>
-                    `;
+                reader.onload = (e) => {
+                    previewModalBody.innerHTML = `<div class="preview-container"><img src="${e.target.result}" class="preview-image" alt="${fileName}"></div>`;
                     previewModal.show();
                 };
-                reader.onerror = function() {
-                    showPreviewError(fileName, index, 'gambar');
-                };
                 reader.readAsDataURL(file);
-            } else if (isPDF) {
+            } else if (file.type === 'application/pdf') {
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
-                            <div class="mb-4">
-                                <i class="lni lni-empty-file display-1 text-primary"></i>
-                            </div>
-                            <h4>${fileName}</h4>
-                            <p class="text-muted mb-3">File PDF (${fileSize})</p>
-
+                            <div class="mb-4"><i class="lni lni-empty-file display-1 text-primary"></i></div>
+                            <h4 class="mb-3">${fileName}</h4>
+                            <p class="text-muted mb-3">File PDF (${formatFileSize(file.size)})</p>
                             <div class="alert alert-info mb-4">
                                 <i class="lni lni-info-circle me-2"></i>
                                 Pilih cara untuk melihat file PDF:
                             </div>
-
                             <div class="d-grid gap-3">
                                 <button class="btn btn-success btn-lg" id="openNewPdfBtn">
                                     <i class="lni lni-external-link me-2"></i>
                                     <strong>Buka PDF di Tab Baru</strong>
                                 </button>
-
                                 <button class="btn btn-outline-primary" onclick="downloadNewFile(${index})">
-                                    <i class="lni lni-download me-2"></i>
-                                    Download PDF
+                                    <i class="lni lni-download me-2"></i> Download PDF
                                 </button>
                             </div>
                         </div>
-                    </div>
-                `;
-
+                    </div>`;
                 previewModal.show();
-
-                document.getElementById('openNewPdfBtn').addEventListener('click', function() {
-                    openNewPDFInNewTab(index);
-                });
+                document.getElementById('openNewPdfBtn').addEventListener('click', () => openNewPDFInNewTab(index));
             } else {
                 previewModalBody.innerHTML = `
                     <div class="preview-container">
                         <div class="text-center py-4">
                             <i class="lni lni-file display-1 text-muted mb-3"></i>
-                            <h4>${fileName}</h4>
-                            <p class="text-muted mb-3">${file.type || 'Unknown type'} (${fileSize})</p>
+                            <h4 class="mb-3">${fileName}</h4>
+                            <p class="text-muted mb-3">${file.type} (${formatFileSize(file.size)})</p>
                             <div class="alert alert-info mb-4">
                                 <i class="lni lni-info-circle me-2"></i>
                                 Berkas ini tidak dapat dipreview langsung di browser.
@@ -897,8 +1148,7 @@
                                 <i class="lni lni-download me-1"></i> Download Berkas
                             </button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 previewModal.show();
             }
         }
@@ -906,36 +1156,18 @@
         function openNewPDFInNewTab(index) {
             const file = newFiles[index];
             if (!file) return;
-
             const url = URL.createObjectURL(file);
             const newWindow = window.open(url, '_blank');
-
             if (!newWindow) {
                 alert('Popup diblokir! Silakan izinkan popup untuk situs ini.');
                 downloadNewFile(index);
             }
-
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 10000);
-        }
-
-        function removeNewFile(index) {
-            if (confirm('Apakah Anda yakin ingin menghapus berkas ini?')) {
-                newFiles.splice(index, 1);
-
-                const dt = new DataTransfer();
-                newFiles.forEach(file => dt.items.add(file));
-                fileInput.files = dt.files;
-
-                updateFilePreview();
-            }
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
         }
 
         function downloadNewFile(index) {
             const file = newFiles[index];
             if (!file) return;
-
             try {
                 const url = URL.createObjectURL(file);
                 const a = document.createElement('a');
@@ -944,11 +1176,7 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-
-                setTimeout(() => {
-                    URL.revokeObjectURL(url);
-                }, 1000);
-
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
                 showToast('Success', `Berkas ${file.name} berhasil di-download`, 'success');
             } catch (error) {
                 showToast('Error', `Gagal mendownload berkas: ${error.message}`, 'danger');
@@ -957,39 +1185,19 @@
 
         window.downloadNewFile = downloadNewFile;
 
-        function showPreviewError(fileName, index, type) {
-            previewModalBody.innerHTML = `
-                <div class="preview-container">
-                    <div class="text-center py-4">
-                        <i class="lni lni-warning display-1 text-danger mb-3"></i>
-                        <h4>Gagal Memuat ${type === 'gambar' ? 'Gambar' : 'File'}</h4>
-                        <p class="text-muted mb-4">
-                            Terjadi kesalahan saat memuat berkas ${fileName}.
-                        </p>
-                        <button class="btn btn-primary" onclick="downloadNewFile(${index})">
-                            <i class="lni lni-download me-1"></i> Download Berkas
-                        </button>
-                    </div>
-                </div>
-            `;
-            previewModal.show();
+        // Select All Delete Checkboxes
+        if (selectAllDeleteBtn) {
+            selectAllDeleteBtn.addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('.delete-checkbox');
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                checkboxes.forEach(cb => cb.checked = !allChecked);
+                this.innerHTML = allChecked
+                    ? '<i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus'
+                    : '<i class="lni lni-checkmark-circle me-1"></i> Batalkan Pilihan Semua';
+            });
         }
 
-        function showImageError() {
-            const imgElement = document.querySelector('.preview-image');
-            if (imgElement) {
-                imgElement.parentElement.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="lni lni-warning display-1 text-danger mb-3"></i>
-                        <h4>Gagal Memuat Gambar</h4>
-                        <p class="text-muted mb-4">
-                            Tidak dapat memuat gambar. File mungkin rusak atau format tidak didukung.
-                        </p>
-                    </div>
-                `;
-            }
-        }
-
+        // Helper Functions
         function showToast(title, message, type = 'info') {
             const toastHtml = `
                 <div class="toast align-items-center text-bg-${type} border-0 position-fixed bottom-0 end-0 m-3" role="alert">
@@ -999,17 +1207,12 @@
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             document.body.insertAdjacentHTML('beforeend', toastHtml);
             const toastEl = document.querySelector('.toast:last-child');
             const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
             toast.show();
-
-            toastEl.addEventListener('hidden.bs.toast', function() {
-                this.remove();
-            });
+            toastEl.addEventListener('hidden.bs.toast', function() { this.remove(); });
         }
 
         function getFileIconClass(mimeType) {
@@ -1036,10 +1239,12 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Drag and drop functionality untuk file baru
+        // Drag and Drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
+            if (uploadArea) {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            }
         });
 
         function preventDefaults(e) {
@@ -1047,75 +1252,56 @@
             e.stopPropagation();
         }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight() {
-            uploadArea.classList.add('drag-over');
-        }
-
-        function unhighlight() {
-            uploadArea.classList.remove('drag-over');
-        }
-
-        uploadArea.addEventListener('drop', function(e) {
-            e.stopPropagation();
-            const dt = e.dataTransfer;
-            const files = dt.files;
-
-            handleFiles(files);
-            unhighlight();
-        }, false);
-
-        // Fungsi untuk select all delete checkbox
-        const selectAllDeleteBtn = document.getElementById('selectAllDeleteBtn');
-        if (selectAllDeleteBtn) {
-            selectAllDeleteBtn.addEventListener('click', function() {
-                const checkboxes = document.querySelectorAll('.delete-checkbox');
-                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-
-                checkboxes.forEach(cb => {
-                    cb.checked = !allChecked;
-                });
-
-                this.innerHTML = allChecked
-                    ? '<i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus'
-                    : '<i class="lni lni-checkmark-circle me-1"></i> Batalkan Pilihan Semua';
+        if (uploadArea) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
             });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.stopPropagation();
+                handleFiles(e.dataTransfer.files);
+                uploadArea.classList.remove('drag-over');
+            }, false);
         }
 
-        // ========== VALIDASI FORM SEBELUM SUBMIT ==========
-        const uploadForm = document.getElementById('uploadForm');
+        // Form Validation
         if (uploadForm) {
             uploadForm.addEventListener('submit', function(e) {
-                // Validasi file size total
-                let totalSize = 0;
-                newFiles.forEach(file => {
-                    totalSize += file.size;
-                });
-
-                const maxTotalSize = 50 * 1024 * 1024; // 50MB total
-                if (totalSize > maxTotalSize) {
+                const totalSize = newFiles.reduce((sum, file) => sum + file.size, 0);
+                if (totalSize > 50 * 1024 * 1024) {
                     e.preventDefault();
                     alert(`Total ukuran berkas melebihi 50MB. Ukuran saat ini: ${formatFileSize(totalSize)}`);
                     return false;
                 }
-
-                // Show loading
                 const submitBtn = document.getElementById('submitBtn');
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="lni lni-spinner-solid spin me-2"></i> Memperbarui...';
                 }
-
                 return true;
             });
         }
+
+        function showImageError() {
+            const imgElement = document.querySelector('.preview-image');
+            if (imgElement) {
+                imgElement.parentElement.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="lni lni-warning display-1 text-danger mb-3"></i>
+                        <h4>Gagal Memuat Gambar</h4>
+                        <p class="text-muted mb-4">
+                            Tidak dapat memuat gambar. File mungkin rusak atau format tidak didukung.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        window.showImageError = showImageError;
     });
 </script>
 @endsection

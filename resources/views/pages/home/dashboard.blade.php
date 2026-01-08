@@ -15,7 +15,11 @@
                             </div>
                         @endif
                         <h2 class="mb-30 wow fadeInUp" data-wow-delay=".2s">
-                            Selamat Datang di Layanan Mandiri Suratku
+                            @auth
+                                Selamat Datang, {{ auth()->user()->name ?? 'Pengguna' }}!
+                            @else
+                                Selamat Datang di Layanan Mandiri Suratku
+                            @endauth
                         </h2>
                         <p class="mb-30 wow fadeInUp" data-wow-delay=".4s">
                             Sistem layanan mandiri berbasis digital yang membantu masyarakat dalam pengurusan surat dan
@@ -25,18 +29,25 @@
                         {{-- TOMBOL LIhat Layanan dengan conditional --}}
                         @auth
                             {{-- Jika sudah login --}}
-                            <a href="{{ route('layanan') }}"
-                               class="button button-lg radius-50 wow fadeInUp"
-                               data-wow-delay=".6s">
-                                Lihat Layanan <i class="lni lni-chevron-right"></i>
-                            </a>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="{{ route('layanan') }}"
+                                   class="button button-lg radius-50 wow fadeInUp"
+                                   data-wow-delay=".6s">
+                                    Lihat Layanan <i class="lni lni-chevron-right"></i>
+                                </a>
+                                <a href="{{ route('permohonan_surat.create') }}"
+                                   class="button button-lg radius-50 wow fadeInUp"
+                                   data-wow-delay=".7s"
+                                   style="background: #10b981; border-color: #10b981;">
+                                    Ajukan Surat <i class="lni lni-plus"></i>
+                                </a>
+                            </div>
                         @else
                             {{-- Jika belum login, arahkan ke login dulu --}}
                             <a href="{{ route('auth.index') }}"
                                class="button button-lg radius-50 wow fadeInUp"
-                               data-wow-delay=".6s"
-                               onclick="return confirm('Anda perlu login terlebih dahulu untuk mengakses layanan. Lanjutkan?')">
-                                Lihat Layanan <i class="lni lni-chevron-right"></i>
+                               data-wow-delay=".6s">
+                                Login / Daftar <i class="lni lni-user"></i>
                             </a>
                         @endauth
                     </div>
@@ -53,91 +64,97 @@
 <!-- ========================= Hero Section end ========================= -->
 
 <!-- ========================= Slideshow Carousel Section start ========================= -->
-<section id="slideshow" class="slideshow-section py-5 bg-light">
+<section id="slideshow" class="slideshow-section py-6">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center mb-5">
-                <h3 class="fw-bold mb-3 display-5" data-wow-delay=".2s">Galeri Pelayanan Desa Digital</h3>
-                <p class="lead text-muted" data-wow-delay=".4s">
-                    Lihat bagaimana Layanan Mandiri Suratku membantu masyarakat dalam pengurusan administrasi
-                </p>
+        <div class="row justify-content-center mb-6">
+            <div class="col-lg-8 text-center">
+                <div class="section-header">
+                    <h2 class="fw-bold mb-3 display-5" data-wow-delay=".2s">
+                        Galeri Pelayanan Suratku
+                    </h2>
+                    <p class="lead text-muted mb-0" data-wow-delay=".4s">
+                        Layanan Mandiri Suratku membantu masyarakat dalam pengurusan administrasi secara digital
+                    </p>
+                </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-lg-12 mx-auto">
+            <div class="col-12">
                 <!-- Enhanced Carousel -->
                 <div id="desaCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
                     <!-- Indicators -->
                     <div class="carousel-indicators custom-indicators">
-                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="0" class="active"></button>
-                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="1"></button>
-                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="2"></button>
-                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="3"></button>
+                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#desaCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
                     </div>
 
                     <!-- Slides -->
-                    <div class="carousel-inner rounded-4 shadow-lg">
-                        <!-- Slide 1 - Enhanced -->
+                    <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
+                        <!-- Slide 1 - Pelayanan Surat Online -->
                         <div class="carousel-item active">
-                            <div class="carousel-slide-content" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                <div class="row align-items-center h-100">
-                                    <div class="col-lg-6">
-                                        <div class="carousel-text p-5 text-white">
+                            <div class="carousel-slide-content slide-1">
+                                <div class="row g-0 h-100">
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-text p-4 p-lg-5">
                                             <div class="slide-badge mb-4">
                                                 <span class="badge bg-white text-primary px-3 py-2 rounded-pill">
                                                     <i class="lni lni-rocket me-2"></i>Fitur Unggulan
                                                 </span>
                                             </div>
-                                            <h2 class="display-6 fw-bold mb-4">Pelayanan Surat Online</h2>
-                                            <p class="mb-4 opacity-90 fs-5">
+                                            <h3 class="display-6 fw-bold mb-4 text-white">Pelayanan Surat Online</h3>
+                                            <p class="text-white mb-4 opacity-90 fs-5">
                                                 Permohonan surat keterangan, surat domisili, dan surat administrasi lainnya dapat dilakukan secara online tanpa harus datang ke kantor desa.
                                             </p>
                                             <div class="features-list">
-                                                <div class="d-flex align-items-center mb-3">
-                                                    <div class="feature-icon me-3">
-                                                        <i class="lni lni-bolt-alt fs-3"></i>
+                                                <div class="feature-item">
+                                                    <div class="feature-icon">
+                                                        <i class="lni lni-bolt-alt"></i>
                                                     </div>
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">Proses Lebih Cepat</h6>
-                                                        <p class="mb-0 opacity-75">Hemat waktu hingga 70%</p>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center mb-3">
-                                                    <div class="feature-icon me-3">
-                                                        <i class="lni lni-timer fs-3"></i>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">Tanpa Antri</h6>
-                                                        <p class="mb-0 opacity-75">Layanan 24/7 dari rumah</p>
+                                                    <div class="feature-content">
+                                                        <h6 class="fw-bold mb-1 text-white">Proses Lebih Cepat</h6>
+                                                        <p class="mb-0 text-white opacity-75">Hemat waktu hingga 70%</p>
                                                     </div>
                                                 </div>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="feature-icon me-3">
-                                                        <i class="lni lni-eye fs-3"></i>
+                                                <div class="feature-item">
+                                                    <div class="feature-icon">
+                                                        <i class="lni lni-timer"></i>
                                                     </div>
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">Real-time Tracking</h6>
-                                                        <p class="mb-0 opacity-75">Pantau status setiap saat</p>
+                                                    <div class="feature-content">
+                                                        <h6 class="fw-bold mb-1 text-white">Tanpa Antri</h6>
+                                                        <p class="mb-0 text-white opacity-75">Layanan 24/7 dari rumah</p>
+                                                    </div>
+                                                </div>
+                                                <div class="feature-item">
+                                                    <div class="feature-icon">
+                                                        <i class="lni lni-eye"></i>
+                                                    </div>
+                                                    <div class="feature-content">
+                                                        <h6 class="fw-bold mb-1 text-white">Real-time Tracking</h6>
+                                                        <p class="mb-0 text-white opacity-75">Pantau status setiap saat</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <div class="carousel-image-container p-5">
-                                            <div class="floating-image">
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-image-container p-4 p-lg-5">
+                                            <div class="image-wrapper position-relative">
                                                 <img src="{{ asset('assets/img/logo/slide1.jpeg') }}"
                                                      alt="Pelayanan Digital"
-                                                     class="img-fluid rounded-4 shadow-lg">
-                                                <div class="floating-element floating-1">
-                                                    <i class="lni lni-checkmark-circle text-success"></i>
-                                                </div>
-                                                <div class="floating-element floating-2">
-                                                    <i class="lni lni-download text-primary"></i>
-                                                </div>
-                                                <div class="floating-element floating-3">
-                                                    <i class="lni lni-calendar text-warning"></i>
+                                                     class="img-fluid rounded-3 shadow-lg slide-image">
+                                                <div class="floating-elements">
+                                                    <div class="floating-element element-1">
+                                                        <i class="lni lni-checkmark-circle"></i>
+                                                    </div>
+                                                    <div class="floating-element element-2">
+                                                        <i class="lni lni-download"></i>
+                                                    </div>
+                                                    <div class="floating-element element-3">
+                                                        <i class="lni lni-calendar"></i>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -146,56 +163,16 @@
                             </div>
                         </div>
 
-                        <!-- Slide 2 - Enhanced -->
+                        <!-- Slide 2 - Upload Berkas Digital -->
                         <div class="carousel-item">
-                            <div class="carousel-slide-content" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                <div class="row align-items-center h-100">
-                                    <div class="col-lg-6 order-lg-2">
-                                        <div class="carousel-text p-5 text-white">
-                                            <div class="slide-badge mb-4">
-                                                <span class="badge bg-white text-primary px-3 py-2 rounded-pill">
-                                                    <i class="lni lni-cloud-upload me-2"></i>Upload Digital
-                                                </span>
-                                            </div>
-                                            <h2 class="display-6 fw-bold mb-4">Upload Berkas Digital</h2>
-                                            <p class="mb-4 opacity-90 fs-5">
-                                                Upload berkas persyaratan dengan mudah melalui sistem kami. Dukung berbagai format file dengan keamanan terjamin.
-                                            </p>
-                                            <div class="row g-3">
-                                                <div class="col-6">
-                                                    <div class="stat-card text-center p-3 rounded-3" style="background: rgba(255,255,255,0.15);">
-                                                        <i class="lni lni-files fs-1 mb-2"></i>
-                                                        <h5 class="fw-bold mb-1">15+</h5>
-                                                        <small>Format File</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="stat-card text-center p-3 rounded-3" style="background: rgba(255,255,255,0.15);">
-                                                        <i class="lni lni-protection fs-1 mb-2"></i>
-                                                        <h5 class="fw-bold mb-1">256-bit</h5>
-                                                        <small>Enkripsi</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4">
-                                                <div class="progress-container">
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <small>Kapasitas Upload</small>
-                                                        <small>50MB/file</small>
-                                                    </div>
-                                                    <div class="progress" style="height: 8px;">
-                                                        <div class="progress-bar bg-white" style="width: 85%"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 order-lg-1">
-                                        <div class="carousel-image-container p-5">
-                                            <div class="floating-image">
+                            <div class="carousel-slide-content slide-2">
+                                <div class="row g-0 h-100">
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-image-container p-4 p-lg-5">
+                                            <div class="image-wrapper position-relative">
                                                 <img src="{{ asset('assets/img/logo/slide2.jpeg') }}"
                                                      alt="Upload Berkas"
-                                                     class="img-fluid rounded-4 shadow-lg">
+                                                     class="img-fluid rounded-3 shadow-lg slide-image">
                                                 <div class="upload-animation">
                                                     <div class="upload-circle">
                                                         <i class="lni lni-upload"></i>
@@ -204,34 +181,75 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-text p-4 p-lg-5">
+                                            <div class="slide-badge mb-4">
+                                                <span class="badge bg-white text-primary px-3 py-2 rounded-pill">
+                                                    <i class="lni lni-cloud-upload me-2"></i>Upload Digital
+                                                </span>
+                                            </div>
+                                            <h3 class="display-6 fw-bold mb-4 text-white">Upload Berkas Digital</h3>
+                                            <p class="text-white mb-4 opacity-90 fs-5">
+                                                Upload berkas persyaratan dengan mudah melalui sistem kami. Dukung berbagai format file dengan keamanan terjamin.
+                                            </p>
+                                            <div class="stats-grid mb-4">
+                                                <div class="stat-card">
+                                                    <div class="stat-icon">
+                                                        <i class="lni lni-files"></i>
+                                                    </div>
+                                                    <div class="stat-content">
+                                                        <h5 class="fw-bold mb-1 text-white">15+</h5>
+                                                        <small class="text-white opacity-75">Format File</small>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-card">
+                                                    <div class="stat-icon">
+                                                        <i class="lni lni-protection"></i>
+                                                    </div>
+                                                    <div class="stat-content">
+                                                        <h5 class="fw-bold mb-1 text-white">256-bit</h5>
+                                                        <small class="text-white opacity-75">Enkripsi</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-section">
+                                                <div class="progress-label d-flex justify-content-between mb-2">
+                                                    <span class="text-white opacity-75">Kapasitas Upload</span>
+                                                    <span class="text-white opacity-75">50MB/file</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-white" style="width: 85%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Slide 3 - Enhanced -->
+                        <!-- Slide 3 - Tracking Permohonan -->
                         <div class="carousel-item">
-                            <div class="carousel-slide-content" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                <div class="row align-items-center h-100">
-                                    <div class="col-lg-6">
-                                        <div class="carousel-text p-5 text-white">
+                            <div class="carousel-slide-content slide-3">
+                                <div class="row g-0 h-100">
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-text p-4 p-lg-5">
                                             <div class="slide-badge mb-4">
                                                 <span class="badge bg-white text-primary px-3 py-2 rounded-pill">
                                                     <i class="lni lni-map me-2"></i>Tracking Real-time
                                                 </span>
                                             </div>
-                                            <h2 class="display-6 fw-bold mb-4">Tracking Permohonan</h2>
-                                            <p class="mb-4 opacity-90 fs-5">
+                                            <h3 class="display-6 fw-bold mb-4 text-white">Tracking Permohonan</h3>
+                                            <p class="text-white mb-4 opacity-90 fs-5">
                                                 Lacak perkembangan permohonan surat Anda dari awal pengajuan hingga selesai melalui dashboard yang interaktif.
                                             </p>
-
-                                            <div class="progress-timeline">
+                                            <div class="timeline">
                                                 <div class="timeline-step active">
                                                     <div class="step-icon">
                                                         <i class="lni lni-paperclip"></i>
                                                     </div>
                                                     <div class="step-content">
-                                                        <h6 class="fw-bold mb-1">Pengajuan</h6>
-                                                        <small class="opacity-75">Permohonan diterima</small>
+                                                        <h6 class="fw-bold mb-1 text-white">Pengajuan</h6>
+                                                        <small class="text-white opacity-75">Permohonan diterima</small>
                                                     </div>
                                                 </div>
                                                 <div class="timeline-step active">
@@ -239,8 +257,8 @@
                                                         <i class="lni lni-checkmark-circle"></i>
                                                     </div>
                                                     <div class="step-content">
-                                                        <h6 class="fw-bold mb-1">Verifikasi</h6>
-                                                        <small class="opacity-75">Data diverifikasi</small>
+                                                        <h6 class="fw-bold mb-1 text-white">Verifikasi</h6>
+                                                        <small class="text-white opacity-75">Data diverifikasi</small>
                                                     </div>
                                                 </div>
                                                 <div class="timeline-step">
@@ -248,8 +266,8 @@
                                                         <i class="lni lni-cogs"></i>
                                                     </div>
                                                     <div class="step-content">
-                                                        <h6 class="fw-bold mb-1">Proses</h6>
-                                                        <small class="opacity-75">Sedang diproses</small>
+                                                        <h6 class="fw-bold mb-1 text-white">Proses</h6>
+                                                        <small class="text-white opacity-75">Sedang diproses</small>
                                                     </div>
                                                 </div>
                                                 <div class="timeline-step">
@@ -257,19 +275,19 @@
                                                         <i class="lni lni-checkmark"></i>
                                                     </div>
                                                     <div class="step-content">
-                                                        <h6 class="fw-bold mb-1">Selesai</h6>
-                                                        <small class="opacity-75">Tunggu konfirmasi</small>
+                                                        <h6 class="fw-bold mb-1 text-white">Selesai</h6>
+                                                        <small class="text-white opacity-75">Tunggu konfirmasi</small>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <div class="carousel-image-container p-5">
-                                            <div class="floating-image">
+                                    <div class="col-lg-6 d-flex align-items-center">
+                                        <div class="carousel-image-container p-4 p-lg-5">
+                                            <div class="image-wrapper position-relative">
                                                 <img src="{{ asset('assets/img/logo/slide3.jpeg') }}"
                                                      alt="Tracking Permohonan"
-                                                     class="img-fluid rounded-4 shadow-lg">
+                                                     class="img-fluid rounded-3 shadow-lg slide-image">
                                                 <div class="tracking-animation">
                                                     <div class="tracking-dot dot-1"></div>
                                                     <div class="tracking-dot dot-2"></div>
@@ -282,91 +300,550 @@
                             </div>
                         </div>
 
-                        <!-- Slide 4 - Enhanced -->
-                        <div class="carousel-item">
-                            <div class="carousel-slide-content" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                                <div class="row align-items-center h-100">
-                                    <div class="col-lg-6 order-lg-2">
-                                        <div class="carousel-text p-5 text-white">
-                                            <div class="slide-badge mb-4">
-                                                <span class="badge bg-white text-primary px-3 py-2 rounded-pill">
-                                                    <i class="lni lni-users me-2"></i>Komunitas Digital
-                                                </span>
-                                            </div>
-                                            <h2 class="display-6 fw-bold mb-4">Komunitas Digital Desa</h2>
-                                            <p class="mb-4 opacity-90 fs-5">
-                                                Bergabung dengan komunitas digital desa untuk mendapatkan informasi terbaru, tips, dan bantuan dalam penggunaan sistem.
-                                            </p>
 
-                                            <div class="community-stats">
-                                                <div class="row g-3">
-                                                    <div class="col-4">
-                                                        <div class="stat-card text-center p-3 rounded-3" style="background: rgba(255,255,255,0.2);">
-                                                            <h3 class="fw-bold mb-0">500+</h3>
-                                                            <small>Pengguna Aktif</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <div class="stat-card text-center p-3 rounded-3" style="background: rgba(255,255,255,0.2);">
-                                                            <h3 class="fw-bold mb-0">98%</h3>
-                                                            <small>Kepuasan</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <div class="stat-card text-center p-3 rounded-3" style="background: rgba(255,255,255,0.2);">
-                                                            <h3 class="fw-bold mb-0">24/7</h3>
-                                                            <small>Support</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="mt-4">
-                                                <button class="btn btn-light btn-lg rounded-pill px-4">
-                                                    <i class="lni lni-arrow-right me-2"></i>Bergabung Sekarang
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 order-lg-1">
-                                        <div class="carousel-image-container p-5">
-                                            <div class="floating-image">
-                                                <img src="{{ asset('assets/img/logo/slide4.jpeg') }}"
-                                                     alt="Komunitas Desa"
-                                                     class="img-fluid rounded-4 shadow-lg">
-                                                <div class="community-animation">
-                                                    <div class="user-avatar avatar-1">
-                                                        <i class="lni lni-user"></i>
-                                                    </div>
-                                                    <div class="user-avatar avatar-2">
-                                                        <i class="lni lni-user"></i>
-                                                    </div>
-                                                    <div class="user-avatar avatar-3">
-                                                        <i class="lni lni-user"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Enhanced Controls -->
-                    <button class="carousel-control-prev custom-control" type="button" data-bs-target="#desaCarousel" data-bs-slide="prev">
+                    <!-- Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#desaCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next custom-control" type="button" data-bs-target="#desaCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#desaCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
             </div>
         </div>
+    </div>
 </section>
 
+<style>
+    /* Section Styling */
+    .slideshow-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 80px 0;
+    }
+
+    .mb-6 {
+        margin-bottom: 4rem !important;
+    }
+
+    .section-header h2 {
+        color: #2c3e50;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .section-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #4361ee, #3a0ca3);
+        border-radius: 2px;
+    }
+
+    /* Carousel Styling */
+    #desaCarousel {
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .carousel-inner {
+        height: 600px;
+        background: #fff;
+    }
+
+    .carousel-slide-content {
+        height: 100%;
+        width: 100%;
+    }
+
+    /* Slide Backgrounds */
+    .slide-1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .slide-2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .slide-3 {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .slide-4 {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    /* Text Content */
+    .carousel-text {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .carousel-text h3 {
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+
+    .carousel-text p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    /* Image Container */
+    .carousel-image-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .slide-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .slide-image:hover {
+        transform: scale(1.02);
+    }
+
+    /* Features List */
+    .features-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .feature-content h6 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card h4, .stat-card h5 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Timeline */
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .timeline-step {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+
+    .timeline-step.active {
+        opacity: 1;
+    }
+
+    .step-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .step-content h6 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Progress Bar */
+    .progress-section {
+        margin-top: 2rem;
+    }
+
+    .progress-label {
+        font-size: 0.9rem;
+    }
+
+    .progress {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+    }
+
+    .progress-bar {
+        border-radius: 3px;
+    }
+
+    /* Action Button */
+    .action-btn {
+        margin-top: 2rem;
+    }
+
+    .btn-light {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-light:hover {
+        background: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .floating-element {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .element-1 {
+        top: 20px;
+        left: 20px;
+        color: #27ae60;
+        animation-delay: 0s;
+    }
+
+    .element-2 {
+        top: 20px;
+        right: 20px;
+        color: #4361ee;
+        animation-delay: 2s;
+    }
+
+    .element-3 {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #f39c12;
+        animation-delay: 4s;
+    }
+
+    /* Upload Animation */
+    .upload-animation {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+    }
+
+    .upload-circle {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #f5576c;
+        animation: pulse 2s ease-in-out infinite;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tracking Animation */
+    .tracking-animation {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .tracking-dot {
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-radius: 50%;
+        animation: bounce 1.5s ease-in-out infinite;
+    }
+
+    .dot-1 { animation-delay: 0s; }
+    .dot-2 { animation-delay: 0.2s; }
+    .dot-3 { animation-delay: 0.4s; }
+
+    /* Community Animation */
+    .community-animation {
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #38f9d7;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: float 4s ease-in-out infinite;
+    }
+
+    .avatar-1 { animation-delay: 0s; }
+    .avatar-2 { animation-delay: 1.3s; }
+    .avatar-3 { animation-delay: 2.6s; }
+
+    /* Carousel Controls */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0 20px;
+        opacity: 1;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background: white;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-size: 60%;
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Indicators */
+    .carousel-indicators {
+        bottom: -60px;
+        margin-bottom: 0;
+    }
+
+    .carousel-indicators button {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        border: none;
+        margin: 0 6px;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-indicators button.active {
+        background-color: #4361ee;
+        transform: scale(1.3);
+    }
+
+    /* Animations */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .carousel-inner {
+            height: auto;
+            min-height: 800px;
+        }
+
+        .carousel-text,
+        .carousel-image-container {
+            padding: 2rem;
+        }
+
+        .carousel-text h3 {
+            font-size: 2rem;
+        }
+
+        .slide-image {
+            height: 300px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .slideshow-section {
+            padding: 60px 0;
+        }
+
+        .carousel-inner {
+            min-height: 900px;
+        }
+
+        .row.g-0 > div {
+            width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            margin: 0 10px;
+        }
+
+        .carousel-indicators {
+            bottom: -50px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .carousel-text h3 {
+            font-size: 1.75rem;
+        }
+
+        .carousel-text p {
+            font-size: 1rem;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('desaCarousel');
+        const carouselInstance = new bootstrap.Carousel(carousel, {
+            interval: 5000,
+            wrap: true,
+            pause: 'hover'
+        });
+
+        // Auto-play carousel
+        carousel.addEventListener('mouseenter', () => {
+            carouselInstance.pause();
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+            carouselInstance.cycle();
+        });
+
+        // Add smooth transitions between slides
+        const slides = document.querySelectorAll('.carousel-item');
+        slides.forEach(slide => {
+            slide.addEventListener('slide.bs.carousel', function () {
+                const activeSlide = this.querySelector('.carousel-item.active');
+                if (activeSlide) {
+                    activeSlide.classList.add('transitioning');
+                    setTimeout(() => {
+                        activeSlide.classList.remove('transitioning');
+                    }, 600);
+                }
+            });
+        });
+    });
+</script>
 <!-- ========================= Slideshow Carousel Section end ========================= -->
 
    <!-- ========================= Identitas Pengembang & Footer Section start ========================= -->
@@ -376,7 +853,7 @@
         <div class="row justify-content-center mb-50">
             <div class="col-lg-8 text-center">
                 <h2 class="fw-bold mb-3" style="color: #1E3A8A;">
-                    Tim Pengembang Sistem
+                    Pengembang Sistem
                 </h2>
                 <p class="lead" style="color: #4a5568;">
                     Sistem Layanan Mandiri Desa untuk Digitalisasi Pelayanan Administratif

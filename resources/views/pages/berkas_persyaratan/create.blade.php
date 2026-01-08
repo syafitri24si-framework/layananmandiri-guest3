@@ -5,21 +5,21 @@
 <section id="contact" class="contact-section contact-style-3">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                <div class="section-title text-center mb-50">
+            <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
+                <div class="section-title text-center mb-40">
                     <br><br>
                     <h3 class="mb-15">Tambah Berkas Persyaratan</h3>
-                    <p>Silahkan isi form berikut untuk menambah berkas persyaratan</p>
+                    <p class="text-muted">Silahkan isi form berikut untuk menambah berkas persyaratan</p>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-lg-10 col-xl-9">
                 <div class="contact-form-wrapper">
-
+                    <!-- Alert Messages -->
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                             <i class="lni lni-checkmark-circle me-2"></i>
                             {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -27,7 +27,7 @@
                     @endif
 
                     @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                             <i class="lni lni-warning me-2"></i>
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
@@ -38,17 +38,18 @@
                         </div>
                     @endif
 
-                    
-
                     <form action="{{ route('berkas_persyaratan.store') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
                         @csrf
-                        <div class="row g-4">
 
-                            {{-- Permohonan Surat --}}
+                        <!-- Form Grid -->
+                        <div class="row g-3">
+                            <!-- Permohonan Surat -->
                             <div class="col-md-6">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2">Permohonan Surat <span class="text-danger">*</span></label>
-                                    <select name="permohonan_id" class="form-select @error('permohonan_id') is-invalid @enderror" required>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Permohonan Surat <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="permohonan_id" class="form-select form-select-md @error('permohonan_id') is-invalid @enderror" required>
                                         <option value="">-- Pilih Permohonan Surat --</option>
                                         @foreach ($permohonanList as $permohonan)
                                             <option value="{{ $permohonan->permohonan_id }}"
@@ -63,11 +64,13 @@
                                 </div>
                             </div>
 
-                            {{-- Nama Berkas --}}
+                            <!-- Nama Berkas -->
                             <div class="col-md-6">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2">Nama Berkas <span class="text-danger">*</span></label>
-                                    <select name="nama_berkas" id="nama_berkas" class="form-select @error('nama_berkas') is-invalid @enderror" required>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Nama Berkas <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="nama_berkas" id="nama_berkas" class="form-select form-select-md @error('nama_berkas') is-invalid @enderror" required>
                                         <option value="">-- Pilih Jenis Berkas --</option>
                                         <option value="KTP" {{ old('nama_berkas') == 'KTP' ? 'selected' : '' }}>KTP</option>
                                         <option value="KK" {{ old('nama_berkas') == 'KK' ? 'selected' : '' }}>Kartu Keluarga (KK)</option>
@@ -86,28 +89,35 @@
                                 </div>
                             </div>
 
-                            {{-- Nama Berkas Custom --}}
+                            <!-- Nama Berkas Custom -->
                             <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Nama Berkas Kustom</label>
-                                    <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
-                                           class="form-input @error('nama_berkas_custom') is-invalid @enderror"
-                                           placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
-                                           value="{{ old('nama_berkas_custom') }}"
-                                           disabled>
-                                    <i class="lni lni-edit position-absolute"
-                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Nama Berkas Kustom
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
+                                               class="form-control form-control-md @error('nama_berkas_custom') is-invalid @enderror"
+                                               placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
+                                               value="{{ old('nama_berkas_custom') }}"
+                                               disabled>
+                                        <span class="input-group-text bg-transparent border-start-0">
+                                            <i class="lni lni-edit text-muted"></i>
+                                        </span>
+                                    </div>
                                     @error('nama_berkas_custom')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
 
-                            {{-- Status Validasi --}}
+                            <!-- Status Validasi -->
                             <div class="col-md-6">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2">Status Validasi <span class="text-danger">*</span></label>
-                                    <select name="valid" class="form-select @error('valid') is-invalid @enderror" required>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Status Validasi <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="valid" class="form-select form-select-md @error('valid') is-invalid @enderror" required>
                                         <option value="">-- Pilih Status --</option>
                                         <option value="menunggu" {{ old('valid') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
                                         <option value="valid" {{ old('valid') == 'valid' ? 'selected' : '' }}>Valid</option>
@@ -119,29 +129,29 @@
                                 </div>
                             </div>
 
-                            {{-- MULTIPLE FILE UPLOAD --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
+                            <!-- File Upload Section -->
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-3">
                                         <i class="lni lni-cloud-upload me-2"></i>
                                         Upload File (Multiple) <span class="text-danger">*</span>
                                     </label>
 
-                                    {{-- File Input yang Tersembunyi --}}
+                                    <!-- Hidden File Input -->
                                     <input type="file" name="files[]" id="files"
                                            class="d-none @error('files') is-invalid @enderror"
                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
                                            multiple required>
 
-                                    {{-- Area Upload yang Dapat Diklik --}}
-                                    <div class="file-upload-area border rounded p-5 mb-4" id="uploadArea">
-                                        <div class="text-center">
+                                    <!-- Upload Area -->
+                                    <div class="file-upload-area border rounded-3 p-4 mb-3" id="uploadArea">
+                                        <div class="text-center py-3">
                                             <div class="upload-icon mb-3">
                                                 <i class="lni lni-cloud-upload display-4 text-primary"></i>
                                             </div>
                                             <h5 class="mb-2">Seret & Lepas File di Sini</h5>
                                             <p class="text-muted mb-3">Atau klik untuk memilih file dari komputer</p>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                                            <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
                                                 <i class="lni lni-folder me-1"></i> Browse Files
                                             </button>
                                             <div class="mt-3">
@@ -160,10 +170,10 @@
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
 
-                                    {{-- File Preview Container --}}
+                                    <!-- File Preview Container -->
                                     <div id="filePreviewContainer" class="mt-4" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h6 class="mb-0">
+                                            <h6 class="mb-0 fw-semibold">
                                                 <i class="lni lni-files me-2"></i> File yang Dipilih
                                                 <span class="badge bg-primary ms-2" id="fileCount">0</span>
                                             </h6>
@@ -172,21 +182,21 @@
                                             </button>
                                         </div>
                                         <div id="fileList" class="row g-3">
-                                            {{-- File previews will be inserted here --}}
+                                            <!-- File previews will be inserted here -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Informasi Warga --}}
-                            <div class="col-md-12">
-                                <div class="card border-0 shadow-sm">
+                            <!-- Informasi Warga Card -->
+                            <div class="col-12">
+                                <div class="card border shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title d-flex align-items-center">
-                                            <i class="lni lni-user me-2"></i> Informasi Warga
+                                        <h6 class="card-title d-flex align-items-center fw-semibold mb-3">
+                                            <i class="lni lni-user me-2 text-primary"></i> Informasi Warga
                                         </h6>
                                         <div id="wargaInfo" class="text-muted">
-                                            <div class="text-center py-3">
+                                            <div class="text-center py-4">
                                                 <i class="lni lni-information display-5 text-muted mb-3"></i>
                                                 <p class="mb-0">Pilih permohonan surat terlebih dahulu untuk melihat informasi warga</p>
                                             </div>
@@ -195,25 +205,22 @@
                                 </div>
                             </div>
 
-                            {{-- Tombol --}}
-                            <div class="col-md-12">
+                            <!-- Action Buttons -->
+                            <div class="col-12">
                                 <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                    <a href="{{ route('berkas_persyaratan.index') }}" class="btn btn-outline-danger px-4">
+                                    <a href="{{ route('berkas_persyaratan.index') }}" class="btn btn-outline-danger px-4 py-2">
                                         <i class="lni lni-cross-circle me-2"></i> Batal
                                     </a>
-                                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Simpan Berkas
+                                    <button type="submit" class="btn btn-success px-4 py-2" id="submitBtn">
+                                        <i class="lni lni-save me-2"></i> Simpan Berkas
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -222,7 +229,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="previewModalTitle">
+                <h5 class="modal-title fw-semibold" id="previewModalTitle">
                     <i class="lni lni-eye me-2"></i> Preview File
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -243,18 +250,41 @@
 </div>
 
 <style>
+    /* Form Styles */
     .form-label {
         font-weight: 600;
         color: #2c3e50;
         margin-bottom: 8px;
+        font-size: 0.95rem;
     }
 
+    .form-select-md,
+    .form-control-md {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-select-md:focus,
+    .form-control-md:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: none;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    /* File Upload Styles */
     .file-upload-area {
         border: 2px dashed #3498db;
         background: linear-gradient(135deg, #f8fafc 0%, #f1f8ff 100%);
         cursor: pointer;
         transition: all 0.3s ease;
-        min-height: 200px;
+        min-height: 180px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -284,29 +314,31 @@
         50% { transform: translateY(-10px); }
     }
 
+    /* File Card Styles */
     .file-card {
         border: 1px solid #e9ecef;
         border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
         background: white;
+        transition: all 0.3s ease;
         position: relative;
+        padding: 15px;
     }
 
     .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         border-color: #3498db;
     }
 
     .file-icon-wrapper {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
+        flex-shrink: 0;
     }
 
     .file-icon-wrapper.pdf { background: #ff6b6b; color: white; }
@@ -317,17 +349,17 @@
 
     .remove-file-btn {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 28px;
-        height: 28px;
+        top: 8px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        font-size: 12px;
-        opacity: 0;
+        font-size: 11px;
+        opacity: 0.8;
         transition: opacity 0.3s;
         z-index: 10;
     }
@@ -339,11 +371,18 @@
     .btn-file-action {
         padding: 4px 10px;
         font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .caption-input {
+        font-size: 0.85rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: 6px;
     }
 
     /* Preview Modal Styles */
     #filePreviewModal .modal-body {
-        height: 70vh;
+        height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -356,23 +395,74 @@
         align-items: center;
         justify-content: center;
         overflow: auto;
+        padding: 1rem;
     }
 
     .preview-image {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        border-radius: 8px;
     }
 
     .preview-pdf {
         width: 100%;
         height: 100%;
         border: none;
+        border-radius: 8px;
     }
 
     .no-preview {
         text-align: center;
-        padding: 3rem;
+        padding: 2rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .file-card {
+            padding: 12px;
+        }
+
+        .file-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .btn-file-action {
+            font-size: 11px;
+            padding: 3px 8px;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        #filePreviewModal .modal-body {
+            height: 50vh;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .form-select-md,
+        .form-control-md {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .file-upload-area {
+            min-height: 150px;
+            padding: 1rem;
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+        }
     }
 </style>
 
@@ -438,7 +528,6 @@
         clearAllBtn.addEventListener('click', function() {
             if (uploadedFiles.length > 0) {
                 if (confirm('Apakah Anda yakin ingin menghapus semua file?')) {
-                    // Clear all files
                     uploadedFiles = [];
                     fileInput.value = '';
                     updateFilePreview();
@@ -485,7 +574,7 @@
                         </div>
                         <h5 class="mb-2">Seret & Lepas File di Sini</h5>
                         <p class="text-muted mb-3">Atau klik untuk memilih file dari komputer</p>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                        <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
                             <i class="lni lni-folder me-1"></i> Browse Files
                         </button>
                         <div class="mt-3">
@@ -540,7 +629,7 @@
                 const canPreview = file.type.startsWith('image/') || file.type === 'application/pdf';
 
                 fileItem.innerHTML = `
-                    <div class="file-card p-3 position-relative" data-file-index="${index}">
+                    <div class="file-card" data-file-index="${index}">
                         <button type="button" class="btn btn-danger btn-sm remove-file-btn"
                                 data-index="${index}" title="Hapus file">
                             <i class="lni lni-close"></i>
@@ -552,10 +641,9 @@
                             </div>
                             <div class="flex-grow-1">
                                 <h6 class="mb-1" title="${file.name}">${fileName}</h6>
-                                <small class="text-muted d-block">${fileSize}</small>
-                                <small class="text-muted">${file.type || 'Unknown type'}</small>
+                                <small class="text-muted d-block mb-2">${fileSize}</small>
 
-                                <div class="mt-3">
+                                <div class="mb-3">
                                     <input type="text"
                                            name="captions[${index}]"
                                            class="form-control form-control-sm caption-input"
@@ -564,7 +652,7 @@
                                            value="${file.name.split('.')[0]}">
                                 </div>
 
-                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                <div class="d-flex flex-wrap gap-2">
                                     ${canPreview ? `
                                     <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-file-btn"
                                             data-index="${index}" data-filename="${file.name}">
@@ -765,7 +853,7 @@
                         </button>
                     </div>
                 </div>
-    `;
+            `;
             previewModal.show();
         }
 
@@ -892,21 +980,21 @@
                 if (parts.length >= 2) {
                     wargaInfo.innerHTML = `
                         <div class="row">
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-6 mb-3">
                                 <div class="d-flex align-items-center">
-                                    <i class="lni lni-user text-primary me-2"></i>
+                                    <i class="lni lni-user text-primary me-2 fs-5"></i>
                                     <div>
                                         <small class="text-muted d-block">Nama Warga</small>
-                                        <strong>${parts[1]}</strong>
+                                        <strong class="fs-6">${parts[1]}</strong>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-6 mb-3">
                                 <div class="d-flex align-items-center">
-                                    <i class="lni lni-tag text-primary me-2"></i>
+                                    <i class="lni lni-tag text-primary me-2 fs-5"></i>
                                     <div>
                                         <small class="text-muted d-block">No. Permohonan</small>
-                                        <strong>${parts[0].replace('#', '')}</strong>
+                                        <strong class="fs-6">${parts[0].replace('#', '')}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -915,7 +1003,7 @@
                 }
             } else {
                 wargaInfo.innerHTML = `
-                    <div class="text-center py-3">
+                    <div class="text-center py-4">
                         <i class="lni lni-information display-5 text-muted mb-3"></i>
                         <p class="mb-0">Pilih permohonan surat terlebih dahulu untuk melihat informasi warga</p>
                     </div>

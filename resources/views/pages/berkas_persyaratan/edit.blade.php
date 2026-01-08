@@ -5,21 +5,21 @@
 <section id="contact" class="contact-section contact-style-3">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                <div class="section-title text-center mb-50">
+            <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
+                <div class="section-title text-center mb-40">
                     <br><br>
                     <h3 class="mb-15">Edit Berkas Persyaratan</h3>
-                    <p>Silahkan perbarui data berkas persyaratan di bawah</p>
+                    <p class="text-muted">Silahkan perbarui data berkas persyaratan di bawah</p>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-lg-10 col-xl-9">
                 <div class="contact-form-wrapper">
-
+                    <!-- Alert Messages -->
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                             <i class="lni lni-checkmark-circle me-2"></i>
                             {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -27,7 +27,7 @@
                     @endif
 
                     @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                             <i class="lni lni-warning me-2"></i>
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
@@ -41,26 +41,34 @@
                     <form action="{{ route('berkas_persyaratan.update', $berkas->berkas_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
                         @csrf
                         @method('PUT')
-                        <div class="row g-4">
 
-                            {{-- Informasi Permohonan (Readonly) --}}
+                        <!-- Form Grid -->
+                        <div class="row g-3">
+                            <!-- Informasi Permohonan (Readonly) -->
                             <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Permohonan Surat</label>
-                                    <input type="text" class="form-input bg-light" readonly
-                                           value="#{{ $berkas->permohonan->nomor_permohonan }} - {{ $berkas->permohonan->warga->nama }}">
-                                    <i class="lni lni-notepad position-absolute"
-                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Permohonan Surat
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-md bg-light" readonly
+                                               value="#{{ $berkas->permohonan->nomor_permohonan }} - {{ $berkas->permohonan->warga->nama }}">
+                                        <span class="input-group-text bg-light border-start-0">
+                                            <i class="lni lni-notepad text-muted"></i>
+                                        </span>
+                                    </div>
                                     <input type="hidden" name="permohonan_id" value="{{ $berkas->permohonan_id }}">
-                                    <small class="text-muted">Permohonan tidak dapat diubah</small>
+                                    <small class="text-muted mt-1 d-block">Permohonan tidak dapat diubah</small>
                                 </div>
                             </div>
 
-                            {{-- Status Validasi --}}
+                            <!-- Status Validasi -->
                             <div class="col-md-6">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2">Status Validasi <span class="text-danger">*</span></label>
-                                    <select name="valid" class="form-select @error('valid') is-invalid @enderror" required>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Status Validasi <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="valid" class="form-select form-select-md @error('valid') is-invalid @enderror" required>
                                         <option value="">-- Pilih Status --</option>
                                         <option value="menunggu" {{ old('valid', $berkas->valid) == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
                                         <option value="valid" {{ old('valid', $berkas->valid) == 'valid' ? 'selected' : '' }}>Valid</option>
@@ -72,11 +80,13 @@
                                 </div>
                             </div>
 
-                            {{-- Nama Berkas --}}
+                            <!-- Nama Berkas -->
                             <div class="col-md-6">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2">Nama Berkas <span class="text-danger">*</span></label>
-                                    <select name="nama_berkas" id="nama_berkas" class="form-select @error('nama_berkas') is-invalid @enderror" required>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Nama Berkas <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="nama_berkas" id="nama_berkas" class="form-select form-select-md @error('nama_berkas') is-invalid @enderror" required>
                                         <option value="">-- Pilih Jenis Berkas --</option>
                                         <option value="KTP" {{ old('nama_berkas', $berkas->nama_berkas) == 'KTP' ? 'selected' : '' }}>KTP</option>
                                         <option value="KK" {{ old('nama_berkas', $berkas->nama_berkas) == 'KK' ? 'selected' : '' }}>Kartu Keluarga (KK)</option>
@@ -95,36 +105,43 @@
                                 </div>
                             </div>
 
-                            {{-- Nama Berkas Custom --}}
+                            <!-- Nama Berkas Custom -->
                             <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Nama Berkas Kustom</label>
-                                    <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
-                                           class="form-input @error('nama_berkas_custom') is-invalid @enderror"
-                                           placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
-                                           value="{{ $berkas->nama_berkas == 'Lainnya' ? $berkas->nama_berkas : '' }}"
-                                           {{ $berkas->nama_berkas == 'Lainnya' ? '' : 'disabled' }}>
-                                    <i class="lni lni-edit position-absolute"
-                                        style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-2">
+                                        Nama Berkas Kustom
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" id="nama_berkas_custom" name="nama_berkas_custom"
+                                               class="form-control form-control-md @error('nama_berkas_custom') is-invalid @enderror"
+                                               placeholder="Masukkan nama berkas jika memilih 'Lainnya'"
+                                               value="{{ $berkas->nama_berkas == 'Lainnya' ? $berkas->nama_berkas : '' }}"
+                                               {{ $berkas->nama_berkas == 'Lainnya' ? '' : 'disabled' }}>
+                                        <span class="input-group-text bg-transparent border-start-0">
+                                            <i class="lni lni-edit text-muted"></i>
+                                        </span>
+                                    </div>
                                     @error('nama_berkas_custom')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
 
-                            {{-- File yang Sudah Ada --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
+                            <!-- File yang Sudah Ada -->
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-3 d-flex align-items-center">
                                         <i class="lni lni-files me-2"></i>
                                         File yang Sudah Ada
-                                        <span class="badge bg-primary ms-2">{{ $mediaFiles->count() }}</span>
+                                        @if($mediaFiles->count() > 0)
+                                            <span class="badge bg-primary ms-2">{{ $mediaFiles->count() }}</span>
+                                        @endif
                                     </label>
 
                                     @if($mediaFiles->count() > 0)
-                                        <div id="existingFilesContainer" class="mt-4">
+                                        <div id="existingFilesContainer" class="mt-3">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">
+                                                <h6 class="mb-0 fw-semibold">
                                                     <i class="lni lni-folder me-2"></i> File Terupload
                                                 </h6>
                                                 <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
@@ -134,8 +151,9 @@
                                             <div id="existingFileList" class="row g-3">
                                                 @foreach($mediaFiles as $index => $media)
                                                 <div class="col-md-6 col-lg-4">
-                                                    <div class="file-card p-3 position-relative border border-primary" data-file-id="{{ $media->media_id }}">
-                                                        <div class="form-check position-absolute top-0 end-0 m-2">
+                                                    <div class="file-card border border-primary" data-file-id="{{ $media->media_id }}">
+                                                        <!-- Delete Checkbox -->
+                                                        <div class="form-check position-absolute top-0 end-0 m-2 z-2">
                                                             <input type="checkbox"
                                                                    class="form-check-input delete-checkbox"
                                                                    name="delete_media[{{ $media->media_id }}]"
@@ -144,44 +162,52 @@
                                                             <label class="form-check-label" for="delete_media_{{ $media->media_id }}"></label>
                                                         </div>
 
-                                                        <div class="d-flex align-items-start">
-                                                            <div class="file-icon-wrapper {{ $media->mime_type == 'application/pdf' ? 'pdf' : (str_contains($media->mime_type, 'image/') ? 'image' : 'other') }} me-3">
-                                                                <i class="{{ $media->mime_type == 'application/pdf' ? 'lni lni-empty-file' : (str_contains($media->mime_type, 'image/') ? 'lni lni-image' : 'lni lni-file') }}"></i>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <h6 class="mb-1" title="{{ $media->file_name }}">
-                                                                    {{ strlen($media->file_name) > 20 ? substr($media->file_name, 0, 17) . '...' : $media->file_name }}
-                                                                </h6>
-                                                                <small class="text-muted d-block">
-                                                                    {{ $media->mime_type }}
-                                                                </small>
-                                                                <small class="text-muted">
-                                                                    {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
-                                                                </small>
-
-                                                                <div class="mt-3">
-                                                                    <input type="text"
-                                                                           name="existing_captions[{{ $media->media_id }}]"
-                                                                           class="form-control form-control-sm caption-input"
-                                                                           placeholder="Caption (opsional)"
-                                                                           value="{{ old('existing_captions.' . $media->media_id, $media->caption) }}">
+                                                        <!-- File Content -->
+                                                        <div class="p-3">
+                                                            <div class="d-flex align-items-start">
+                                                                <!-- File Icon -->
+                                                                <div class="file-icon-wrapper {{ $media->mime_type == 'application/pdf' ? 'pdf' : (str_contains($media->mime_type, 'image/') ? 'image' : 'other') }} me-3">
+                                                                    <i class="{{ $media->mime_type == 'application/pdf' ? 'lni lni-empty-file' : (str_contains($media->mime_type, 'image/') ? 'lni lni-image' : 'lni lni-file') }}"></i>
                                                                 </div>
 
-                                                                <div class="d-flex flex-wrap gap-2 mt-3">
-                                                                    @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
-                                                                    <button type="button"
-                                                                            class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
-                                                                            data-media-id="{{ $media->media_id }}"
-                                                                            data-filename="{{ $media->file_name }}"
-                                                                            data-mimetype="{{ $media->mime_type }}"
-                                                                            data-url="{{ asset('storage/uploads/berkas_persyaratan/' . $media->file_name) }}">
-                                                                        <i class="lni lni-eye me-1"></i> Preview
-                                                                    </button>
-                                                                    @endif
-                                                                    <a href="{{ route('berkas_persyaratan.download', $media->media_id) }}"
-                                                                       class="btn btn-outline-success btn-sm btn-file-action">
-                                                                        <i class="lni lni-download me-1"></i> Download
-                                                                    </a>
+                                                                <!-- File Info -->
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="mb-1" title="{{ $media->file_name }}">
+                                                                        {{ strlen($media->file_name) > 20 ? substr($media->file_name, 0, 17) . '...' : $media->file_name }}
+                                                                    </h6>
+                                                                    <small class="text-muted d-block mb-2">
+                                                                        {{ $media->mime_type }}
+                                                                    </small>
+                                                                    <small class="text-muted">
+                                                                        {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
+                                                                    </small>
+
+                                                                    <!-- Caption Input -->
+                                                                    <div class="mt-3">
+                                                                        <input type="text"
+                                                                               name="existing_captions[{{ $media->media_id }}]"
+                                                                               class="form-control form-control-sm caption-input"
+                                                                               placeholder="Caption (opsional)"
+                                                                               value="{{ old('existing_captions.' . $media->media_id, $media->caption) }}">
+                                                                    </div>
+
+                                                                    <!-- Action Buttons -->
+                                                                    <div class="d-flex flex-wrap gap-2 mt-3">
+                                                                        @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
+                                                                                data-media-id="{{ $media->media_id }}"
+                                                                                data-filename="{{ $media->file_name }}"
+                                                                                data-mimetype="{{ $media->mime_type }}"
+                                                                                data-url="{{ asset('storage/uploads/berkas_persyaratan/' . $media->file_name) }}">
+                                                                            <i class="lni lni-eye me-1"></i> Preview
+                                                                        </button>
+                                                                        @endif
+                                                                        <a href="{{ route('berkas_persyaratan.download', $media->media_id) }}"
+                                                                           class="btn btn-outline-success btn-sm btn-file-action">
+                                                                            <i class="lni lni-download me-1"></i> Download
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -198,29 +224,29 @@
                                 </div>
                             </div>
 
-                            {{-- TAMBAH FILE BARU --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
+                            <!-- TAMBAH FILE BARU -->
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold mb-3 d-flex align-items-center">
                                         <i class="lni lni-cloud-upload me-2"></i>
                                         Tambah File Baru (Optional)
                                     </label>
 
-                                    {{-- File Input yang Tersembunyi --}}
+                                    <!-- Hidden File Input -->
                                     <input type="file" name="files[]" id="files"
                                            class="d-none @error('files') is-invalid @enderror"
                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
                                            multiple>
 
-                                    {{-- Area Upload yang Dapat Diklik --}}
-                                    <div class="file-upload-area border rounded p-5 mb-4" id="uploadArea">
-                                        <div class="text-center">
+                                    <!-- Upload Area -->
+                                    <div class="file-upload-area border rounded-3 p-4 mb-3" id="uploadArea">
+                                        <div class="text-center py-3">
                                             <div class="upload-icon mb-3">
                                                 <i class="lni lni-plus display-4 text-primary"></i>
                                             </div>
                                             <h5 class="mb-2">Seret & Lepas File di Sini</h5>
                                             <p class="text-muted mb-3">Atau klik untuk menambah file baru</p>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                                            <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
                                                 <i class="lni lni-folder me-1"></i> Browse Files
                                             </button>
                                             <div class="mt-3">
@@ -239,10 +265,10 @@
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
 
-                                    {{-- File Preview Container untuk File Baru --}}
+                                    <!-- File Preview Container untuk File Baru -->
                                     <div id="filePreviewContainer" class="mt-4" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h6 class="mb-0">
+                                            <h6 class="mb-0 fw-semibold">
                                                 <i class="lni lni-plus-circle me-2"></i> File Baru
                                                 <span class="badge bg-success ms-2" id="fileCount">0</span>
                                             </h6>
@@ -251,54 +277,54 @@
                                             </button>
                                         </div>
                                         <div id="fileList" class="row g-3">
-                                            {{-- File previews will be inserted here --}}
+                                            <!-- File previews will be inserted here -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Informasi Warga --}}
-                            <div class="col-md-12">
-                                <div class="card border-0 shadow-sm">
+                            <!-- Informasi Warga Card -->
+                            <div class="col-12">
+                                <div class="card border shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title d-flex align-items-center">
-                                            <i class="lni lni-user me-2"></i> Informasi Warga
+                                        <h6 class="card-title d-flex align-items-center fw-semibold mb-3">
+                                            <i class="lni lni-user me-2 text-primary"></i> Informasi Warga
                                         </h6>
                                         <div id="wargaInfo">
                                             <div class="row">
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-6 mb-3">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="lni lni-user text-primary me-2"></i>
+                                                        <i class="lni lni-user text-primary me-2 fs-5"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Nama Warga</small>
-                                                            <strong>{{ $berkas->permohonan->warga->nama }}</strong>
+                                                            <strong class="fs-6">{{ $berkas->permohonan->warga->nama }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-6 mb-3">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="lni lni-tag text-primary me-2"></i>
+                                                        <i class="lni lni-tag text-primary me-2 fs-5"></i>
                                                         <div>
                                                             <small class="text-muted d-block">No. Permohonan</small>
-                                                            <strong>{{ $berkas->permohonan->nomor_permohonan }}</strong>
+                                                            <strong class="fs-6">{{ $berkas->permohonan->nomor_permohonan }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-6 mb-3">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="lni lni-envelope text-primary me-2"></i>
+                                                        <i class="lni lni-envelope text-primary me-2 fs-5"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Jenis Surat</small>
-                                                            <strong>{{ $berkas->permohonan->jenisSurat->nama_jenis ?? 'N/A' }}</strong>
+                                                            <strong class="fs-6">{{ $berkas->permohonan->jenisSurat->nama_jenis ?? 'N/A' }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-6 mb-3">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="lni lni-calendar text-primary me-2"></i>
+                                                        <i class="lni lni-calendar text-primary me-2 fs-5"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Tanggal Permohonan</small>
-                                                            <strong>{{ \Carbon\Carbon::parse($berkas->permohonan->created_at)->format('d/m/Y') }}</strong>
+                                                            <strong class="fs-6">{{ \Carbon\Carbon::parse($berkas->permohonan->created_at)->format('d/m/Y') }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -308,26 +334,23 @@
                                 </div>
                             </div>
 
-                            {{-- Tombol --}}
-                            <div class="col-md-12">
+                            <!-- Action Buttons -->
+                            <div class="col-12">
                                 <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
                                     <a href="{{ route('berkas_persyaratan.index', ['permohonan_id' => $berkas->permohonan_id]) }}"
-                                       class="btn btn-outline-danger px-4">
+                                       class="btn btn-outline-danger px-4 py-2">
                                         <i class="lni lni-cross-circle me-2"></i> Batal
                                     </a>
-                                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Perbarui Berkas
+                                    <button type="submit" class="btn btn-success px-4 py-2" id="submitBtn">
+                                        <i class="lni lni-save me-2"></i> Perbarui Berkas
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -336,7 +359,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="previewModalTitle">
+                <h5 class="modal-title fw-semibold" id="previewModalTitle">
                     <i class="lni lni-eye me-2"></i> Preview File
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -357,18 +380,45 @@
 </div>
 
 <style>
+    /* Form Styles */
     .form-label {
         font-weight: 600;
         color: #2c3e50;
         margin-bottom: 8px;
+        font-size: 0.95rem;
     }
 
+    .form-select-md,
+    .form-control-md {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-select-md:focus,
+    .form-control-md:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: none;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    /* File Upload Styles */
     .file-upload-area {
         border: 2px dashed #3498db;
         background: linear-gradient(135deg, #f8fafc 0%, #f1f8ff 100%);
         cursor: pointer;
         transition: all 0.3s ease;
-        min-height: 200px;
+        min-height: 180px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -398,29 +448,35 @@
         50% { transform: translateY(-10px); }
     }
 
+    /* File Card Styles */
     .file-card {
         border: 1px solid #e9ecef;
         border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
         background: white;
+        transition: all 0.3s ease;
         position: relative;
+        overflow: hidden;
     }
 
     .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         border-color: #3498db;
     }
 
+    .file-card.border-primary {
+        border-color: #3498db !important;
+    }
+
     .file-icon-wrapper {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
+        flex-shrink: 0;
     }
 
     .file-icon-wrapper.pdf { background: #ff6b6b; color: white; }
@@ -429,35 +485,32 @@
     .file-icon-wrapper.excel { background: #2ecc71; color: white; }
     .file-icon-wrapper.other { background: #95a5a6; color: white; }
 
-    .remove-file-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        font-size: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: 10;
-    }
-
-    .file-card:hover .remove-file-btn {
-        opacity: 1;
-    }
-
     .btn-file-action {
         padding: 4px 10px;
         font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .caption-input {
+        font-size: 0.85rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: 6px;
+    }
+
+    /* Delete Checkbox Style */
+    .form-check-input:checked {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .form-check-input:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 
     /* Preview Modal Styles */
     #filePreviewModal .modal-body {
-        height: 70vh;
+        height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -470,29 +523,66 @@
         align-items: center;
         justify-content: center;
         overflow: auto;
+        padding: 1rem;
     }
 
     .preview-image {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        border-radius: 8px;
     }
 
-    .preview-pdf {
-        width: 100%;
-        height: 100%;
-        border: none;
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .file-card {
+            padding: 12px;
+        }
+
+        .file-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .btn-file-action {
+            font-size: 11px;
+            padding: 3px 8px;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        #filePreviewModal .modal-body {
+            height: 50vh;
+        }
     }
 
-    .no-preview {
-        text-align: center;
-        padding: 3rem;
-    }
+    @media (max-width: 576px) {
+        .form-select-md,
+        .form-control-md {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.85rem;
+        }
 
-    /* Checkbox style for deletion */
-    .form-check-input:checked {
-        background-color: #dc3545;
-        border-color: #dc3545;
+        .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .file-upload-area {
+            min-height: 150px;
+            padding: 1rem;
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
     }
 </style>
 
@@ -608,7 +698,7 @@
                         </div>
                         <h5 class="mb-2">Seret & Lepas File di Sini</h5>
                         <p class="text-muted mb-3">Atau klik untuk menambah file baru</p>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                        <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
                             <i class="lni lni-folder me-1"></i> Browse Files
                         </button>
                         <div class="mt-3">
@@ -663,41 +753,43 @@
                 const canPreview = file.type.startsWith('image/') || file.type === 'application/pdf';
 
                 fileItem.innerHTML = `
-                    <div class="file-card p-3 position-relative" data-file-index="${index}">
-                        <button type="button" class="btn btn-danger btn-sm remove-file-btn"
+                    <div class="file-card" data-file-index="${index}">
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-file-btn"
                                 data-index="${index}" title="Hapus file">
                             <i class="lni lni-close"></i>
                         </button>
 
-                        <div class="d-flex align-items-start">
-                            <div class="file-icon-wrapper ${fileIconClass} me-3">
-                                <i class="${fileIcon}"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1" title="${file.name}">${fileName}</h6>
-                                <small class="text-muted d-block">${fileSize}</small>
-                                <small class="text-muted">${file.type || 'Unknown type'}</small>
-
-                                <div class="mt-3">
-                                    <input type="text"
-                                           name="captions[${index}]"
-                                           class="form-control form-control-sm caption-input"
-                                           placeholder="Caption (opsional)"
-                                           data-index="${index}"
-                                           value="${file.name.split('.')[0]}">
+                        <div class="p-3">
+                            <div class="d-flex align-items-start">
+                                <div class="file-icon-wrapper ${fileIconClass} me-3">
+                                    <i class="${fileIcon}"></i>
                                 </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" title="${file.name}">${fileName}</h6>
+                                    <small class="text-muted d-block mb-2">${fileSize}</small>
+                                    <small class="text-muted">${file.type || 'Unknown type'}</small>
 
-                                <div class="d-flex flex-wrap gap-2 mt-3">
-                                    ${canPreview ? `
-                                    <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
-                                            data-index="${index}" data-filename="${file.name}">
-                                        <i class="lni lni-eye me-1"></i> Preview
-                                    </button>
-                                    ` : ''}
-                                    <button type="button" class="btn btn-outline-success btn-sm btn-file-action download-new-file-btn"
-                                            data-index="${index}">
-                                        <i class="lni lni-download me-1"></i> Download
-                                    </button>
+                                    <div class="mt-3">
+                                        <input type="text"
+                                               name="captions[${index}]"
+                                               class="form-control form-control-sm caption-input"
+                                               placeholder="Caption (opsional)"
+                                               data-index="${index}"
+                                               value="${file.name.split('.')[0]}">
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mt-3">
+                                        ${canPreview ? `
+                                        <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
+                                                data-index="${index}" data-filename="${file.name}">
+                                            <i class="lni lni-eye me-1"></i> Preview
+                                        </button>
+                                        ` : ''}
+                                        <button type="button" class="btn btn-outline-success btn-sm btn-file-action download-new-file-btn"
+                                                data-index="${index}">
+                                            <i class="lni lni-download me-1"></i> Download
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

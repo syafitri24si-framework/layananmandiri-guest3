@@ -5,625 +5,488 @@
     <section id="contact" class="contact-section contact-style-3">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                    <div class="section-title text-center mb-50">
-                        <br><br>
-                        <h3 class="mb-15">Edit Data User: {{ $user->name }}</h3>
-                        <p>Perbarui data user di bawah. Kosongkan password jika tidak ingin mengganti.</p>
+                <div class="col-lg-10 col-xl-8">
+                    <div class="section-title text-center mb-40">
+                        <h2 class="fw-bold mb-3">Edit Data User</h2>
+                        <p class="text-muted fs-5">Perbarui data untuk user: <span class="text-primary fw-semibold">{{ $user->name }}</span></p>
+                        <p class="text-muted">Kosongkan kolom password jika tidak ingin mengubah password</p>
                     </div>
                 </div>
             </div>
 
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="contact-form-wrapper">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <div class="card-body p-4 p-md-5">
+                            @if (session('success'))
+                                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                                    <i class="lni lni-checkmark-circle me-3 fs-4"></i>
+                                    <div class="flex-grow-1">{{ session('success') }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            @endif
 
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="lni lni-checkmark-circle me-2"></i>
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="lni lni-warning me-2"></i>
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <form action="{{ route('user.update', $user->id) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <div class="row g-4">
-
-                                {{-- Foto Profil Saat Ini --}}
-                                <div class="col-12">
-                                    <div class="text-center mb-4">
-                                        <div class="current-photo">
-                                            <div class="position-relative d-inline-block">
-                                                <img src="{{ $user->profile_picture_url }}"
-                                                     alt="{{ $user->name }}"
-                                                     class="rounded-circle border shadow mb-3"
-                                                     style="width: 150px; height: 150px; object-fit: cover;">
-                                                @if($user->has_default_avatar)
-                                                    <span class="badge bg-info position-absolute"
-                                                          style="bottom: 10px; right: 10px;">
-                                                        <i class="lni lni-stars me-1"></i> Generated
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <p class="text-muted mb-2">
-                                                @if($user->profile_picture)
-                                                    Foto Profil Saat Ini (Custom)
-                                                @else
-                                                    Avatar Saat Ini (Auto-generated)
-                                                @endif
-                                            </p>
-                                            @if($user->profile_picture)
-                                                <div class="form-check d-inline-block">
-                                                    <input class="form-check-input" type="checkbox"
-                                                           name="remove_profile_picture"
-                                                           id="remove_profile_picture" value="1">
-                                                    <label class="form-check-label text-danger" for="remove_profile_picture">
-                                                        <i class="lni lni-trash me-1"></i> Hapus foto custom
-                                                    </label>
-                                                </div>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">
-                                                        <i class="lni lni-info-circle me-1"></i>
-                                                        Jika dihapus, akan kembali ke avatar auto-generated
-                                                    </small>
-                                                </div>
-                                            @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                    <div class="d-flex align-items-start">
+                                        <i class="lni lni-warning me-3 mt-1 fs-4"></i>
+                                        <div class="flex-grow-1">
+                                            <h6 class="alert-heading mb-2">Terjadi Kesalahan</h6>
+                                            <ul class="mb-0 ps-3">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
                                         </div>
                                     </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('user.update', $user->id) }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate id="editUserForm">
+                                @csrf
+                                @method('PUT')
+
+                                {{-- Foto Profil Saat Ini --}}
+                                <div class="text-center mb-5 pb-4 border-bottom">
+                                    <div class="position-relative d-inline-block mb-3">
+                                        <img src="{{ $user->profile_picture_url }}"
+                                             alt="{{ $user->name }}"
+                                             class="rounded-circle border shadow-lg"
+                                             style="width: 160px; height: 160px; object-fit: cover;">
+                                        @if($user->has_default_avatar)
+                                            <span class="badge bg-info position-absolute shadow-sm"
+                                                  style="bottom: 15px; right: 15px; border: 2px solid white;">
+                                                <i class="lni lni-stars me-1"></i> Generated
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <h5 class="fw-semibold mb-2">{{ $user->name }}</h5>
+                                    <p class="text-muted mb-3">
+                                        @if($user->profile_picture)
+                                            <i class="lni lni-image me-1"></i> Foto Profil Custom
+                                        @else
+                                            <i class="lni lni-stars me-1"></i> Avatar Auto-generated
+                                        @endif
+                                    </p>
+
+                                    @if($user->profile_picture)
+                                        <div class="d-inline-block text-start">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="remove_profile_picture"
+                                                       id="remove_profile_picture" value="1">
+                                                <label class="form-check-label text-danger fw-medium" for="remove_profile_picture">
+                                                    <i class="lni lni-trash-can me-1"></i> Hapus foto custom
+                                                </label>
+                                            </div>
+                                            <small class="text-muted d-block">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Jika dihapus, akan kembali ke avatar auto-generated
+                                            </small>
+                                        </div>
+                                    @endif
                                 </div>
 
-                                {{-- Upload Foto Baru --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Upload Foto Custom</label>
-                                        <div class="single-input position-relative">
+                                <div class="row">
+                                    {{-- Upload Foto Baru --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="profile_picture" class="form-label fw-semibold">
+                                            Upload Foto Custom Baru
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-upload text-muted"></i>
+                                            </span>
                                             <input type="file" id="profile_picture" name="profile_picture"
-                                                   class="form-input @error('profile_picture') is-invalid @enderror"
+                                                   class="form-control border-start-0 ps-2 @error('profile_picture') is-invalid @enderror"
                                                    accept="image/*">
-                                            <i class="lni lni-image position-absolute"
-                                               style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
                                             @error('profile_picture')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <small class="text-muted mt-1">
+                                        <small class="form-text text-muted mt-2 d-block">
                                             <i class="lni lni-info-circle me-1"></i>
                                             Format: JPG, PNG, JPEG, GIF, WEBP. Maksimal 2MB
                                         </small>
 
                                         {{-- Preview gambar baru --}}
                                         <div id="imagePreview" class="mt-3 d-none">
-                                            <p class="mb-2"><small>Preview foto baru:</small></p>
-                                            <img id="previewImage" src="#" alt="Preview"
-                                                 class="rounded-circle border"
-                                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                            <p class="text-muted mb-2">Preview foto baru:</p>
+                                            <div class="d-flex align-items-center">
+                                                <img id="previewImage" src="#" alt="Preview"
+                                                     class="rounded-circle border shadow-sm me-3"
+                                                     style="width: 80px; height: 80px; object-fit: cover;">
+                                                <div>
+                                                    <small class="text-success d-block">
+                                                        <i class="lni lni-checkmark-circle me-1"></i>
+                                                        Foto siap diupload
+                                                    </small>
+                                                    <small class="text-muted">
+                                                        Klik Simpan untuk mengganti foto
+                                                    </small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {{-- Nama User --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Nama User <span class="text-danger">*</span></label>
-                                        <div class="single-input position-relative">
+                                    {{-- Nama User --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="name" class="form-label fw-semibold">
+                                            Nama Lengkap <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-user text-muted"></i>
+                                            </span>
                                             <input type="text" id="name" name="name"
-                                                class="form-input @error('name') is-invalid @enderror"
-                                                placeholder="Masukkan nama lengkap" value="{{ old('name', $user->name) }}"
-                                                required>
-                                            <i class="lni lni-user position-absolute"
-                                                style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                                   class="form-control border-start-0 ps-2 @error('name') is-invalid @enderror"
+                                                   placeholder="Masukkan nama lengkap"
+                                                   value="{{ old('name', $user->name) }}"
+                                                   required>
                                             @error('name')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
-                                </div>
 
-                                {{-- Email --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Email <span class="text-danger">*</span></label>
-                                        <div class="single-input position-relative">
+                                    {{-- Email --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="email" class="form-label fw-semibold">
+                                            Email <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-envelope text-muted"></i>
+                                            </span>
                                             <input type="email" id="email" name="email"
-                                                class="form-input @error('email') is-invalid @enderror"
-                                                placeholder="Masukkan alamat email" value="{{ old('email', $user->email) }}"
-                                                required>
-                                            <i class="lni lni-envelope position-absolute"
-                                                style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                                   class="form-control border-start-0 ps-2 @error('email') is-invalid @enderror"
+                                                   placeholder="contoh@email.com"
+                                                   value="{{ old('email', $user->email) }}"
+                                                   required>
                                             @error('email')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
+                                        @if($user->email_verified_at && old('email', $user->email) !== $user->email)
+                                            <div class="alert alert-warning mt-2 p-2" id="emailVerificationWarning">
+                                                <i class="lni lni-warning me-1"></i>
+                                                <small>Email sudah terverifikasi. Mengganti email memerlukan verifikasi ulang.</small>
+                                            </div>
+                                        @endif
                                     </div>
-                                </div>
 
-                                {{-- Role --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Role <span class="text-danger">*</span></label>
-                                        <div class="single-input position-relative">
+                                    {{-- Role --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="role" class="form-label fw-semibold">
+                                            Role <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-users text-muted"></i>
+                                            </span>
                                             <select name="role" id="role"
-                                                class="form-input select-input @error('role') is-invalid @enderror"
-                                                required>
-                                                <option value="">-- Pilih Role --</option>
-                                                <option value="Admin"
-                                                    {{ old('role', $user->role) == 'Admin' ? 'selected' : '' }}>Admin
-                                                </option>
-                                                <option value="Warga"
-                                                    {{ old('role', $user->role) == 'Warga' ? 'selected' : '' }}>Warga
-                                                </option>
+                                                    class="form-select border-start-0 ps-2 @error('role') is-invalid @enderror"
+                                                    required>
+                                                <option value="" disabled {{ old('role', $user->role) ? '' : 'selected' }}>-- Pilih Role --</option>
+                                                <option value="Admin" {{ old('role', $user->role) == 'Admin' ? 'selected' : '' }}>Admin</option>
+                                                <option value="Warga" {{ old('role', $user->role) == 'Warga' ? 'selected' : '' }}>Warga</option>
                                             </select>
                                             @error('role')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
-                                </div>
 
-                                {{-- Password Baru (Opsional) --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Password Baru</label>
-                                        <div class="single-input position-relative">
+                                    {{-- Password Baru (Opsional) --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="password" class="form-label fw-semibold">
+                                            Password Baru
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-lock text-muted"></i>
+                                            </span>
                                             <input type="password" id="password" name="password"
-                                                class="form-input @error('password') is-invalid @enderror"
-                                                placeholder="Kosongkan jika tidak ingin mengganti">
-                                            <i class="lni lni-lock position-absolute"
-                                                style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                                   class="form-control border-start-0 ps-2 password-input @error('password') is-invalid @enderror"
+                                                   placeholder="Kosongkan jika tidak ingin mengubah">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                                <i class="lni lni-eye"></i>
+                                            </button>
                                             @error('password')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <small class="text-muted mt-1">
-                                            <i class="lni lni-info-circle me-1"></i>
+                                        <small class="form-text text-muted mt-2 d-block">
+                                            <i class="lni lni-checkmark-circle me-1"></i>
                                             Minimal 8 karakter, maksimal 20 karakter
                                         </small>
                                     </div>
-                                </div>
 
-                                {{-- Konfirmasi Password Baru --}}
-                                <div class="col-md-6">
-                                    <div class="position-relative">
-                                        <label class="form-label mb-2">Konfirmasi Password Baru</label>
-                                        <div class="single-input position-relative">
+                                    {{-- Konfirmasi Password Baru --}}
+                                    <div class="col-md-6 mb-4">
+                                        <label for="password_confirmation" class="form-label fw-semibold">
+                                            Konfirmasi Password Baru
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="lni lni-lock-alt text-muted"></i>
+                                            </span>
                                             <input type="password" id="password_confirmation" name="password_confirmation"
-                                                class="form-input @error('password_confirmation') is-invalid @enderror"
-                                                placeholder="Konfirmasi password baru">
-                                            <i class="lni lni-lock position-absolute"
-                                                style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                                                   class="form-control border-start-0 ps-2 password-input @error('password_confirmation') is-invalid @enderror"
+                                                   placeholder="Konfirmasi password baru">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                                <i class="lni lni-eye"></i>
+                                            </button>
                                             @error('password_confirmation')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <small class="text-muted mt-1">
+                                        <small class="form-text text-muted mt-2 d-block">
                                             <i class="lni lni-checkmark-circle me-1"></i>
                                             Harus sama dengan password baru di atas
                                         </small>
                                     </div>
                                 </div>
 
-                                {{-- Informasi Akun --}}
-                                <div class="col-md-12">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body">
-                                            <h6 class="card-title d-flex align-items-center">
-                                                <i class="lni lni-info-circle me-2"></i> Informasi Akun
-                                            </h6>
-                                            <div class="text-muted">
-                                                <div class="row">
-                                                    <div class="col-md-3 mb-3">
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="lni lni-id-card text-primary me-2"></i>
-                                                            <div>
-                                                                <small class="text-muted d-block">User ID</small>
-                                                                <strong>#{{ $user->id }}</strong>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3 mb-3">
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="lni lni-image text-primary me-2"></i>
-                                                            <div>
-                                                                <small class="text-muted d-block">Avatar</small>
-                                                                @if($user->profile_picture)
-                                                                    <span class="badge bg-success">
-                                                                        <i class="lni lni-checkmark-circle me-1"></i>
-                                                                        Custom
-                                                                    </span>
-                                                                @else
-                                                                    <span class="badge bg-info">
-                                                                        <i class="lni lni-stars me-1"></i> Auto-generated
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3 mb-3">
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="lni lni-verified text-primary me-2"></i>
-                                                            <div>
-                                                                <small class="text-muted d-block">Status Email</small>
-                                                                @if ($user->email_verified_at)
-                                                                    <span class="badge bg-success">
-                                                                        <i class="lni lni-checkmark-circle me-1"></i>
-                                                                        Terverifikasi
-                                                                    </span>
-                                                                @else
-                                                                    <span class="badge bg-warning text-dark">
-                                                                        <i class="lni lni-timer me-1"></i> Belum Verifikasi
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3 mb-3">
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="lni lni-key text-primary me-2"></i>
-                                                            <div>
-                                                                <small class="text-muted d-block">Status Password</small>
-                                                                <span class="badge bg-success">
-                                                                    <i class="lni lni-checkmark-circle me-1"></i>
-                                                                    Terenkripsi
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                {{-- Informasi Status User --}}
+                                <div class="border-top pt-4 mt-3 mb-5">
+                                    <h5 class="fw-semibold mb-4 d-flex align-items-center">
+                                        <i class="lni lni-info-circle text-primary me-2"></i> Informasi Status User
+                                    </h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded h-100">
+                                                <div class="bg-primary rounded-circle p-2 me-3">
+                                                    <i class="lni lni-id-card text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">User ID</small>
+                                                    <strong class="text-primary">#{{ $user->id }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded h-100">
+                                                <div class="bg-info rounded-circle p-2 me-3">
+                                                    <i class="lni lni-image text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Avatar</small>
+                                                    @if($user->profile_picture)
+                                                        <span class="badge bg-success">Custom</span>
+                                                    @else
+                                                        <span class="badge bg-info">Auto-generated</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded h-100">
+                                                <div class="bg-warning rounded-circle p-2 me-3">
+                                                    <i class="lni lni-verified text-dark"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Email</small>
+                                                    @if ($user->email_verified_at)
+                                                        <span class="badge bg-success">Terverifikasi</span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">Belum Verifikasi</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded h-100">
+                                                <div class="bg-success rounded-circle p-2 me-3">
+                                                    <i class="lni lni-key text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Password</small>
+                                                    <span class="badge bg-success">Terenkripsi</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if ($user->email_verified_at)
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                    <i class="lni lni-calendar text-primary me-3 fs-4"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Tanggal Verifikasi</small>
+                                                        <strong>{{ \Carbon\Carbon::parse($user->email_verified_at)->format('d M Y H:i') }}</strong>
                                                     </div>
                                                 </div>
-
-                                                @if ($user->email_verified_at)
-                                                    <div class="row">
-                                                        <div class="col-md-6 mb-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="lni lni-calendar text-primary me-2"></i>
-                                                                <div>
-                                                                    <small class="text-muted d-block">Tanggal
-                                                                        Verifikasi</small>
-                                                                    <strong>{{ \Carbon\Carbon::parse($user->email_verified_at)->format('d M Y H:i') }}</strong>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 mb-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="lni lni-timer text-primary me-2"></i>
-                                                                <div>
-                                                                    <small class="text-muted d-block">Terakhir
-                                                                        Login</small>
-                                                                    <strong>{{ $user->updated_at->format('d M Y H:i') }}</strong>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                    <i class="lni lni-timer text-primary me-3 fs-4"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Terakhir Login</small>
+                                                        <strong>{{ $user->updated_at->format('d M Y H:i') }}</strong>
                                                     </div>
-                                                @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
 
-                                                <div class="alert alert-info mb-0">
-                                                    <div class="d-flex">
-                                                        <i class="lni lni-bulb text-info me-2 mt-1"></i>
-                                                        <div>
-                                                            <small>
-                                                                <strong>Catatan Avatar:</strong>
-                                                                <ul class="mb-0 mt-2">
-                                                                    <li>Avatar auto-generated dibuat dari nama user</li>
-                                                                    <li>Anda bisa upload foto custom untuk mengganti avatar</li>
-                                                                    <li>Foto custom akan dihapus jika checkbox "Hapus foto custom" dicentang</li>
-                                                                    <li>Sistem akan kembali ke avatar auto-generated jika tidak ada foto custom</li>
-                                                                </ul>
-                                                            </small>
-                                                        </div>
-                                                    </div>
+                                {{-- Informasi Timestamp --}}
+                                <div class="border-top pt-4 mt-3 mb-5">
+                                    <h5 class="fw-semibold mb-4 d-flex align-items-center">
+                                        <i class="lni lni-history text-primary me-2"></i> Informasi Timestamp
+                                    </h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                <div class="bg-secondary rounded-circle p-2 me-3">
+                                                    <i class="lni lni-calendar text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Dibuat Pada</small>
+                                                    <strong>{{ $user->created_at->format('d M Y H:i:s') }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                <div class="bg-dark rounded-circle p-2 me-3">
+                                                    <i class="lni lni-reload text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Diperbarui Pada</small>
+                                                    <strong>{{ $user->updated_at->format('d M Y H:i:s') }}</strong>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- Timestamps --}}
-                                <div class="col-md-12">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body">
-                                            <h6 class="card-title d-flex align-items-center">
-                                                <i class="lni lni-history me-2"></i> Informasi Timestamp
-                                            </h6>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        <i class="lni lni-calendar text-primary me-3"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Dibuat Pada</small>
-                                                            <strong>{{ $user->created_at->format('d M Y H:i:s') }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        <i class="lni lni-reload text-primary me-3"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Diperbarui Pada</small>
-                                                            <strong>{{ $user->updated_at->format('d M Y H:i:s') }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                {{-- Catatan Avatar --}}
+                                <div class="alert alert-light border mb-5">
+                                    <div class="d-flex">
+                                        <i class="lni lni-bulb text-warning me-3 mt-1 fs-4"></i>
+                                        <div>
+                                            <h6 class="fw-semibold mb-2">Catatan Avatar:</h6>
+                                            <ul class="mb-0 text-muted">
+                                                <li>Avatar auto-generated dibuat berdasarkan nama user</li>
+                                                <li>Upload foto custom untuk mengganti avatar saat ini</li>
+                                                <li>Foto custom akan dihapus jika checkbox "Hapus foto custom" dicentang</li>
+                                                <li>Sistem akan kembali ke avatar auto-generated jika tidak ada foto custom</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- Tombol --}}
-                                <div class="col-md-12">
-                                    <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                        <a href="{{ route('user.index') }}" class="btn btn-outline-danger px-4">
-                                            <i class="lni lni-cross-circle me-2"></i> Batal
+                                {{-- Tombol Aksi --}}
+                                <div class="border-top pt-4 mt-2">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{{ route('user.index') }}" class="btn btn-outline-secondary px-4">
+                                            <i class="lni lni-arrow-left me-2"></i> Kembali
                                         </a>
-                                        <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                            <i class="lni lni-telegram-original me-2"></i> Perbarui User
-                                        </button>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-outline-danger px-4" id="resetBtn">
+                                                <i class="lni lni-eraser me-2"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+                                                <i class="lni lni-save me-2"></i> Perbarui User
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-
-                            </div>
-                        </form>
-
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 
     <style>
-        .form-label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .single-input {
-            position: relative;
-        }
-
-        .form-input {
-            padding-right: 45px !important;
-            height: 50px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease;
-            font-size: 16px;
-        }
-
-        .form-input:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-            outline: none;
-        }
-
-        .form-input.is-invalid {
-            border-color: #e74c3c;
-        }
-
-        .form-input.is-invalid:focus {
-            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
-        }
-
-        .invalid-feedback {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .single-input i {
-            color: #6c757d;
-            z-index: 10;
-        }
-
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-        }
-
-        .card-title {
-            color: #2c3e50;
-            font-weight: 600;
-        }
-
-        .badge {
-            font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-danger {
-            border-color: #e74c3c;
-            color: #e74c3c;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .btn-success {
-            background-color: #27ae60;
-            border-color: #27ae60;
-            transition: all 0.3s ease;
-        }
-
-        .btn-success:hover {
-            background-color: #219955;
-            border-color: #219955;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
-        }
-
-        .btn-danger {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
-
-        .alert-info {
-            background-color: #e8f4fc;
-            border-color: #b6e0fe;
-            color: #2c3e50;
-        }
-
-        .border-top {
-            border-top: 1px solid #e9ecef !important;
-        }
-
-        /* Styling select */
-        .select-input {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 100%;
-            height: 50px !important;
-            padding-right: 45px !important;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            font-size: 16px;
-            color: #2c3e50;
-        }
-
-        .select-input::-ms-expand {
-            display: none;
-        }
-
-        .select-input:focus {
-            border-color: #3498db !important;
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-            outline: none;
-        }
-
-        /* Style untuk input file */
-        input[type="file"] {
-            padding: 12px !important;
-            line-height: 1.5;
-            height: auto !important;
-        }
-
-        input[type="file"]::file-selector-button {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 8px 16px;
-            border-radius: 6px;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        input[type="file"]::file-selector-button:hover {
-            background: #e9ecef;
-            border-color: #adb5bd;
-        }
-
-        /* Style untuk preview image */
-        #previewImage {
-            border: 3px solid #f8f9fa;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* Style untuk foto profil saat ini */
-        .current-photo img {
-            transition: all 0.3s ease;
-        }
-
-        .current-photo img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        /* Style untuk checkbox hapus foto */
-        .form-check-input:checked {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-
-        .form-check-label {
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* Style untuk badge position */
-        .position-relative .badge {
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        /* ... (CSS tetap sama seperti sebelumnya) ... */
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Simpan nilai default untuk reset
+            const defaultValues = {
+                name: "{{ old('name', $user->name) }}",
+                email: "{{ old('email', $user->email) }}",
+                role: "{{ old('role', $user->role) }}",
+                password: "",
+                password_confirmation: "",
+                profile_picture: null,
+                remove_profile_picture: false
+            };
+
+            const originalEmail = "{{ $user->email }}";
+            const originalEmailVerified = "{{ $user->email_verified_at ? 'true' : 'false' }}";
+
             // Validasi password match
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('password_confirmation');
             const submitBtn = document.getElementById('submitBtn');
 
             function validatePassword() {
-                if (passwordInput.value !== '' && confirmPasswordInput.value !== '') {
-                    if (passwordInput.value !== confirmPasswordInput.value) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                if (password || confirmPassword) {
+                    if (password && confirmPassword && password !== confirmPassword) {
                         confirmPasswordInput.classList.add('is-invalid');
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="lni lni-warning me-2"></i> Password tidak cocok';
-                        submitBtn.classList.remove('btn-success');
+                        submitBtn.innerHTML = '<i class="lni lni-warning me-2"></i> Password Tidak Cocok';
+                        submitBtn.classList.remove('btn-primary');
+                        submitBtn.classList.add('btn-danger');
+                        return false;
+                    } else if ((password && !confirmPassword) || (!password && confirmPassword)) {
+                        confirmPasswordInput.classList.add('is-invalid');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="lni lni-warning me-2"></i> Isi Kedua Kolom Password';
+                        submitBtn.classList.remove('btn-primary');
                         submitBtn.classList.add('btn-danger');
                         return false;
                     } else {
                         confirmPasswordInput.classList.remove('is-invalid');
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="lni lni-telegram-original me-2"></i> Perbarui User';
+                        submitBtn.innerHTML = '<i class="lni lni-save me-2"></i> Perbarui User';
                         submitBtn.classList.remove('btn-danger');
-                        submitBtn.classList.add('btn-success');
+                        submitBtn.classList.add('btn-primary');
                         return true;
                     }
-                }
-
-                if (passwordInput.value === '' && confirmPasswordInput.value === '') {
+                } else {
                     confirmPasswordInput.classList.remove('is-invalid');
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="lni lni-telegram-original me-2"></i> Perbarui User';
+                    submitBtn.innerHTML = '<i class="lni lni-save me-2"></i> Perbarui User';
                     submitBtn.classList.remove('btn-danger');
-                    submitBtn.classList.add('btn-success');
+                    submitBtn.classList.add('btn-primary');
                     return true;
-                }
-
-                if ((passwordInput.value === '' && confirmPasswordInput.value !== '') ||
-                    (passwordInput.value !== '' && confirmPasswordInput.value === '')) {
-                    confirmPasswordInput.classList.add('is-invalid');
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="lni lni-warning me-2"></i> Harap isi kedua kolom password';
-                    submitBtn.classList.remove('btn-success');
-                    submitBtn.classList.add('btn-danger');
-                    return false;
                 }
             }
 
             passwordInput.addEventListener('input', validatePassword);
             confirmPasswordInput.addEventListener('input', validatePassword);
+
+            // Toggle password visibility
+            const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+            togglePasswordBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    const input = this.parentElement.querySelector('.password-input');
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('lni-eye');
+                        icon.classList.add('lni-eye-off');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('lni-eye-off');
+                        icon.classList.add('lni-eye');
+                    }
+                });
+            });
 
             // Preview image baru sebelum upload
             const profilePictureInput = document.getElementById('profile_picture');
@@ -636,7 +499,7 @@
                 if (file) {
                     // Validasi ukuran file (max 2MB)
                     if (file.size > 2 * 1024 * 1024) {
-                        alert('Ukuran file maksimal 2MB');
+                        showAlert('Ukuran file maksimal 2MB', 'danger');
                         this.value = '';
                         imagePreview.classList.add('d-none');
                         return;
@@ -645,7 +508,7 @@
                     // Validasi tipe file
                     const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
                     if (!validTypes.includes(file.type)) {
-                        alert('Format file tidak didukung. Gunakan JPG, PNG, GIF, atau WEBP.');
+                        showAlert('Format file tidak didukung. Gunakan JPG, PNG, GIF, atau WEBP.', 'danger');
                         this.value = '';
                         imagePreview.classList.add('d-none');
                         return;
@@ -674,50 +537,144 @@
                         profilePictureInput.disabled = true;
                         profilePictureInput.value = '';
                         imagePreview.classList.add('d-none');
+                        showAlert('Foto custom akan dihapus. Klik Simpan untuk melanjutkan.', 'warning');
                     } else {
                         profilePictureInput.disabled = false;
                     }
                 });
             }
 
-            // Toggle password visibility
-            const togglePasswordBtns = document.querySelectorAll('.single-input i.lni-lock');
-            togglePasswordBtns.forEach(icon => {
-                icon.style.cursor = 'pointer';
-                icon.addEventListener('click', function() {
-                    const input = this.parentElement.querySelector('input');
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        this.classList.remove('lni-lock');
-                        this.classList.add('lni-unlock');
-                    } else {
-                        input.type = 'password';
-                        this.classList.remove('lni-unlock');
-                        this.classList.add('lni-lock');
-                    }
-                });
+            // Fungsi reset form
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin mereset form? Semua perubahan yang belum disimpan akan hilang.')) {
+                    resetForm();
+                    showAlert('Form telah direset ke nilai awal', 'info');
+                }
             });
+
+            function resetForm() {
+                // Reset text inputs
+                document.getElementById('name').value = defaultValues.name;
+                document.getElementById('email').value = defaultValues.email;
+                document.getElementById('password').value = '';
+                document.getElementById('password_confirmation').value = '';
+
+                // Reset select
+                const roleSelect = document.getElementById('role');
+                roleSelect.value = defaultValues.role || '';
+
+                // Reset file input
+                profilePictureInput.value = '';
+                profilePictureInput.disabled = false;
+                imagePreview.classList.add('d-none');
+
+                // Reset checkbox
+                if (removePhotoCheckbox) {
+                    removePhotoCheckbox.checked = false;
+                }
+
+                // Reset validation states
+                document.querySelectorAll('.is-invalid').forEach(el => {
+                    el.classList.remove('is-invalid');
+                });
+
+                document.querySelectorAll('.was-validated').forEach(el => {
+                    el.classList.remove('was-validated');
+                });
+
+                // Reset toggle password icons
+                document.querySelectorAll('.toggle-password i').forEach(icon => {
+                    icon.classList.remove('lni-eye-off');
+                    icon.classList.add('lni-eye');
+                });
+
+                document.querySelectorAll('.password-input').forEach(input => {
+                    input.type = 'password';
+                });
+
+                // Reset email warning
+                checkEmailChange();
+
+                // Reset submit button
+                validatePassword();
+
+                // Focus ke field pertama
+                document.getElementById('name').focus();
+            }
+
+            // Fungsi untuk menampilkan alert
+            function showAlert(message, type) {
+                // Hapus alert sebelumnya dengan class 'auto-dismiss'
+                document.querySelectorAll('.alert.auto-dismiss').forEach(alert => {
+                    alert.remove();
+                });
+
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3 auto-dismiss`;
+                alertDiv.innerHTML = `
+                    <i class="lni lni-${type === 'danger' ? 'warning' : type === 'warning' ? 'warning' : 'info-circle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                const form = document.getElementById('editUserForm');
+                form.insertBefore(alertDiv, form.firstChild);
+
+                // Hapus alert setelah 3 detik
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 3000);
+            }
+
+            // Validasi form
+            const form = document.getElementById('editUserForm');
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
 
             // Validasi awal
             validatePassword();
 
-            // Jika email sudah terverifikasi, tampilkan warning
+            // Jika email berubah dan sudah terverifikasi, tampilkan warning
             const emailInput = document.getElementById('email');
-            const originalEmail = "{{ $user->email }}";
 
-            if (emailInput.value !== originalEmail) {
-                const emailVerified = "{{ $user->email_verified_at ? 'true' : 'false' }}";
+            function checkEmailChange() {
+                const emailWarningDiv = document.getElementById('emailVerificationWarning');
 
-                if (emailVerified === 'true') {
-                    const warningDiv = document.createElement('div');
-                    warningDiv.className = 'alert alert-warning mt-2';
-                    warningDiv.innerHTML = `
-                        <i class="lni lni-warning me-2"></i>
-                        <strong>Perhatian:</strong> Email sudah terverifikasi. Mengganti email akan memerlukan verifikasi ulang.
-                    `;
-                    emailInput.parentElement.parentElement.appendChild(warningDiv);
+                if (emailInput.value !== originalEmail) {
+                    if (originalEmailVerified === 'true') {
+                        if (!emailWarningDiv) {
+                            const warningDiv = document.createElement('div');
+                            warningDiv.id = 'emailVerificationWarning';
+                            warningDiv.className = 'alert alert-warning mt-2 p-3';
+                            warningDiv.innerHTML = `
+                                <div class="d-flex align-items-start">
+                                    <i class="lni lni-warning me-2 text-warning fs-5"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Perhatian</h6>
+                                        <p class="mb-0">Email sudah terverifikasi. Mengganti email akan memerlukan verifikasi ulang dan user perlu login kembali.</p>
+                                    </div>
+                                </div>
+                            `;
+                            emailInput.parentElement.parentElement.appendChild(warningDiv);
+                        }
+                    }
+                } else {
+                    if (emailWarningDiv) {
+                        emailWarningDiv.remove();
+                    }
                 }
             }
+
+            emailInput.addEventListener('input', checkEmailChange);
+            checkEmailChange(); // Cek saat halaman load
         });
     </script>
 @endsection

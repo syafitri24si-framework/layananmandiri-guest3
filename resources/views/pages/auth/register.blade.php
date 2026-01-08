@@ -10,7 +10,7 @@
                     <div class="card shadow-lg border-0"
                         style="border-radius: 15px; background-color: rgba(255,255,255,0.95);">
                         <div class="card-body p-4">
-                            <h3 class="text-center mb-4" style="color:#0d6efd;">Daftar Akun Bina Desa</h3>
+                            <h3 class="text-center mb-4" style="color:#0d6efd;">Daftar Akun Suratku</h3>
 
                             {{-- Alert --}}
                             @if (session('success'))

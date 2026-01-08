@@ -40,3 +40,4 @@ class Warga extends Model
         return $query;
     }
 }
+

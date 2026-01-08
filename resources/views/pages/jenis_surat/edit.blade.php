@@ -4,311 +4,372 @@
 @section('content')
 <section id="contact" class="contact-section contact-style-3">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                <div class="section-title text-center mb-50">
-                    <br><br>
-                    <h3 class="mb-15">Edit Jenis Surat</h3>
-                    <p>Silahkan perbarui data jenis surat di bawah</p>
+        <!-- Page Header -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <div class="page-header mb-4">
+                    <h1 class="page-title mb-3">
+                        <i class="lni lni-pencil text-primary me-3"></i>
+                        Edit Jenis Surat
+                    </h1>
+                    <p class="page-subtitle text-muted">
+                        Silahkan perbarui data jenis surat di bawah
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="contact-form-wrapper">
-
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="lni lni-checkmark-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="lni lni-warning me-2"></i>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('jenis_surat.update', $jenisSurat->jenis_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
-                        @csrf
-                        @method('PUT')
-                        <div class="row g-4">
-
-                            {{-- Kode Surat --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Kode Surat <span class="text-danger">*</span></label>
-                                    <input type="text" id="kode" name="kode"
-                                           class="form-input @error('kode') is-invalid @enderror"
-                                           placeholder="Contoh: SKTM, SKU, SKCK"
-                                           value="{{ old('kode', $jenisSurat->kode) }}" required>
-                                    <i class="lni lni-key position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('kode')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Kode unik untuk jenis surat</small>
+            <div class="col-lg-9 col-xl-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Alert Messages -->
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-checkmark-circle me-3 fs-4"></i>
+                                    <div class="flex-grow-1">
+                                        {{ session('success') }}
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
+                        @endif
 
-                            {{-- Nama Jenis Surat --}}
-                            <div class="col-md-6">
-                                <div class="single-input position-relative">
-                                    <label class="form-label mb-2">Nama Jenis Surat <span class="text-danger">*</span></label>
-                                    <input type="text" id="nama_jenis" name="nama_jenis"
-                                           class="form-input @error('nama_jenis') is-invalid @enderror"
-                                           placeholder="Contoh: Surat Keterangan Tidak Mampu"
-                                           value="{{ old('nama_jenis', $jenisSurat->nama_jenis) }}" required>
-                                    <i class="lni lni-text-format position-absolute"
-                                       style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
-                                    @error('nama_jenis')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Nama lengkap jenis surat</small>
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="lni lni-warning me-3 fs-4"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="alert-heading mb-2">Terjadi kesalahan:</h6>
+                                        <ul class="mb-0 ps-3">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
+                        @endif
 
-                            {{-- Syarat (Dinamis) --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-2 d-flex justify-content-between align-items-center">
-                                        <span>Syarat <span class="text-danger">*</span></span>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" id="addSyaratBtn">
-                                            <i class="lni lni-plus me-1"></i> Tambah Syarat
-                                        </button>
-                                    </label>
-                                    <div id="syaratContainer">
-                                        @php
-                                            // FIX: Ambil data syarat dari model (sudah di-decode oleh accessor)
-                                            $syaratArray = old('syarat_json') ?? $jenisSurat->syarat_json ?? [];
-                                            // Pastikan selalu array
-                                            if (is_string($syaratArray)) {
-                                                // Jika masih string, coba decode JSON
-                                                $decoded = json_decode($syaratArray, true);
-                                                $syaratArray = is_array($decoded) ? $decoded : explode(',', $syaratArray);
-                                            }
-                                            $syaratArray = array_map('trim', $syaratArray);
-                                        @endphp
+                        <!-- Form -->
+                        <form action="{{ route('jenis_surat.update', $jenisSurat->jenis_id) }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                            @csrf
+                            @method('PUT')
+                            <div class="row g-4">
+                                <!-- Kode Surat -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            Kode Surat <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="lni lni-key text-muted"></i>
+                                            </span>
+                                            <input type="text" id="kode" name="kode"
+                                                   class="form-control form-control-md border-start-0 @error('kode') is-invalid @enderror"
+                                                   placeholder="Contoh: SKTM, SKU, SKCK"
+                                                   value="{{ old('kode', $jenisSurat->kode) }}" required>
+                                            @error('kode')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Kode unik untuk jenis surat (menggunakan huruf kapital)
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        @if(count($syaratArray) > 0)
-                                            @foreach($syaratArray as $index => $syarat)
-                                                <div class="input-group mb-2 syarat-item">
-                                                    <input type="text" name="syarat_json[]"
-                                                           class="form-control"
-                                                           placeholder="Masukkan syarat"
-                                                           value="{{ $syarat }}" required>
-                                                    <button type="button" class="btn btn-outline-danger remove-syarat">
+                                <!-- Nama Jenis Surat -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-2">
+                                            Nama Jenis Surat <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="lni lni-text-format text-muted"></i>
+                                            </span>
+                                            <input type="text" id="nama_jenis" name="nama_jenis"
+                                                   class="form-control form-control-md border-start-0 @error('nama_jenis') is-invalid @enderror"
+                                                   placeholder="Contoh: Surat Keterangan Tidak Mampu"
+                                                   value="{{ old('nama_jenis', $jenisSurat->nama_jenis) }}" required>
+                                            @error('nama_jenis')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Nama lengkap jenis surat
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Syarat (Dinamis) -->
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="form-label fw-semibold mb-0">
+                                                Syarat <span class="text-danger">*</span>
+                                            </label>
+                                            <button type="button" class="btn btn-outline-primary btn-sm" id="addSyaratBtn">
+                                                <i class="lni lni-plus me-1"></i> Tambah Syarat
+                                            </button>
+                                        </div>
+
+                                        <div id="syaratContainer" class="syarat-list">
+                                            @php
+                                                // FIX: Ambil data syarat dari model (sudah di-decode oleh accessor)
+                                                $syaratArray = old('syarat_json') ?? $jenisSurat->syarat_json ?? [];
+                                                // Pastikan selalu array
+                                                if (is_string($syaratArray)) {
+                                                    // Jika masih string, coba decode JSON
+                                                    $decoded = json_decode($syaratArray, true);
+                                                    $syaratArray = is_array($decoded) ? $decoded : explode(',', $syaratArray);
+                                                }
+                                                $syaratArray = array_map('trim', $syaratArray);
+                                            @endphp
+
+                                            @if(count($syaratArray) > 0)
+                                                @foreach($syaratArray as $index => $syarat)
+                                                    <div class="syarat-item d-flex align-items-center mb-2">
+                                                        <div class="flex-grow-1 me-2">
+                                                            <input type="text" name="syarat_json[]"
+                                                                   class="form-control form-control-md"
+                                                                   placeholder="Masukkan syarat"
+                                                                   value="{{ $syarat }}" required>
+                                                        </div>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm remove-syarat"
+                                                                {{ $loop->first ? 'disabled' : '' }}>
+                                                            <i class="lni lni-close"></i>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="syarat-item d-flex align-items-center mb-2">
+                                                    <div class="flex-grow-1 me-2">
+                                                        <input type="text" name="syarat_json[]"
+                                                               class="form-control form-control-md"
+                                                               placeholder="Contoh: Fotokopi KTP" required>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-syarat" disabled>
                                                         <i class="lni lni-close"></i>
                                                     </button>
                                                 </div>
-                                            @endforeach
-                                        @else
-                                            <div class="input-group mb-2 syarat-item">
-                                                <input type="text" name="syarat_json[]"
-                                                       class="form-control"
-                                                       placeholder="Contoh: Fotokopi KTP" required>
-                                                <button type="button" class="btn btn-outline-danger remove-syarat">
-                                                    <i class="lni lni-close"></i>
-                                                </button>
-                                            </div>
-                                        @endif
+                                            @endif
+                                        </div>
+
+                                        @error('syarat_json')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                        @error('syarat_json.*')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+                                        <div class="form-text mt-2">
+                                            <small class="text-muted">
+                                                <i class="lni lni-info-circle me-1"></i>
+                                                Tambahkan syarat yang diperlukan untuk jenis surat ini
+                                            </small>
+                                        </div>
                                     </div>
-                                    @error('syarat_json')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    @error('syarat_json.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Tambahkan syarat yang diperlukan untuk jenis surat ini</small>
                                 </div>
-                            </div>
 
-                            {{-- FILE TEMPLATE YANG SUDAH ADA --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
-                                        <i class="lni lni-files me-2"></i>
-                                        File Template yang Sudah Ada
+                                <!-- File Template yang Sudah Ada -->
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-3">
+                                            <i class="lni lni-files me-2 text-primary"></i>
+                                            File Template yang Sudah Ada
+                                            @if($jenisSurat->mediaFiles && $jenisSurat->mediaFiles->count() > 0)
+                                                <span class="badge bg-primary ms-2">{{ $jenisSurat->mediaFiles->count() }}</span>
+                                            @endif
+                                        </label>
+
                                         @if($jenisSurat->mediaFiles && $jenisSurat->mediaFiles->count() > 0)
-                                            <span class="badge bg-primary ms-2">{{ $jenisSurat->mediaFiles->count() }}</span>
-                                        @endif
-                                    </label>
-
-                                    @if($jenisSurat->mediaFiles && $jenisSurat->mediaFiles->count() > 0)
-                                        <div id="existingFilesContainer" class="mt-4">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">
-                                                    <i class="lni lni-folder me-2"></i> File Template Terupload
-                                                </h6>
-                                                <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
-                                                    <i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus
-                                                </button>
-                                            </div>
-                                            <div id="existingFileList" class="row g-3">
-                                                @foreach($jenisSurat->mediaFiles as $media)
-                                                    <div class="col-md-6 col-lg-4">
-                                                        <div class="file-card p-3 position-relative border border-primary" data-file-id="{{ $media->media_id }}">
-                                                            <div class="form-check position-absolute top-0 end-0 m-2">
-                                                                <input type="checkbox"
-                                                                       class="form-check-input delete-checkbox"
-                                                                       name="delete_files[]"
-                                                                       id="delete_file_{{ $media->media_id }}"
-                                                                       value="{{ $media->media_id }}">
-                                                                <label class="form-check-label" for="delete_file_{{ $media->media_id }}"></label>
-                                                            </div>
-
-                                                            <div class="d-flex align-items-start">
-                                                                <div class="file-icon-wrapper
-                                                                    @if($media->mime_type == 'application/pdf') pdf
-                                                                    @elseif(str_contains($media->mime_type, 'image/')) image
-                                                                    @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) word
-                                                                    @else other @endif
-                                                                    me-3">
-                                                                    <i class="
-                                                                        @if($media->mime_type == 'application/pdf') lni lni-empty-file
-                                                                        @elseif(str_contains($media->mime_type, 'image/')) lni lni-image
-                                                                        @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) lni lni-files
-                                                                        @else lni lni-file @endif
-                                                                    "></i>
+                                            <div id="existingFilesContainer" class="mt-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0 fw-semibold">
+                                                        <i class="lni lni-folder me-2"></i> File Template Terupload
+                                                    </h6>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" id="selectAllDeleteBtn">
+                                                        <i class="lni lni-trash-can me-1"></i> Pilih Semua untuk Hapus
+                                                    </button>
+                                                </div>
+                                                <div id="existingFileList" class="row g-3">
+                                                    @foreach($jenisSurat->mediaFiles as $media)
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <div class="file-card border border-primary" data-file-id="{{ $media->media_id }}">
+                                                                <!-- Delete Checkbox -->
+                                                                <div class="form-check position-absolute top-0 end-0 m-2 z-2">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input delete-checkbox"
+                                                                           name="delete_files[]"
+                                                                           id="delete_file_{{ $media->media_id }}"
+                                                                           value="{{ $media->media_id }}">
+                                                                    <label class="form-check-label" for="delete_file_{{ $media->media_id }}"></label>
                                                                 </div>
-                                                                <div class="flex-grow-1">
-                                                                    <h6 class="mb-1" title="{{ $media->file_name }}">
-                                                                        {{ Str::limit($media->file_name, 20) }}
-                                                                    </h6>
-                                                                    <small class="text-muted d-block">
-                                                                        {{ $media->mime_type }}
-                                                                    </small>
-                                                                    <small class="text-muted">
-                                                                        {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
-                                                                    </small>
 
-                                                                    <div class="mt-3">
-                                                                        <input type="text"
-                                                                               name="captions[{{ $media->media_id }}]"
-                                                                               class="form-control form-control-sm caption-input"
-                                                                               placeholder="Caption (opsional)"
-                                                                               value="{{ old('captions.' . $media->media_id, $media->caption) }}">
-                                                                    </div>
+                                                                <!-- File Content -->
+                                                                <div class="p-3">
+                                                                    <div class="d-flex align-items-start">
+                                                                        <!-- File Icon -->
+                                                                        <div class="file-icon-wrapper
+                                                                            @if($media->mime_type == 'application/pdf') pdf
+                                                                            @elseif(str_contains($media->mime_type, 'image/')) image
+                                                                            @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) word
+                                                                            @else other @endif
+                                                                            me-3">
+                                                                            <i class="
+                                                                                @if($media->mime_type == 'application/pdf') lni lni-empty-file
+                                                                                @elseif(str_contains($media->mime_type, 'image/')) lni lni-image
+                                                                                @elseif(str_contains($media->mime_type, 'word') || str_contains($media->mime_type, 'document')) lni lni-files
+                                                                                @else lni lni-file @endif
+                                                                            "></i>
+                                                                        </div>
 
-                                                                    <div class="d-flex flex-wrap gap-2 mt-3">
-                                                                        @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
-                                                                            <button type="button"
-                                                                                    class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
-                                                                                    data-media-id="{{ $media->media_id }}"
-                                                                                    data-filename="{{ $media->file_name }}"
-                                                                                    data-mimetype="{{ $media->mime_type }}"
-                                                                                    data-url="{{ asset('storage/templates/jenis_surat/' . $media->file_name) }}">
-                                                                                <i class="lni lni-eye me-1"></i> Preview
-                                                                            </button>
-                                                                        @endif
-                                                                        <a href="{{ route('jenis_surat.download_template', $media->media_id) }}"
-                                                                           class="btn btn-outline-success btn-sm btn-file-action"
-                                                                           download="{{ $media->file_name }}">
-                                                                            <i class="lni lni-download me-1"></i> Download
-                                                                        </a>
+                                                                        <!-- File Info -->
+                                                                        <div class="flex-grow-1">
+                                                                            <h6 class="mb-1" title="{{ $media->file_name }}">
+                                                                                {{ Str::limit($media->file_name, 20) }}
+                                                                            </h6>
+                                                                            <small class="text-muted d-block mb-2">
+                                                                                {{ $media->mime_type }}
+                                                                            </small>
+                                                                            <small class="text-muted">
+                                                                                {{ \Carbon\Carbon::parse($media->created_at)->format('d/m/Y H:i') }}
+                                                                            </small>
+
+                                                                            <!-- Caption Input -->
+                                                                            <div class="mt-3">
+                                                                                <input type="text"
+                                                                                       name="captions[{{ $media->media_id }}]"
+                                                                                       class="form-control form-control-sm caption-input"
+                                                                                       placeholder="Caption (opsional)"
+                                                                                       value="{{ old('captions.' . $media->media_id, $media->caption) }}">
+                                                                            </div>
+
+                                                                            <!-- Action Buttons -->
+                                                                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                                                                @if(str_contains($media->mime_type, 'image/') || $media->mime_type == 'application/pdf')
+                                                                                    <button type="button"
+                                                                                            class="btn btn-outline-primary btn-sm btn-file-action preview-existing-btn"
+                                                                                            data-media-id="{{ $media->media_id }}"
+                                                                                            data-filename="{{ $media->file_name }}"
+                                                                                            data-mimetype="{{ $media->mime_type }}"
+                                                                                            data-url="{{ asset('storage/templates/jenis_surat/' . $media->file_name) }}">
+                                                                                        <i class="lni lni-eye me-1"></i> Preview
+                                                                                    </button>
+                                                                                @endif
+                                                                                <a href="{{ route('jenis_surat.download_template', $media->media_id) }}"
+                                                                                   class="btn btn-outline-success btn-sm btn-file-action"
+                                                                                   download="{{ $media->file_name }}">
+                                                                                    <i class="lni lni-download me-1"></i> Download
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-warning">
-                                            <i class="lni lni-warning me-2"></i> Belum ada file template yang diupload.
-                                        </div>
-                                    @endif
+                                        @else
+                                            <div class="alert alert-warning">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="lni lni-warning me-3"></i>
+                                                    <div>Belum ada file template yang diupload.</div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- TAMBAH FILE TEMPLATE BARU --}}
-                            <div class="col-md-12">
-                                <div class="position-relative">
-                                    <label class="form-label mb-3 d-flex align-items-center">
-                                        <i class="lni lni-cloud-upload me-2"></i>
-                                        Tambah File Template Baru (Optional)
-                                    </label>
+                                <!-- Tambah File Template Baru -->
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold mb-3">
+                                            <i class="lni lni-cloud-upload me-2 text-primary"></i>
+                                            Tambah File Template Baru
+                                            <span class="text-muted fw-normal">(Opsional)</span>
+                                        </label>
 
-                                    {{-- File Input yang Tersembunyi --}}
-                                    <input type="file" name="template_files[]" id="templateFiles"
-                                           class="d-none @error('template_files') is-invalid @enderror"
-                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                           multiple>
+                                        <!-- Hidden File Input -->
+                                        <input type="file" name="template_files[]" id="templateFiles"
+                                               class="d-none @error('template_files') is-invalid @enderror"
+                                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                               multiple>
 
-                                    {{-- Area Upload yang Dapat Diklik --}}
-                                    <div class="file-upload-area border rounded p-5 mb-4" id="uploadArea">
-                                        <div class="text-center">
-                                            <div class="upload-icon mb-3">
-                                                <i class="lni lni-plus display-4 text-primary"></i>
+                                        <!-- Upload Area -->
+                                        <div class="file-upload-area border rounded-3 p-4 mb-3" id="uploadArea">
+                                            <div class="text-center py-3">
+                                                <div class="upload-icon mb-3">
+                                                    <i class="lni lni-plus display-4 text-primary"></i>
+                                                </div>
+                                                <h5 class="mb-2">Seret & Lepas File di Sini</h5>
+                                                <p class="text-muted mb-3">Atau klik untuk menambah file template baru</p>
+                                                <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
+                                                    <i class="lni lni-folder me-1"></i> Browse Files
+                                                </button>
+                                                <div class="mt-3">
+                                                    <small class="text-muted">
+                                                        <i class="lni lni-info-circle me-1"></i>
+                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
+                                                    </small>
+                                                </div>
                                             </div>
-                                            <h5 class="mb-2">Seret & Lepas File di Sini</h5>
-                                            <p class="text-muted mb-3">Atau klik untuk menambah file template baru</p>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
-                                                <i class="lni lni-folder me-1"></i> Browse Files
-                                            </button>
-                                            <div class="mt-3">
-                                                <small class="text-muted">
-                                                    <i class="lni lni-info-circle me-1"></i>
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG | Maks: 10MB per file
-                                                </small>
+                                        </div>
+
+                                        @error('template_files')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                        @error('template_files.*')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+                                        <!-- File Preview Container untuk File Baru -->
+                                        <div id="filePreviewContainer" class="mt-4" style="display: none;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0 fw-semibold">
+                                                    <i class="lni lni-plus-circle me-2"></i> File Template Baru
+                                                    <span class="badge bg-success ms-2" id="fileCount">0</span>
+                                                </h6>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
+                                                    <i class="lni lni-trash-can me-1"></i> Hapus Semua
+                                                </button>
+                                            </div>
+                                            <div id="fileList" class="row g-3">
+                                                <!-- File previews will be inserted here -->
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    @error('template_files')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    @error('template_files.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-
-                                    {{-- File Preview Container untuk File Baru --}}
-                                    <div id="filePreviewContainer" class="mt-4" style="display: none;">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h6 class="mb-0">
-                                                <i class="lni lni-plus-circle me-2"></i> File Template Baru
-                                                <span class="badge bg-success ms-2" id="fileCount">0</span>
-                                            </h6>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" id="clearAllBtn">
-                                                <i class="lni lni-trash-can me-1"></i> Hapus Semua
-                                            </button>
-                                        </div>
-                                        <div id="fileList" class="row g-3">
-                                            {{-- File previews will be inserted here --}}
-                                        </div>
+                                <!-- Action Buttons -->
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end gap-3 mt-4 pt-4 border-top">
+                                        <a href="{{ route('jenis_surat.index') }}" class="btn btn-outline-danger px-4 py-2">
+                                            <i class="lni lni-cross-circle me-2"></i> Batal
+                                        </a>
+                                        <button type="submit" class="btn btn-success px-4 py-2" id="submitBtn">
+                                            <i class="lni lni-save me-2"></i> Perbarui Jenis Surat
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- Tombol --}}
-                            <div class="col-md-12">
-                                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                                    <a href="{{ route('jenis_surat.index') }}" class="btn btn-outline-danger px-4">
-                                        <i class="lni lni-cross-circle me-2"></i> Batal
-                                    </a>
-                                    <button type="submit" class="btn btn-success px-4" id="submitBtn">
-                                        <i class="lni lni-telegram-original me-2"></i> Perbarui Jenis Surat
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -317,7 +378,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="previewModalTitle">
+                <h5 class="modal-title fw-semibold" id="previewModalTitle">
                     <i class="lni lni-eye me-2"></i> Preview File
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -338,18 +399,96 @@
 </div>
 
 <style>
+    /* Page Header */
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Form Styles */
     .form-label {
         font-weight: 600;
         color: #2c3e50;
         margin-bottom: 8px;
+        font-size: 0.95rem;
     }
 
+    .form-select-md,
+    .form-control-md {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-select-md:focus,
+    .form-control-md:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: none;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+    }
+
+    /* Syarat Styles */
+    .syarat-list {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+    }
+
+    .syarat-item {
+        transition: all 0.3s ease;
+    }
+
+    .syarat-item:hover {
+        transform: translateX(5px);
+    }
+
+    .remove-syarat {
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .remove-syarat:not(:disabled):hover {
+        background-color: #dc3545;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .remove-syarat:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* File Upload Styles */
     .file-upload-area {
         border: 2px dashed #3498db;
         background: linear-gradient(135deg, #f8fafc 0%, #f1f8ff 100%);
         cursor: pointer;
         transition: all 0.3s ease;
-        min-height: 200px;
+        min-height: 180px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -379,29 +518,35 @@
         50% { transform: translateY(-10px); }
     }
 
+    /* File Card Styles */
     .file-card {
         border: 1px solid #e9ecef;
         border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
         background: white;
+        transition: all 0.3s ease;
         position: relative;
+        overflow: hidden;
     }
 
     .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         border-color: #3498db;
     }
 
+    .file-card.border-primary {
+        border-color: #3498db !important;
+    }
+
     .file-icon-wrapper {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
+        flex-shrink: 0;
     }
 
     .file-icon-wrapper.pdf { background: #ff6b6b; color: white; }
@@ -412,17 +557,17 @@
 
     .remove-file-btn {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 28px;
-        height: 28px;
+        top: 8px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        font-size: 12px;
-        opacity: 0;
+        font-size: 11px;
+        opacity: 0.8;
         transition: opacity 0.3s;
         z-index: 10;
     }
@@ -434,11 +579,29 @@
     .btn-file-action {
         padding: 4px 10px;
         font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .caption-input {
+        font-size: 0.85rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: 6px;
+    }
+
+    /* Delete Checkbox Style */
+    .form-check-input:checked {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .form-check-input:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 
     /* Preview Modal Styles */
     #filePreviewModal .modal-body {
-        height: 70vh;
+        height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -451,46 +614,53 @@
         align-items: center;
         justify-content: center;
         overflow: auto;
+        padding: 1rem;
     }
 
     .preview-image {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        border-radius: 8px;
     }
 
-    .preview-pdf {
-        width: 100%;
-        height: 100%;
-        border: none;
+    /* Main Card */
+    .card {
+        border-radius: 16px;
+        overflow: hidden;
     }
 
-    .no-preview {
-        text-align: center;
-        padding: 3rem;
+    /* Action Buttons */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
     }
 
-    /* Syarat Input Styles */
-    .syarat-item .form-control {
-        border-right: 0;
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    .syarat-item .btn-outline-danger {
-        border-left: 0;
-        border-color: #ced4da;
-    }
-    .syarat-item .btn-outline-danger:hover {
+
+    .btn-outline-danger:hover {
         background-color: #dc3545;
         border-color: #dc3545;
         color: white;
     }
 
-    /* Checkbox style for deletion */
-    .form-check-input:checked {
-        background-color: #dc3545;
-        border-color: #dc3545;
+    .btn-outline-primary:hover {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: white;
     }
 
-    /* Loading spinner */
+    /* Alert Styles */
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    /* Spinner Animation */
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -498,6 +668,58 @@
 
     .spin {
         animation: spin 1s linear infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .file-upload-area {
+            min-height: 150px;
+            padding: 1.5rem;
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+        }
+
+        .file-card {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .form-select-md,
+        .form-control-md {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .d-flex.justify-content-end {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .d-flex.justify-content-end .btn {
+            width: 100%;
+        }
+
+        .file-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
     }
 </style>
 
@@ -513,21 +735,39 @@
         // Tambah syarat baru
         addSyaratBtn.addEventListener('click', function() {
             const newSyarat = document.createElement('div');
-            newSyarat.className = 'input-group mb-2 syarat-item';
+            newSyarat.className = 'syarat-item d-flex align-items-center mb-2';
             newSyarat.innerHTML = `
-                <input type="text" name="syarat_json[]"
-                       class="form-control"
-                       placeholder="Masukkan syarat" required>
-                <button type="button" class="btn btn-outline-danger remove-syarat">
+                <div class="flex-grow-1 me-2">
+                    <input type="text" name="syarat_json[]"
+                           class="form-control form-control-md"
+                           placeholder="Masukkan syarat" required>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm remove-syarat">
                     <i class="lni lni-close"></i>
                 </button>
             `;
             syaratContainer.appendChild(newSyarat);
 
+            // Focus ke input baru
+            const newInput = newSyarat.querySelector('input');
+            newInput.focus();
+
+            // Enable remove button untuk yang pertama jika sudah ada lebih dari 1
+            const firstRemoveBtn = syaratContainer.querySelector('.syarat-item:first-child .remove-syarat');
+            if (firstRemoveBtn && syaratContainer.children.length > 1) {
+                firstRemoveBtn.disabled = false;
+            }
+
             // Attach event listener untuk tombol hapus
             newSyarat.querySelector('.remove-syarat').addEventListener('click', function() {
                 if (syaratContainer.children.length > 1) {
                     newSyarat.remove();
+
+                    // Disable remove button untuk yang pertama jika tinggal 1
+                    if (syaratContainer.children.length === 1) {
+                        const firstBtn = syaratContainer.querySelector('.syarat-item:first-child .remove-syarat');
+                        if (firstBtn) firstBtn.disabled = true;
+                    }
                 } else {
                     alert('Minimal harus ada satu syarat');
                 }
@@ -537,8 +777,15 @@
         // Attach event listener untuk tombol hapus syarat yang sudah ada
         document.querySelectorAll('.remove-syarat').forEach(btn => {
             btn.addEventListener('click', function() {
+                const syaratItem = this.closest('.syarat-item');
                 if (syaratContainer.children.length > 1) {
-                    this.closest('.syarat-item').remove();
+                    syaratItem.remove();
+
+                    // Disable remove button untuk yang pertama jika tinggal 1
+                    if (syaratContainer.children.length === 1) {
+                        const firstBtn = syaratContainer.querySelector('.syarat-item:first-child .remove-syarat');
+                        if (firstBtn) firstBtn.disabled = true;
+                    }
                 } else {
                     alert('Minimal harus ada satu syarat');
                 }
@@ -625,7 +872,7 @@
                         </div>
                         <h5 class="mb-2">Seret & Lepas File di Sini</h5>
                         <p class="text-muted mb-3">Atau klik untuk menambah file baru</p>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="browseBtn">
+                        <button type="button" class="btn btn-outline-primary btn-md px-4" id="browseBtn">
                             <i class="lni lni-folder me-1"></i> Browse Files
                         </button>
                         <div class="mt-3">
@@ -680,41 +927,43 @@
                 const canPreview = file.type.startsWith('image/') || file.type === 'application/pdf';
 
                 fileItem.innerHTML = `
-                    <div class="file-card p-3 position-relative" data-file-index="${index}">
-                        <button type="button" class="btn btn-danger btn-sm remove-file-btn"
+                    <div class="file-card" data-file-index="${index}">
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-file-btn"
                                 data-index="${index}" title="Hapus file">
                             <i class="lni lni-close"></i>
                         </button>
 
-                        <div class="d-flex align-items-start">
-                            <div class="file-icon-wrapper ${fileIconClass} me-3">
-                                <i class="${fileIcon}"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1" title="${file.name}">${fileName}</h6>
-                                <small class="text-muted d-block">${fileSize}</small>
-                                <small class="text-muted">${file.type || 'Unknown type'}</small>
-
-                                <div class="mt-3">
-                                    <input type="text"
-                                           name="captions[${index}]"
-                                           class="form-control form-control-sm caption-input"
-                                           placeholder="Caption (opsional)"
-                                           data-index="${index}"
-                                           value="${file.name.split('.')[0]}">
+                        <div class="p-3">
+                            <div class="d-flex align-items-start">
+                                <div class="file-icon-wrapper ${fileIconClass} me-3">
+                                    <i class="${fileIcon}"></i>
                                 </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" title="${file.name}">${fileName}</h6>
+                                    <small class="text-muted d-block mb-2">${fileSize}</small>
+                                    <small class="text-muted">${file.type || 'Unknown type'}</small>
 
-                                <div class="d-flex flex-wrap gap-2 mt-3">
-                                    ${canPreview ? `
-                                    <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
-                                            data-index="${index}" data-filename="${file.name}">
-                                        <i class="lni lni-eye me-1"></i> Preview
-                                    </button>
-                                    ` : ''}
-                                    <button type="button" class="btn btn-outline-success btn-sm btn-file-action download-new-file-btn"
-                                            data-index="${index}">
-                                        <i class="lni lni-download me-1"></i> Download
-                                    </button>
+                                    <div class="mt-3">
+                                        <input type="text"
+                                               name="captions[${index}]"
+                                               class="form-control form-control-sm caption-input"
+                                               placeholder="Caption (opsional)"
+                                               data-index="${index}"
+                                               value="${file.name.split('.')[0]}">
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mt-3">
+                                        ${canPreview ? `
+                                        <button type="button" class="btn btn-outline-primary btn-sm btn-file-action preview-new-file-btn"
+                                                data-index="${index}" data-filename="${file.name}">
+                                            <i class="lni lni-eye me-1"></i> Preview
+                                        </button>
+                                        ` : ''}
+                                        <button type="button" class="btn btn-outline-success btn-sm btn-file-action download-new-file-btn"
+                                                data-index="${index}">
+                                            <i class="lni lni-download me-1"></i> Download
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1122,13 +1371,17 @@
         const uploadForm = document.getElementById('uploadForm');
         if (uploadForm) {
             uploadForm.addEventListener('submit', function(e) {
-                // Validasi minimal 1 syarat yang diisi
+                // Validasi syarat
                 const syaratInputs = document.querySelectorAll('input[name="syarat_json[]"]');
                 let hasValidSyarat = false;
+                let allSyaratFilled = true;
 
                 syaratInputs.forEach(input => {
                     if (input.value.trim() !== '') {
                         hasValidSyarat = true;
+                    }
+                    if (input.value.trim() === '') {
+                        allSyaratFilled = false;
                     }
                 });
 
@@ -1137,15 +1390,6 @@
                     alert('Minimal harus ada satu syarat yang diisi!');
                     return false;
                 }
-
-                // Validasi semua syarat harus diisi jika ada
-                let allSyaratFilled = true;
-                syaratInputs.forEach((input, index) => {
-                    if (input.value.trim() === '') {
-                        allSyaratFilled = false;
-                        input.focus();
-                    }
-                });
 
                 if (!allSyaratFilled) {
                     e.preventDefault();
@@ -1162,19 +1406,6 @@
                         kodeInput.focus();
                         return false;
                     }
-                }
-
-                // Validasi file size total
-                let totalSize = 0;
-                newFiles.forEach(file => {
-                    totalSize += file.size;
-                });
-
-                const maxTotalSize = 50 * 1024 * 1024; // 50MB total
-                if (totalSize > maxTotalSize) {
-                    e.preventDefault();
-                    alert(`Total ukuran file melebihi 50MB. Ukuran saat ini: ${formatFileSize(totalSize)}`);
-                    return false;
                 }
 
                 // Show loading
